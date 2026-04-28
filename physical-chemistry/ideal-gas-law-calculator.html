@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ideal Gas Law Calculator (PV=nRT) — LabCalcs</title>
+<meta name="description" content="Free ideal gas law calculator. Solve PV=nRT for pressure, volume, temperature, or moles. Supports atm, kPa, bar, mmHg, L, mL, K, °C, and °F.">
+<link rel="canonical" href="https://labcalcs.github.io/physical-chemistry/ideal-gas-law-calculator.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="cat-physical">
+<div class="grain"></div>
+<nav class="site-nav" id="site-nav"></nav>
+<div class="breadcrumb" id="breadcrumb"></div>
+<div class="ad-slot" id="ad-top"></div>
+
+<div class="container">
+  <h1 class="page-title">Ideal Gas Law Calculator</h1>
+  <p class="page-subtitle">Solve PV = nRT for any variable with flexible units.</p>
+
+  <div class="calc-card">
+    <div class="formula-bar"><em>P</em><em>V</em> = <em>n</em><em>R</em><em>T</em></div>
+
+    <div class="solve-for">
+      <label>Solve for</label>
+      <div class="solve-btns" id="solveBtns">
+        <button class="active" data-target="P" onclick="setSolve('P')">Pressure</button>
+        <button data-target="V" onclick="setSolve('V')">Volume</button>
+        <button data-target="n" onclick="setSolve('n')">Moles</button>
+        <button data-target="T" onclick="setSolve('T')">Temperature</button>
+      </div>
+    </div>
+
+    <div class="fields">
+      <div class="field">
+        <label>Pressure</label>
+        <div class="input-with-unit" id="wrap-P">
+          <input type="number" id="P" step="any" placeholder="e.g. 1" oninput="calc()">
+          <select id="P-unit" onchange="calc()">
+            <option value="atm" selected>atm</option>
+            <option value="kPa">kPa</option>
+            <option value="bar">bar</option>
+            <option value="mmHg">mmHg</option>
+            <option value="psi">psi</option>
+            <option value="Pa">Pa</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Volume</label>
+        <div class="input-with-unit" id="wrap-V">
+          <input type="number" id="V" step="any" placeholder="e.g. 22.4" oninput="calc()">
+          <select id="V-unit" onchange="calc()">
+            <option value="L" selected>L</option>
+            <option value="mL">mL</option>
+            <option value="m3">m³</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Moles</label>
+        <div class="input-with-unit" id="wrap-n">
+          <input type="number" id="n" step="any" placeholder="e.g. 1" oninput="calc()">
+          <select id="n-unit" disabled><option value="mol">mol</option></select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Temperature</label>
+        <div class="input-with-unit" id="wrap-T">
+          <input type="number" id="T" step="any" placeholder="e.g. 273.15" oninput="calc()">
+          <select id="T-unit" onchange="calc()">
+            <option value="K" selected>K</option>
+            <option value="C">°C</option>
+            <option value="F">°F</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="result-box" id="resultBox">
+      <div class="result-label" id="resultLabel">Result</div>
+      <div class="result-value" id="resultValue">—</div>
+    </div>
+
+    <div class="note-box" id="noteBox"></div>
+  </div>
+
+  <div class="ad-slot" id="ad-mid"></div>
+
+  <div class="info-section">
+    <h2>How to Use This Calculator</h2>
+    <p>Select which variable you want to solve for, enter the other three values with your preferred units, and the result updates instantly. The calculator converts all units internally to atm, L, mol, and K before solving.</p>
+
+    <h2>The Math Behind It</h2>
+    <p>The ideal gas law <strong>PV = nRT</strong> relates pressure (P), volume (V), amount of gas in moles (n), and temperature (T) through the universal gas constant R = 0.08206 L·atm/(mol·K).</p>
+    <p><strong>Worked example:</strong> What volume does 2.5 mol of an ideal gas occupy at 25°C and 1 atm? T = 25 + 273.15 = 298.15 K. V = nRT/P = (2.5)(0.08206)(298.15)/(1) = 61.2 L.</p>
+    <p>The ideal gas law assumes gas molecules have negligible volume and no intermolecular attractions. It works well for most gases at moderate temperatures and pressures, but breaks down at very high pressures or very low temperatures where real gas behavior (van der Waals forces, molecular volume) becomes significant.</p>
+    <p><strong>At STP</strong> (0°C, 1 atm), one mole of an ideal gas occupies 22.414 L. At <strong>standard lab conditions</strong> (25°C, 1 atm), it occupies 24.47 L.</p>
+  </div>
+
+  <div class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a class="related-card" href="../general-lab/molarity-calculator.html"><h3>Molarity Calculator</h3><p>Moles, concentration, volume, mass.</p></a>
+      <a class="related-card" href="../general-lab/dilution-calculator.html"><h3>Dilution Calculator</h3><p>C₁V₁ = C₂V₂ with flexible units.</p></a>
+    </div>
+  </div>
+</div>
+
+<div class="ad-slot" id="ad-bot"></div>
+<footer class="site-footer"><a href="../">← Back to all categories</a> · © 2026 LabCalcs</footer>
+
+<script>LC = window.LC || {}; LC.basePath = '..';</script>
+<script src="../js/analytics.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() { buildBreadcrumb('physical', 'Ideal Gas Law Calculator'); });
+
+const R = 0.082057; // L·atm/(mol·K)
+const pConv = { atm:1, kPa:1/101.325, bar:1/1.01325, mmHg:1/760, psi:1/14.696, Pa:1/101325 };
+const vConv = { L:1, mL:0.001, m3:1000 };
+function toK(val, u) { if(u==='K') return val; if(u==='C') return val+273.15; return (val-32)*5/9+273.15; }
+function fromK(val, u) { if(u==='K') return val; if(u==='C') return val-273.15; return (val-273.15)*9/5+32; }
+
+let solveFor = 'P';
+
+function setSolve(t) {
+  solveFor = t;
+  document.querySelectorAll('#solveBtns button').forEach(b => b.classList.toggle('active', b.dataset.target === t));
+  ['P','V','n','T'].forEach(id => {
+    document.getElementById(id).disabled = (id === t);
+    document.getElementById('wrap-' + id).classList.toggle('is-result', id === t);
+  });
+  document.getElementById(t).value = '';
+  calc();
+}
+
+function fmt(v) {
+  if (v == null || isNaN(v) || !isFinite(v)) return null;
+  if (v === 0) return '0';
+  if (Math.abs(v) >= 0.001 && Math.abs(v) < 1e7) return parseFloat(v.toPrecision(6)).toString();
+  return v.toExponential(4);
+}
+
+function calc() {
+  const Praw = parseFloat(document.getElementById('P').value);
+  const Vraw = parseFloat(document.getElementById('V').value);
+  const nraw = parseFloat(document.getElementById('n').value);
+  const Traw = parseFloat(document.getElementById('T').value);
+  const Pu = document.getElementById('P-unit').value;
+  const Vu = document.getElementById('V-unit').value;
+  const Tu = document.getElementById('T-unit').value;
+
+  const P = isNaN(Praw) ? NaN : Praw * pConv[Pu];
+  const V = isNaN(Vraw) ? NaN : Vraw * vConv[Vu];
+  const n = isNaN(nraw) ? NaN : nraw;
+  const T = isNaN(Traw) ? NaN : toK(Traw, Tu);
+
+  let result = null, label = '', unit = '';
+  const note = document.getElementById('noteBox');
+  note.classList.remove('visible');
+
+  switch (solveFor) {
+    case 'P':
+      if (!isNaN(n) && !isNaN(T) && !isNaN(V) && V > 0) {
+        result = (n * R * T) / V / pConv[Pu];
+        label = 'Pressure'; unit = Pu;
+      } break;
+    case 'V':
+      if (!isNaN(n) && !isNaN(T) && !isNaN(P) && P > 0) {
+        result = (n * R * T) / P / vConv[Vu];
+        label = 'Volume'; unit = Vu;
+      } break;
+    case 'n':
+      if (!isNaN(P) && !isNaN(V) && !isNaN(T) && R*T !== 0) {
+        result = (P * V) / (R * T);
+        label = 'Moles'; unit = 'mol';
+      } break;
+    case 'T':
+      if (!isNaN(P) && !isNaN(V) && !isNaN(n) && n*R !== 0) {
+        const Tkelvin = (P * V) / (n * R);
+        result = fromK(Tkelvin, Tu);
+        label = 'Temperature'; unit = Tu === 'C' ? '°C' : Tu === 'F' ? '°F' : 'K';
+        if (Tkelvin < 0) { note.textContent = '⚠ Result is below absolute zero — check your inputs.'; note.classList.add('visible'); }
+      } break;
+  }
+
+  const box = document.getElementById('resultBox');
+  const f = fmt(result);
+  if (f !== null && result !== null) {
+    document.getElementById('resultLabel').textContent = label;
+    document.getElementById('resultValue').innerHTML = f + '<span class="result-unit">' + unit + '</span>';
+    box.classList.add('visible');
+    document.getElementById(solveFor).value = f;
+  } else { box.classList.remove('visible'); }
+}
+
+setSolve('P');
+</script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beer-Lambert Law Calculator — LabCalcs</title>
+<meta name="description" content="Free Beer-Lambert Law calculator. Solve A = εlc for absorbance, molar absorptivity, path length, or concentration. Includes transmittance conversion.">
+<link rel="canonical" href="https://labcalcs.github.io/spectroscopy/beer-lambert-calculator.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="cat-spectroscopy">
+<div class="grain"></div>
+<nav class="site-nav" id="site-nav"></nav>
+<div class="breadcrumb" id="breadcrumb"></div>
+<div class="ad-slot" id="ad-top"></div>
+
+<div class="container">
+  <h1 class="page-title">Beer-Lambert Law Calculator</h1>
+  <p class="page-subtitle">Solve A = εlc for any variable, or convert between absorbance and transmittance.</p>
+
+  <div class="calc-card">
+    <div class="formula-bar">
+      <em>A</em> = <em>ε</em> × <em>l</em> × <em>c</em> &nbsp;&nbsp;|&nbsp;&nbsp; <em>A</em> = −log₁₀(<em>T</em>)
+    </div>
+
+    <div class="solve-for">
+      <label>Solve for</label>
+      <div class="solve-btns" id="solveBtns">
+        <button class="active" data-target="conc" onclick="setSolve('conc')">Concentration</button>
+        <button data-target="abs" onclick="setSolve('abs')">Absorbance</button>
+        <button data-target="epsilon" onclick="setSolve('epsilon')">ε (Absorptivity)</button>
+        <button data-target="path" onclick="setSolve('path')">Path Length</button>
+      </div>
+    </div>
+
+    <div class="fields">
+      <div class="field">
+        <label>Absorbance <span class="unit">A (unitless)</span></label>
+        <input type="number" id="abs" step="any" placeholder="e.g. 0.45" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Molar Absorptivity <span class="unit">L/(mol·cm)</span></label>
+        <input type="number" id="epsilon" step="any" placeholder="e.g. 6220" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Path Length <span class="unit">cm</span></label>
+        <input type="number" id="path" step="any" placeholder="e.g. 1" value="1" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Concentration <span class="unit">mol/L (M)</span></label>
+        <input type="number" id="conc" step="any" placeholder="—" oninput="calc()">
+      </div>
+    </div>
+
+    <div class="result-box" id="resultBox">
+      <div class="result-label" id="resultLabel">Result</div>
+      <div class="result-value" id="resultValue">—</div>
+    </div>
+
+    <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);">
+      <label style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);display:block;margin-bottom:10px;">Transmittance ↔ Absorbance Converter</label>
+      <div class="fields">
+        <div class="field">
+          <label>Transmittance <span class="unit">%T</span></label>
+          <input type="number" id="transT" step="any" placeholder="e.g. 35" oninput="convT()">
+        </div>
+        <div class="field">
+          <label>Absorbance <span class="unit">A</span></label>
+          <input type="number" id="transA" step="any" placeholder="e.g. 0.456" oninput="convA()">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ad-slot" id="ad-mid"></div>
+
+  <div class="info-section">
+    <h2>How to Use This Calculator</h2>
+    <p>Select what you want to solve for, fill in the known values, and the result updates instantly. The path length defaults to 1 cm (standard cuvette). The transmittance converter at the bottom works independently — enter %T to get absorbance, or vice versa.</p>
+
+    <h2>The Math Behind It</h2>
+    <p>The Beer-Lambert law relates the absorbance of light to the properties of the material it passes through. The equation is <strong>A = εlc</strong>, where A is absorbance (unitless), ε is the molar absorptivity or extinction coefficient (L mol⁻¹ cm⁻¹), l is the path length through the sample (cm), and c is the molar concentration (mol/L).</p>
+    <p><strong>Worked example:</strong> NADH has an extinction coefficient of 6,220 L mol⁻¹ cm⁻¹ at 340 nm. If you measure an absorbance of 0.311 in a 1 cm cuvette: c = A / (ε × l) = 0.311 / (6220 × 1) = 5.0 × 10⁻⁵ M = 50 µM.</p>
+    <p>Absorbance and transmittance are related by <strong>A = −log₁₀(T)</strong>, where T is the fractional transmittance (0 to 1). A %T of 35% corresponds to T = 0.35, so A = −log₁₀(0.35) = 0.456.</p>
+    <p>The law is most accurate at low absorbance values (A &lt; 1.0). At higher absorbances, deviations occur due to stray light, detector nonlinearity, and intermolecular interactions. If your sample reads above A ≈ 1.5, consider diluting before measurement.</p>
+  </div>
+
+  <div class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a class="related-card" href="../general-lab/molarity-calculator.html"><h3>Molarity Calculator</h3><p>Calculate concentration from mass and MW.</p></a>
+      <a class="related-card" href="../general-lab/dilution-calculator.html"><h3>Dilution Calculator</h3><p>C₁V₁ = C₂V₂ with flexible units.</p></a>
+      <a class="related-card" href="a280-protein-concentration.html"><h3>A280 Protein Conc.</h3><p>Protein concentration from UV absorbance.</p></a>
+    </div>
+  </div>
+</div>
+
+<div class="ad-slot" id="ad-bot"></div>
+<footer class="site-footer"><a href="../">← Back to all categories</a> · © 2026 LabCalcs</footer>
+
+<script>LC = window.LC || {}; LC.basePath = '..';</script>
+<script src="../js/analytics.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() { buildBreadcrumb('spectroscopy', 'Beer-Lambert Calculator'); });
+
+let solveFor = 'conc';
+
+function setSolve(target) {
+  solveFor = target;
+  document.querySelectorAll('#solveBtns button').forEach(b => b.classList.toggle('active', b.dataset.target === target));
+  ['abs','epsilon','path','conc'].forEach(id => { document.getElementById(id).disabled = (id === target); });
+  document.getElementById(target).value = '';
+  calc();
+}
+
+function fmt(v) {
+  if (v == null || isNaN(v) || !isFinite(v)) return null;
+  if (v === 0) return '0';
+  if (Math.abs(v) >= 0.001 && Math.abs(v) < 1e7) return parseFloat(v.toPrecision(6)).toString();
+  return v.toExponential(4);
+}
+
+function calc() {
+  const A = parseFloat(document.getElementById('abs').value);
+  const e = parseFloat(document.getElementById('epsilon').value);
+  const l = parseFloat(document.getElementById('path').value);
+  const c = parseFloat(document.getElementById('conc').value);
+  let result = null, label = '', unit = '';
+
+  switch (solveFor) {
+    case 'conc':
+      if (!isNaN(A) && !isNaN(e) && !isNaN(l) && e*l !== 0) { result = A / (e * l); label = 'Concentration'; unit = 'M'; } break;
+    case 'abs':
+      if (!isNaN(e) && !isNaN(l) && !isNaN(c)) { result = e * l * c; label = 'Absorbance'; unit = ''; } break;
+    case 'epsilon':
+      if (!isNaN(A) && !isNaN(l) && !isNaN(c) && l*c !== 0) { result = A / (l * c); label = 'Molar Absorptivity'; unit = 'L/(mol·cm)'; } break;
+    case 'path':
+      if (!isNaN(A) && !isNaN(e) && !isNaN(c) && e*c !== 0) { result = A / (e * c); label = 'Path Length'; unit = 'cm'; } break;
+  }
+
+  const box = document.getElementById('resultBox');
+  const f = fmt(result);
+  if (f !== null) {
+    document.getElementById('resultLabel').textContent = label;
+    document.getElementById('resultValue').innerHTML = f + (unit ? '<span class="result-unit">' + unit + '</span>' : '');
+    box.classList.add('visible');
+    document.getElementById(solveFor).value = f;
+  } else { box.classList.remove('visible'); }
+}
+
+function convT() {
+  const t = parseFloat(document.getElementById('transT').value);
+  if (!isNaN(t) && t > 0 && t <= 100) {
+    document.getElementById('transA').value = fmt(-Math.log10(t / 100));
+  }
+}
+
+function convA() {
+  const a = parseFloat(document.getElementById('transA').value);
+  if (!isNaN(a)) {
+    document.getElementById('transT').value = fmt(Math.pow(10, -a) * 100);
+  }
+}
+
+setSolve('conc');
+</script>
+</body>
+</html>

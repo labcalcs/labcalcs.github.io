@@ -28,7 +28,7 @@ LC.tools = [
   { name: 'LOD/LOQ Calculator', cat: 'analytical', path: '/analytical-chemistry/lod-loq-calculator.html', aka: ['limit of detection','limit of quantitation','sensitivity','calibration'], desc: 'Estimate detection and quantitation limits.', soon: true },
 
   // Biology & Biochemistry
-  { name: 'Henderson-Hasselbalch Calculator', cat: 'biology', path: '/biology-biochemistry/henderson-hasselbalch-calculator.html', aka: ['buffer pH','pKa','acid base'], desc: 'Calculate buffer pH from component ratios.', soon: true },
+  { name: 'Henderson-Hasselbalch Calculator', cat: 'biology', path: '/biology-biochemistry/henderson-hasselbalch-calculator.html', aka: ['buffer pH','pKa','acid base'], desc: 'Calculate buffer pH from component ratios.' },
   { name: 'PCR Master Mix Calculator', cat: 'biology', path: '/biology-biochemistry/pcr-master-mix-calculator.html', aka: ['polymerase','reaction','Taq','primer'], desc: 'Scale PCR reactions with overage.', soon: true },
   { name: 'SDS-PAGE Gel Recipe', cat: 'biology', path: '/biology-biochemistry/sds-page-gel-recipe.html', aka: ['acrylamide','gel percentage','stacking','separating'], desc: 'Get exact volumes for pouring gels.', soon: true },
 
@@ -37,7 +37,7 @@ LC.tools = [
   { name: 'A280 Protein Concentration', cat: 'spectroscopy', path: '/spectroscopy/a280-protein-concentration.html', aka: ['UV absorbance','nanodrop','protein quantitation','280nm'], desc: 'Protein concentration from UV absorbance.', soon: true },
 
   // Organic Chemistry
-  { name: 'Theoretical Yield Calculator', cat: 'organic', path: '/organic-chemistry/theoretical-yield-calculator.html', aka: ['product','stoichiometry','reaction yield'], desc: 'Calculate maximum product from reactants.', soon: true },
+  { name: 'Theoretical Yield Calculator', cat: 'organic', path: '/organic-chemistry/theoretical-yield-calculator.html', aka: ['product','stoichiometry','reaction yield'], desc: 'Calculate maximum product from reactants.' },
   { name: 'Percent Yield Calculator', cat: 'organic', path: '/organic-chemistry/percent-yield-calculator.html', aka: ['actual yield','efficiency'], desc: 'Determine reaction efficiency.', soon: true },
   { name: 'Degree of Unsaturation', cat: 'organic', path: '/organic-chemistry/degree-of-unsaturation-calculator.html', aka: ['DoU','IHD','index of hydrogen deficiency','double bond equivalents'], desc: 'Calculate degrees of unsaturation from formula.', soon: true },
 
@@ -46,7 +46,7 @@ LC.tools = [
   { name: 'Electron Configuration', cat: 'inorganic', path: '/inorganic-chemistry/electron-configuration.html', aka: ['orbital','aufbau','periodic table'], desc: 'Generate electron configurations.', soon: true },
 
   // Physical Chemistry
-  { name: 'Ideal Gas Law Calculator', cat: 'physical', path: '/physical-chemistry/ideal-gas-law-calculator.html', aka: ['PV=nRT','pressure','volume','temperature','gas'], desc: 'Solve PV=nRT for any variable.', soon: true },
+  { name: 'Ideal Gas Law Calculator', cat: 'physical', path: '/physical-chemistry/ideal-gas-law-calculator.html', aka: ['PV=nRT','pressure','volume','temperature','gas'], desc: 'Solve PV=nRT for any variable.' },
   { name: 'Nernst Equation Calculator', cat: 'physical', path: '/physical-chemistry/nernst-equation-calculator.html', aka: ['cell potential','electrochemistry','EMF'], desc: 'Calculate cell potential at non-standard conditions.', soon: true },
   { name: 'Gibbs Free Energy Calculator', cat: 'physical', path: '/physical-chemistry/gibbs-free-energy-calculator.html', aka: ['delta G','enthalpy','entropy','spontaneous'], desc: 'Calculate ΔG from ΔH and ΔS.', soon: true },
 ];

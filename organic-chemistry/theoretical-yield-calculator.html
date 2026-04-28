@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Theoretical Yield Calculator — LabCalcs</title>
+<meta name="description" content="Free theoretical yield calculator. Calculate the maximum product from reactant mass, molecular weights, and stoichiometry. Identifies the limiting reagent.">
+<link rel="canonical" href="https://labcalcs.github.io/organic-chemistry/theoretical-yield-calculator.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="cat-organic">
+<div class="grain"></div>
+<nav class="site-nav" id="site-nav"></nav>
+<div class="breadcrumb" id="breadcrumb"></div>
+<div class="ad-slot" id="ad-top"></div>
+
+<div class="container">
+  <h1 class="page-title">Theoretical Yield Calculator</h1>
+  <p class="page-subtitle">Calculate the maximum amount of product from your reactants, and identify the limiting reagent.</p>
+
+  <div class="calc-card">
+    <div class="formula-bar">
+      <em>yield</em> = ( <em>moles</em><sub>limiting</sub> × <em>coeff</em><sub>product</sub> / <em>coeff</em><sub>limiting</sub> ) × <em>MW</em><sub>product</sub>
+    </div>
+
+    <div style="margin-bottom:20px;">
+      <label style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);display:block;margin-bottom:10px;">Reactant A</label>
+      <div class="fields">
+        <div class="field">
+          <label>Mass <span class="unit">g</span></label>
+          <input type="number" id="massA" step="any" placeholder="e.g. 5.0" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>Molecular Weight <span class="unit">g/mol</span></label>
+          <input type="number" id="mwA" step="any" placeholder="e.g. 120.15" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>Stoich. Coefficient</label>
+          <input type="number" id="coeffA" step="1" min="1" value="1" placeholder="1" oninput="calc()">
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:20px;">
+      <label style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);display:block;margin-bottom:10px;">Reactant B <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">(optional — leave blank for single-reactant calculations)</span></label>
+      <div class="fields">
+        <div class="field">
+          <label>Mass <span class="unit">g</span></label>
+          <input type="number" id="massB" step="any" placeholder="e.g. 3.2" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>Molecular Weight <span class="unit">g/mol</span></label>
+          <input type="number" id="mwB" step="any" placeholder="e.g. 46.07" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>Stoich. Coefficient</label>
+          <input type="number" id="coeffB" step="1" min="1" value="1" placeholder="1" oninput="calc()">
+        </div>
+      </div>
+    </div>
+
+    <div class="divider-row"><span class="line"></span><span class="label">Product</span><span class="line"></span></div>
+
+    <div class="fields" style="margin-bottom:0;">
+      <div class="field">
+        <label>Product MW <span class="unit">g/mol</span></label>
+        <input type="number" id="mwP" step="any" placeholder="e.g. 148.16" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Product Stoich. Coefficient</label>
+        <input type="number" id="coeffP" step="1" min="1" value="1" placeholder="1" oninput="calc()">
+      </div>
+    </div>
+
+    <div class="result-box" id="resultBox">
+      <div class="result-label" id="resultLabel">Theoretical Yield</div>
+      <div class="result-value" id="resultValue">—</div>
+    </div>
+
+    <div class="note-box" id="noteBox"></div>
+  </div>
+
+  <div class="ad-slot" id="ad-mid"></div>
+
+  <div class="info-section">
+    <h2>How to Use This Calculator</h2>
+    <p>Enter the mass and molecular weight of your reactant(s), plus their stoichiometric coefficients from the balanced equation. Then enter the product's molecular weight and coefficient. If you have two reactants, the calculator automatically identifies the limiting reagent and calculates the theoretical yield based on it.</p>
+    <p>For single-reactant calculations (like decomposition reactions), just leave Reactant B blank.</p>
+
+    <h2>The Math Behind It</h2>
+    <p>Theoretical yield is the maximum mass of product that could form if a reaction goes to 100% completion. The calculation involves converting reactant mass to moles (mass ÷ MW), identifying the limiting reagent (the one that runs out first based on stoichiometry), and using stoichiometric ratios to find product moles, then converting back to mass.</p>
+    <p><strong>Worked example:</strong> React 10 g of benzaldehyde (MW = 106.12, coeff = 1) with 5 g of acetone (MW = 58.08, coeff = 1) to form dibenzalacetone (MW = 234.29, coeff = 1). Moles of benzaldehyde = 10/106.12 = 0.0942 mol. Moles of acetone = 5/58.08 = 0.0861 mol. Acetone is limiting. Theoretical yield = 0.0861 × 234.29 = 20.17 g.</p>
+    <p>In practice, actual yields are always less than theoretical due to incomplete reactions, side reactions, transfer losses, and purification steps. Percent yield = (actual yield ÷ theoretical yield) × 100%.</p>
+  </div>
+
+  <div class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a class="related-card" href="percent-yield-calculator.html"><h3>Percent Yield Calculator</h3><p>Calculate reaction efficiency.</p></a>
+      <a class="related-card" href="../general-lab/molarity-calculator.html"><h3>Molarity Calculator</h3><p>Moles, concentration, volume, mass.</p></a>
+      <a class="related-card" href="../general-lab/stock-solution-calculator.html"><h3>Stock Solution Calculator</h3><p>Weigh reagents for 60+ compounds.</p></a>
+    </div>
+  </div>
+</div>
+
+<div class="ad-slot" id="ad-bot"></div>
+<footer class="site-footer"><a href="../">← Back to all categories</a> · © 2026 LabCalcs</footer>
+
+<script>LC = window.LC || {}; LC.basePath = '..';</script>
+<script src="../js/analytics.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() { buildBreadcrumb('organic', 'Theoretical Yield Calculator'); });
+
+function fmt(v) {
+  if (v == null || isNaN(v) || !isFinite(v)) return null;
+  if (v === 0) return '0';
+  if (Math.abs(v) >= 0.01 && Math.abs(v) < 1e6) return parseFloat(v.toPrecision(5)).toString();
+  return v.toExponential(4);
+}
+
+function calc() {
+  const massA = parseFloat(document.getElementById('massA').value);
+  const mwA = parseFloat(document.getElementById('mwA').value);
+  const coeffA = parseFloat(document.getElementById('coeffA').value) || 1;
+  const massB = parseFloat(document.getElementById('massB').value);
+  const mwB = parseFloat(document.getElementById('mwB').value);
+  const coeffB = parseFloat(document.getElementById('coeffB').value) || 1;
+  const mwP = parseFloat(document.getElementById('mwP').value);
+  const coeffP = parseFloat(document.getElementById('coeffP').value) || 1;
+
+  const box = document.getElementById('resultBox');
+  const note = document.getElementById('noteBox');
+  note.classList.remove('visible');
+
+  if (isNaN(massA) || isNaN(mwA) || isNaN(mwP) || mwA <= 0 || mwP <= 0) {
+    box.classList.remove('visible');
+    return;
+  }
+
+  const molesA = massA / mwA;
+  const equivA = molesA / coeffA;
+  let limiting = 'A';
+  let limitingMoles = molesA;
+  let limitingCoeff = coeffA;
+
+  if (!isNaN(massB) && !isNaN(mwB) && mwB > 0) {
+    const molesB = massB / mwB;
+    const equivB = molesB / coeffB;
+    if (equivB < equivA) {
+      limiting = 'B';
+      limitingMoles = molesB;
+      limitingCoeff = coeffB;
+    }
+    note.innerHTML = '<strong>Limiting reagent:</strong> Reactant ' + limiting +
+      ' &nbsp;|&nbsp; Moles A: ' + fmt(molesA) + ' mol &nbsp;|&nbsp; Moles B: ' + fmt(molesB) + ' mol';
+    note.classList.add('visible');
+    note.style.color = 'var(--accent)';
+    note.style.background = 'var(--accent-glow)';
+    note.style.borderColor = 'var(--accent-border)';
+  }
+
+  const productMoles = (limitingMoles / limitingCoeff) * coeffP;
+  const yieldG = productMoles * mwP;
+
+  const f = fmt(yieldG);
+  if (f !== null) {
+    document.getElementById('resultLabel').textContent = 'Theoretical Yield';
+    document.getElementById('resultValue').innerHTML = f + '<span class="result-unit">g</span>';
+    box.classList.add('visible');
+  } else {
+    box.classList.remove('visible');
+  }
+}
+</script>
+</body>
+</html>

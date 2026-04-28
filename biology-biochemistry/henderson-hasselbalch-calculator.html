@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Henderson-Hasselbalch Calculator — LabCalcs</title>
+<meta name="description" content="Free Henderson-Hasselbalch calculator. Calculate buffer pH from pKa and component ratios, or find the ratio needed for a target pH. Includes common buffer pKa values.">
+<link rel="canonical" href="https://labcalcs.github.io/biology-biochemistry/henderson-hasselbalch-calculator.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="cat-biology">
+<div class="grain"></div>
+<nav class="site-nav" id="site-nav"></nav>
+<div class="breadcrumb" id="breadcrumb"></div>
+<div class="ad-slot" id="ad-top"></div>
+
+<div class="container">
+  <h1 class="page-title">Henderson-Hasselbalch Calculator</h1>
+  <p class="page-subtitle">Calculate buffer pH from pKa and conjugate base/acid ratio, or find the ratio needed for a target pH.</p>
+
+  <div class="calc-card">
+    <div class="formula-bar"><em>pH</em> = <em>pKa</em> + log₁₀( [<em>A⁻</em>] / [<em>HA</em>] )</div>
+
+    <div class="solve-for">
+      <label>Solve for</label>
+      <div class="solve-btns" id="solveBtns">
+        <button class="active" data-target="pH" onclick="setSolve('pH')">pH</button>
+        <button data-target="ratio" onclick="setSolve('ratio')">Ratio [A⁻]/[HA]</button>
+        <button data-target="pKa" onclick="setSolve('pKa')">pKa</button>
+      </div>
+    </div>
+
+    <div class="fields">
+      <div class="field">
+        <label>pKa</label>
+        <input type="number" id="pKa" step="any" placeholder="e.g. 8.07" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>pH</label>
+        <input type="number" id="pH" step="any" placeholder="—" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>[A⁻] — Conjugate base <span class="unit">M or mM</span></label>
+        <input type="number" id="base" step="any" placeholder="e.g. 75" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>[HA] — Weak acid <span class="unit">M or mM</span></label>
+        <input type="number" id="acid" step="any" placeholder="e.g. 25" oninput="calc()">
+      </div>
+    </div>
+
+    <div class="result-box" id="resultBox">
+      <div class="result-label" id="resultLabel">Result</div>
+      <div class="result-value" id="resultValue">—</div>
+    </div>
+
+    <div class="note-box" id="noteBox"></div>
+
+    <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);">
+      <label style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);display:block;margin-bottom:10px;">Common Buffer pKa Values (click to use)</label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;" id="pkaPresets"></div>
+    </div>
+  </div>
+
+  <div class="ad-slot" id="ad-mid"></div>
+
+  <div class="info-section">
+    <h2>How to Use This Calculator</h2>
+    <p>To find the pH of a buffer, enter the pKa (or click a preset) and the concentrations of conjugate base [A⁻] and weak acid [HA]. To find what ratio you need for a target pH, select "Ratio" and enter pKa and your desired pH. The units for [A⁻] and [HA] don't matter as long as they're the same — only the ratio matters.</p>
+
+    <h2>The Math Behind It</h2>
+    <p>The Henderson-Hasselbalch equation <strong>pH = pKa + log₁₀([A⁻]/[HA])</strong> relates the pH of a buffer solution to the pKa of the weak acid and the ratio of conjugate base to weak acid concentrations.</p>
+    <p><strong>Worked example:</strong> You want to make a Tris buffer at pH 7.4 (pKa of Tris = 8.07 at 25°C). The ratio needed is: [A⁻]/[HA] = 10^(pH − pKa) = 10^(7.4 − 8.07) = 10^(−0.67) = 0.214. This means you need about 1 part Tris base to 4.7 parts Tris-HCl.</p>
+    <p>Buffers work best within ±1 pH unit of their pKa. Outside this range, the buffering capacity drops sharply. When choosing a buffer for your experiment, pick one whose pKa is close to your target pH.</p>
+    <p><strong>Temperature matters:</strong> pKa values change with temperature. Tris is particularly temperature-sensitive (ΔpKa ≈ −0.03/°C), so a Tris buffer prepared at room temperature will be ~0.5 pH units lower at 4°C. Always adjust pH at the temperature you'll use the buffer.</p>
+  </div>
+
+  <div class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a class="related-card" href="../general-lab/stock-solution-calculator.html"><h3>Stock Solution Calculator</h3><p>Weigh reagents for 60+ buffers and reagents.</p></a>
+      <a class="related-card" href="../general-lab/molarity-calculator.html"><h3>Molarity Calculator</h3><p>Calculate concentration from mass and MW.</p></a>
+      <a class="related-card" href="../general-lab/dilution-calculator.html"><h3>Dilution Calculator</h3><p>C₁V₁ = C₂V₂ with flexible units.</p></a>
+    </div>
+  </div>
+</div>
+
+<div class="ad-slot" id="ad-bot"></div>
+<footer class="site-footer"><a href="../">← Back to all categories</a> · © 2026 LabCalcs</footer>
+
+<script>LC = window.LC || {}; LC.basePath = '..';</script>
+<script src="../js/analytics.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() { buildBreadcrumb('biology', 'Henderson-Hasselbalch Calculator'); });
+
+const buffers = [
+  ["Phosphoric acid (pKa1)", 2.15],
+  ["Citric acid (pKa1)", 3.13],
+  ["Acetic acid", 4.76],
+  ["Citric acid (pKa2)", 4.76],
+  ["MES", 6.27],
+  ["Citric acid (pKa3)", 6.40],
+  ["PIPES", 6.80],
+  ["Phosphate (pKa2)", 7.20],
+  ["MOPS", 7.20],
+  ["HEPES", 7.55],
+  ["Tris", 8.07],
+  ["Bicine", 8.35],
+  ["Tricine", 8.15],
+  ["Glycine (pKa2)", 9.60],
+  ["Carbonate (pKa2)", 10.33],
+];
+
+const presetDiv = document.getElementById('pkaPresets');
+buffers.forEach(function(b) {
+  const btn = document.createElement('button');
+  btn.className = 'solve-btns';
+  btn.style.cssText = 'font-family:var(--font-mono);font-size:11px;padding:6px 10px;border-radius:6px;border:1px solid var(--border);background:var(--input-bg);color:var(--text-dim);cursor:pointer;transition:all 0.15s;';
+  btn.textContent = b[0] + ' (' + b[1] + ')';
+  btn.addEventListener('click', function() {
+    document.getElementById('pKa').value = b[1];
+    calc();
+  });
+  btn.addEventListener('mouseenter', function() { this.style.borderColor = 'var(--accent)'; this.style.color = 'var(--text)'; });
+  btn.addEventListener('mouseleave', function() { this.style.borderColor = 'var(--border)'; this.style.color = 'var(--text-dim)'; });
+  presetDiv.appendChild(btn);
+});
+
+let solveFor = 'pH';
+
+function setSolve(t) {
+  solveFor = t;
+  document.querySelectorAll('#solveBtns button').forEach(b => b.classList.toggle('active', b.dataset.target === t));
+  ['pKa','pH','base','acid'].forEach(id => { document.getElementById(id).disabled = false; });
+  if (t === 'pH') { document.getElementById('pH').disabled = true; document.getElementById('pH').value = ''; }
+  else if (t === 'pKa') { document.getElementById('pKa').disabled = true; document.getElementById('pKa').value = ''; }
+  else if (t === 'ratio') { document.getElementById('base').disabled = true; document.getElementById('acid').disabled = true; document.getElementById('base').value = ''; document.getElementById('acid').value = ''; }
+  calc();
+}
+
+function fmt(v) {
+  if (v == null || isNaN(v) || !isFinite(v)) return null;
+  if (v === 0) return '0';
+  if (Math.abs(v) >= 0.001 && Math.abs(v) < 1e7) return parseFloat(v.toPrecision(5)).toString();
+  return v.toExponential(4);
+}
+
+function calc() {
+  const pKa = parseFloat(document.getElementById('pKa').value);
+  const pH = parseFloat(document.getElementById('pH').value);
+  const base = parseFloat(document.getElementById('base').value);
+  const acid = parseFloat(document.getElementById('acid').value);
+  const note = document.getElementById('noteBox');
+  note.classList.remove('visible');
+
+  let result = null, label = '', unit = '';
+
+  switch (solveFor) {
+    case 'pH':
+      if (!isNaN(pKa) && !isNaN(base) && !isNaN(acid) && acid > 0 && base > 0) {
+        result = pKa + Math.log10(base / acid);
+        label = 'pH'; unit = '';
+        if (Math.abs(result - pKa) > 1) { note.textContent = '⚠ pH is more than 1 unit from pKa — buffering capacity will be low.'; note.classList.add('visible'); }
+      } break;
+    case 'ratio':
+      if (!isNaN(pKa) && !isNaN(pH)) {
+        const ratio = Math.pow(10, pH - pKa);
+        result = ratio;
+        label = '[A⁻]/[HA] Ratio'; unit = '';
+        document.getElementById('base').value = fmt(ratio);
+        document.getElementById('acid').value = '1';
+        if (Math.abs(pH - pKa) > 1) { note.textContent = '⚠ Target pH is more than 1 unit from pKa — consider a different buffer system.'; note.classList.add('visible'); }
+      } break;
+    case 'pKa':
+      if (!isNaN(pH) && !isNaN(base) && !isNaN(acid) && acid > 0 && base > 0) {
+        result = pH - Math.log10(base / acid);
+        label = 'pKa'; unit = '';
+      } break;
+  }
+
+  const box = document.getElementById('resultBox');
+  const f = fmt(result);
+  if (f !== null) {
+    document.getElementById('resultLabel').textContent = label;
+    document.getElementById('resultValue').innerHTML = f + (unit ? '<span class="result-unit">' + unit + '</span>' : '');
+    box.classList.add('visible');
+    if (solveFor === 'pH') document.getElementById('pH').value = f;
+    if (solveFor === 'pKa') document.getElementById('pKa').value = f;
+  } else { box.classList.remove('visible'); }
+}
+
+setSolve('pH');
+</script>
+</body>
+</html>
