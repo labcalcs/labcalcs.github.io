@@ -118,14 +118,37 @@ function buildNav() {
   }
   overlay.innerHTML = mobileHTML;
 
-  // Dropdown behavior
+  // Dropdown behavior — position fixed menus relative to buttons
+  function positionDropdown(dd) {
+    const btn = dd.querySelector('button');
+    const menu = dd.querySelector('.nav-dropdown-menu');
+    if (!btn || !menu) return;
+    const rect = btn.getBoundingClientRect();
+    menu.style.top = (rect.bottom + 4) + 'px';
+    menu.style.left = rect.left + 'px';
+  }
+
+  document.querySelectorAll('.nav-dropdown').forEach(dd => {
+    dd.addEventListener('mouseenter', function() {
+      document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('open'));
+      positionDropdown(this);
+      this.classList.add('open');
+    });
+    dd.addEventListener('mouseleave', function() {
+      this.classList.remove('open');
+    });
+  });
+
   document.querySelectorAll('.nav-dropdown > button').forEach(btn => {
     btn.addEventListener('click', function(e) {
       e.stopPropagation();
       const dd = this.parentElement;
       const wasOpen = dd.classList.contains('open');
       document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('open'));
-      if (!wasOpen) dd.classList.add('open');
+      if (!wasOpen) {
+        positionDropdown(dd);
+        dd.classList.add('open');
+      }
     });
   });
 

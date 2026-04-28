@@ -86,10 +86,15 @@ a:hover { text-decoration: underline; }
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   flex: 1;
-  flex-wrap: wrap;
+  overflow-x: auto;
+  overflow-y: visible;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
+
+.nav-links::-webkit-scrollbar { display: none; }
 
 .nav-dropdown {
   position: relative;
@@ -97,9 +102,9 @@ a:hover { text-decoration: underline; }
 
 .nav-dropdown > button {
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
-  padding: 8px 12px;
+  padding: 8px 10px;
   border-radius: 6px;
   border: none;
   background: transparent;
@@ -123,21 +128,17 @@ a:hover { text-decoration: underline; }
 
 .nav-dropdown-menu {
   display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
+  position: fixed;
   min-width: 240px;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 6px;
-  margin-top: 4px;
   box-shadow: 0 12px 40px rgba(0,0,0,0.5);
   z-index: 1001;
 }
 
 .nav-dropdown.open .nav-dropdown-menu { display: block; }
-.nav-dropdown:hover .nav-dropdown-menu { display: block; }
 
 .nav-dropdown-menu a {
   display: block;
