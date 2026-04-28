@@ -62,10 +62,11 @@ a:hover { text-decoration: underline; }
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
-  height: 56px;
+  min-height: 56px;
   position: relative;
   z-index: 1000;
   background: var(--bg);
+  overflow: visible;
 }
 
 .nav-logo {
@@ -87,7 +88,7 @@ a:hover { text-decoration: underline; }
   align-items: center;
   gap: 4px;
   flex: 1;
-  overflow-x: auto;
+  flex-wrap: wrap;
 }
 
 .nav-dropdown {
