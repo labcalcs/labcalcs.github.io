@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LabCalcs — Free Science & Lab Calculators</title>
+<meta name="description" content="Free online calculators for chemistry, biology, analytical chemistry, and lab work. Molarity, dilutions, Beer-Lambert, ideal gas law, and 50+ more tools. No sign-up required.">
+<link rel="canonical" href="https://labcalcs.github.io/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="grain"></div>
+<nav class="site-nav" id="site-nav"></nav>
+
+<div class="hero">
+  <h1>Free calculators for<br>science & lab work</h1>
+  <p class="hero-sub">Fast, accurate tools for chemistry, biology, and analytical science. No sign-up, no downloads — just answers.</p>
+  <div class="hero-search">
+    <input type="text" placeholder="Search all calculators..." id="heroSearchInput" autocomplete="off">
+    <div class="hero-search-results" id="heroSearchResults"></div>
+  </div>
+</div>
+
+<div class="ad-slot" id="ad-top"></div>
+
+<div class="cat-grid">
+  <a class="cat-card" data-cat="general-lab" href="general-lab/">
+    <div class="cat-card-icon">🧪</div>
+    <h2>General Lab</h2>
+    <p>Molarity, dilutions, RCF/RPM, stock solutions, unit converters.</p>
+    <span class="tool-count">4 tools</span>
+  </a>
+  <a class="cat-card" data-cat="analytical" href="analytical-chemistry/">
+    <div class="cat-card-icon">🔬</div>
+    <h2>Analytical Chemistry</h2>
+    <p>Mass accuracy, chromatography, LOD/LOQ, column efficiency.</p>
+    <span class="tool-count">Coming soon</span>
+  </a>
+  <a class="cat-card" data-cat="biology" href="biology-biochemistry/">
+    <div class="cat-card-icon">🧬</div>
+    <h2>Biology & Biochemistry</h2>
+    <p>Buffers, PCR, gel recipes, primer Tm, cell counting.</p>
+    <span class="tool-count">Coming soon</span>
+  </a>
+  <a class="cat-card" data-cat="spectroscopy" href="spectroscopy/">
+    <div class="cat-card-icon">📊</div>
+    <h2>Spectroscopy</h2>
+    <p>Beer-Lambert law, A280, standard curves.</p>
+    <span class="tool-count">Coming soon</span>
+  </a>
+  <a class="cat-card" data-cat="organic" href="organic-chemistry/">
+    <div class="cat-card-icon">⚗️</div>
+    <h2>Organic Chemistry</h2>
+    <p>Theoretical yield, percent yield, degree of unsaturation.</p>
+    <span class="tool-count">Coming soon</span>
+  </a>
+  <a class="cat-card" data-cat="inorganic" href="inorganic-chemistry/">
+    <div class="cat-card-icon">🪨</div>
+    <h2>Inorganic Chemistry</h2>
+    <p>Oxidation states, electron configurations, crystal field theory.</p>
+    <span class="tool-count">Coming soon</span>
+  </a>
+  <a class="cat-card" data-cat="physical" href="physical-chemistry/">
+    <div class="cat-card-icon">📐</div>
+    <h2>Physical Chemistry</h2>
+    <p>Ideal gas law, Nernst equation, Gibbs free energy.</p>
+    <span class="tool-count">Coming soon</span>
+  </a>
+</div>
+
+<div class="section-header"><h2>Popular Tools</h2></div>
+<div class="popular-tools">
+  <a class="popular-pill" href="general-lab/molarity-calculator.html">Molarity Calculator</a>
+  <a class="popular-pill" href="general-lab/dilution-calculator.html">Dilution Calculator (C₁V₁=C₂V₂)</a>
+  <a class="popular-pill" href="general-lab/rcf-rpm-converter.html">RCF ↔ RPM Converter</a>
+  <a class="popular-pill" href="general-lab/stock-solution-calculator.html">Stock Solution Calculator</a>
+</div>
+
+<footer class="site-footer">
+  &copy; 2026 LabCalcs. Free tools for researchers and students.
+</footer>
+
+<script src="js/analytics.js"></script>
+<script src="js/nav.js"></script>
+<script>
+// Hero search
+document.addEventListener('DOMContentLoaded', function() {
+  const input = document.getElementById('heroSearchInput');
+  const results = document.getElementById('heroSearchResults');
+  if (!input) return;
+
+  input.addEventListener('input', function() {
+    const q = this.value.trim().toLowerCase();
+    if (q.length < 1) { results.classList.remove('open'); return; }
+    const matches = searchTools(q);
+    if (matches.length === 0) {
+      results.innerHTML = '<div style="padding:12px;color:var(--text-dim);font-size:14px;">No matching tools found</div>';
+    } else {
+      results.innerHTML = matches.slice(0, 8).map(t => {
+        const cat = LC.categories.find(c => c.id === t.cat);
+        return '<a href="' + LC.basePath + t.path + '"><span>' + t.name + '</span><span class="sr-cat">' + (cat ? cat.name : '') + '</span></a>';
+      }).join('');
+    }
+    results.classList.add('open');
+  });
+
+  input.addEventListener('blur', function() {
+    setTimeout(function() { results.classList.remove('open'); }, 200);
+  });
+});
+</script>
+</body>
+</html>
