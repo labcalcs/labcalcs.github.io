@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock Solution Calculator — LabCalc</title>
+<meta name="description" content="Free stock solution calculator. Calculate how much reagent to weigh or measure for any buffer or lab solution. Supports Tris, PBS, HEPES, EDTA, NaCl and 50+ common reagents.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0b1120;
+    --bg-card: #111827;
+    --bg-card-alt: #151e2e;
+    --border: #1e2d3d;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --accent: #34d399;
+    --accent-glow: rgba(52, 211, 153, 0.13);
+    --accent-border: rgba(52, 211, 153, 0.3);
+    --warn: #fbbf24;
+    --warn-glow: rgba(251, 191, 36, 0.08);
+    --warn-border: rgba(251, 191, 36, 0.2);
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+    --input-bg: #0d1526;
+    --focus-ring: rgba(52, 211, 153, 0.35);
+    --teal: #2dd4bf;
+  }
+
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; line-height: 1.6; }
+
+  .grain {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 9999;
+  }
+
+  nav { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 16px; }
+  nav a.logo-link { font-family: var(--font-mono); font-size: 13px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; color: var(--teal); text-decoration: none; }
+  nav a.logo-link span { color: var(--text-dim); }
+  nav .sep { color: var(--border); font-size: 18px; }
+  nav .page-name { font-size: 14px; color: var(--text-dim); }
+
+  .container { max-width: 740px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  h1 { font-size: clamp(26px, 4vw, 36px); font-weight: 700; letter-spacing: -0.5px; margin-bottom: 8px; }
+  .subtitle { color: var(--text-dim); font-size: 15px; margin-bottom: 36px; }
+
+  .calc-card {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 32px 28px;
+  }
+
+  .prompt-line {
+    font-size: 16px; color: var(--text-dim); margin-bottom: 24px; line-height: 1.8;
+    font-weight: 500;
+  }
+  .prompt-line em { color: var(--accent); font-style: normal; font-weight: 600; }
+
+  .input-row {
+    display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; margin-bottom: 8px;
+  }
+
+  .field { display: flex; flex-direction: column; }
+  .field > label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 6px; color: var(--text-dim); }
+
+  .input-with-unit {
+    display: flex; border: 1px solid var(--border); border-radius: 8px;
+    overflow: hidden; background: var(--input-bg); transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .input-with-unit:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--focus-ring); }
+
+  .input-with-unit input {
+    flex: 1; min-width: 0; font-family: var(--font-mono); font-size: 16px; font-weight: 500;
+    padding: 12px 14px; border: none; background: transparent; color: var(--text); outline: none;
+    -moz-appearance: textfield;
+  }
+  .input-with-unit input::-webkit-outer-spin-button,
+  .input-with-unit input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  .input-with-unit select {
+    font-family: var(--font-mono); font-size: 13px; font-weight: 500;
+    padding: 0 10px; border: none; border-left: 1px solid var(--border);
+    background: rgba(255,255,255,0.03); color: var(--accent); cursor: pointer; outline: none;
+    -webkit-appearance: none; appearance: none; min-width: 68px; text-align: center;
+  }
+  .input-with-unit select option { background: var(--bg-card); color: var(--text); }
+
+  /* Substance search */
+  .substance-field { position: relative; flex: 1; min-width: 200px; }
+
+  .substance-input-wrap {
+    display: flex; border: 1px solid var(--border); border-radius: 8px;
+    overflow: hidden; background: var(--input-bg); transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .substance-input-wrap:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--focus-ring); }
+
+  .substance-input-wrap input {
+    flex: 1; font-family: var(--font-body); font-size: 15px; font-weight: 500;
+    padding: 12px 14px; border: none; background: transparent; color: var(--text); outline: none;
+  }
+
+  .dropdown {
+    position: absolute; top: calc(100%); left: 0; right: 0;
+    background: var(--bg-card); border: 1px solid var(--border); border-top: none;
+    border-radius: 0 0 10px 10px; max-height: 280px; overflow-y: auto;
+    z-index: 100; display: none; box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+  }
+  .dropdown.open { display: block; }
+
+  .dropdown-item {
+    padding: 10px 14px; cursor: pointer; transition: background 0.12s;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .dropdown-item:hover, .dropdown-item.highlighted { background: var(--accent-glow); }
+
+  .dropdown-item .name { font-size: 14px; font-weight: 500; color: var(--text); }
+  .dropdown-item .meta { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); }
+
+  .dropdown-cat {
+    padding: 8px 14px 4px; font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent);
+    border-top: 1px solid var(--border); pointer-events: none;
+  }
+  .dropdown-cat:first-child { border-top: none; }
+
+  /* Connector words */
+  .connector {
+    font-size: 15px; color: var(--text-dim); font-weight: 500;
+    padding-bottom: 6px; align-self: center;
+  }
+
+  /* Result */
+  .result-card {
+    margin-top: 24px; padding: 24px; border-radius: 12px;
+    background: var(--accent-glow); border: 1px solid var(--accent-border);
+    display: none;
+  }
+  .result-card.visible { display: block; }
+
+  .result-header {
+    font-size: 13px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 1.2px; color: var(--accent); margin-bottom: 16px;
+  }
+
+  .result-main {
+    display: flex; align-items: baseline; gap: 8px; margin-bottom: 16px;
+  }
+  .result-amount {
+    font-family: var(--font-mono); font-size: 36px; font-weight: 600; color: var(--accent);
+  }
+  .result-unit-label { font-size: 18px; color: var(--text-dim); }
+
+  .result-detail {
+    font-size: 14px; color: var(--text-dim); line-height: 1.7;
+  }
+  .result-detail strong { color: var(--text); font-weight: 600; }
+
+  .recipe-steps {
+    margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--accent-border);
+  }
+
+  .recipe-steps h3 {
+    font-size: 12px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1.5px; color: var(--accent); margin-bottom: 12px;
+  }
+
+  .step {
+    display: flex; gap: 12px; margin-bottom: 10px; font-size: 14px; color: var(--text-dim);
+  }
+  .step-num {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+    color: var(--accent); background: rgba(52,211,153,0.1); border-radius: 50%;
+    width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .step-text { flex: 1; }
+  .step-text strong { color: var(--text); }
+
+  .reagent-info {
+    margin-top: 16px; padding: 14px 16px; border-radius: 8px;
+    background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+    font-size: 13px; color: var(--text-dim); line-height: 1.7;
+  }
+  .reagent-info .ri-label { font-family: var(--font-mono); font-size: 11px; color: var(--accent); margin-right: 6px; }
+
+  .warn-box {
+    margin-top: 12px; padding: 12px 16px; border-radius: 8px;
+    background: var(--warn-glow); border: 1px solid var(--warn-border);
+    font-size: 13px; color: var(--warn); display: none;
+  }
+  .warn-box.visible { display: block; }
+
+  .info-section { margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border); }
+  .info-section h2 { font-size: 20px; font-weight: 600; margin-bottom: 12px; }
+  .info-section p { color: var(--text-dim); font-size: 15px; margin-bottom: 12px; }
+
+  footer { text-align: center; padding: 24px; border-top: 1px solid var(--border); color: var(--text-dim); font-size: 13px; }
+  footer a { color: var(--teal); text-decoration: none; }
+
+  @media (max-width: 600px) {
+    .container { padding: 32px 16px 60px; }
+    .calc-card { padding: 24px 16px; }
+    .input-row { flex-direction: column; align-items: stretch; }
+    .connector { display: none; }
+    .result-amount { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<nav>
+  <a class="logo-link" href="index.html">Lab<span>Calc</span></a>
+  <span class="sep">›</span>
+  <span class="page-name">Stock Solution Calculator</span>
+</nav>
+
+<div class="container">
+  <h1>Stock Solution Calculator</h1>
+  <p class="subtitle">Tell us what you want to make — we'll tell you what to weigh and how to prep it.</p>
+
+  <div class="calc-card">
+    <div class="prompt-line">I want to make...</div>
+
+    <div class="input-row">
+      <div class="field">
+        <label>Volume</label>
+        <div class="input-with-unit" style="min-width:160px;">
+          <input type="number" id="vol" step="any" placeholder="e.g. 500" oninput="calculate()">
+          <select id="vol-unit" onchange="calculate()">
+            <option value="L">L</option>
+            <option value="mL" selected>mL</option>
+            <option value="µL">µL</option>
+          </select>
+        </div>
+      </div>
+      <span class="connector">of</span>
+      <div class="field">
+        <label>Concentration</label>
+        <div class="input-with-unit" style="min-width:160px;">
+          <input type="number" id="conc" step="any" placeholder="e.g. 100" oninput="calculate()">
+          <select id="conc-unit" onchange="calculate()">
+            <option value="M">M</option>
+            <option value="mM" selected>mM</option>
+            <option value="µM">µM</option>
+            <option value="nM">nM</option>
+            <option value="mg/mL">mg/mL</option>
+            <option value="µg/mL">µg/mL</option>
+            <option value="g/L">g/L</option>
+            <option value="mg/L">mg/L</option>
+            <option value="%(w/v)">%(w/v)</option>
+            <option value="%(v/v)">%(v/v)</option>
+            <option value="x">x</option>
+          </select>
+        </div>
+      </div>
+      <span class="connector">of</span>
+      <div class="field substance-field">
+        <label>Substance</label>
+        <div class="substance-input-wrap">
+          <input type="text" id="substance" placeholder="Search reagents..." autocomplete="off"
+            oninput="onSubstanceInput()" onfocus="onSubstanceFocus()" onkeydown="onSubstanceKey(event)">
+        </div>
+        <div class="dropdown" id="dropdown"></div>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div class="result-card" id="resultCard">
+      <div class="result-header" id="resultHeader">You need</div>
+      <div class="result-main">
+        <span class="result-amount" id="resultAmount">—</span>
+        <span class="result-unit-label" id="resultUnitLabel"></span>
+      </div>
+      <div class="result-detail" id="resultDetail"></div>
+
+      <div class="recipe-steps" id="recipeSteps"></div>
+
+      <div class="reagent-info" id="reagentInfo"></div>
+    </div>
+
+    <div class="warn-box" id="warnBox"></div>
+  </div>
+
+  <div class="info-section">
+    <h2>How to use this calculator</h2>
+    <p>Enter the volume and concentration you need, then search for a substance. The calculator will tell you exactly how much to weigh out (for solids) or measure (for liquids), plus step-by-step preparation instructions.</p>
+    <p>For pH buffers like Tris-HCl and phosphate buffers, the calculator includes notes on which acid or base to use for pH adjustment and the effective buffering range.</p>
+
+    <h2 style="margin-top:24px;">About molecular-weight-based calculations</h2>
+    <p>For molar concentrations (M, mM, µM, nM), the calculator uses: <strong>mass = M × V × MW</strong>, where M is molarity in mol/L, V is volume in liters, and MW is the molecular weight in g/mol. For mass-based concentrations (mg/mL, g/L, %(w/v)), no molecular weight is needed — the calculation is direct.</p>
+  </div>
+</div>
+
+<footer>
+  <a href="index.html">← Back to all calculators</a> &nbsp;·&nbsp; &copy; 2026 LabCalc
+</footer>
+
+<script>
+// ═══════════════════════════════════════
+//  REAGENT DATABASE
+// ═══════════════════════════════════════
+const reagents = [
+  // ── BUFFERS ──
+  { name:"Tris Base", aka:["tris","tham","tromethamine"], formula:"C₄H₁₁NO₃", mw:121.14, cat:"Buffers", state:"solid",
+    bufferRange:"7.0–9.0", phNote:"Adjust to desired pH with concentrated HCl. pH is temperature-sensitive (ΔpKa ≈ −0.03/°C); adjust at the temperature you'll use.", safety:"" },
+  { name:"Tris-HCl", aka:["tris hydrochloride"], formula:"C₄H₁₁NO₃·HCl", mw:157.60, cat:"Buffers", state:"solid",
+    bufferRange:"7.0–9.0", phNote:"Already partially acidified. Adjust pH with NaOH or HCl as needed.", safety:"" },
+  { name:"HEPES", aka:[], formula:"C₈H₁₈N₂O₄S", mw:238.30, cat:"Buffers", state:"solid",
+    bufferRange:"6.8–8.2", phNote:"Adjust pH with NaOH. Very popular for cell culture (does not require CO₂ equilibration).", safety:"" },
+  { name:"HEPES Sodium Salt", aka:["hepes-na"], formula:"C₈H₁₇N₂NaO₄S", mw:260.29, cat:"Buffers", state:"solid",
+    bufferRange:"6.8–8.2", phNote:"Adjust pH with HCl.", safety:"" },
+  { name:"MES", aka:["mes hydrate"], formula:"C₆H₁₃NO₄S", mw:195.24, cat:"Buffers", state:"solid",
+    bufferRange:"5.5–6.7", phNote:"Adjust pH with NaOH.", safety:"" },
+  { name:"MOPS", aka:[], formula:"C₇H₁₅NO₄S", mw:209.26, cat:"Buffers", state:"solid",
+    bufferRange:"6.5–7.9", phNote:"Adjust pH with NaOH.", safety:"" },
+  { name:"PIPES", aka:[], formula:"C₈H₁₈N₂O₆S₂", mw:302.37, cat:"Buffers", state:"solid",
+    bufferRange:"6.1–7.5", phNote:"Dissolves poorly at low pH; add NaOH during dissolution. Adjust final pH with HCl or NaOH.", safety:"" },
+  { name:"Bicine", aka:[], formula:"C₆H₁₃NO₄", mw:163.17, cat:"Buffers", state:"solid",
+    bufferRange:"7.6–9.0", phNote:"Adjust pH with NaOH or HCl.", safety:"" },
+  { name:"Tricine", aka:[], formula:"C₆H₁₃NO₅", mw:179.17, cat:"Buffers", state:"solid",
+    bufferRange:"7.4–8.8", phNote:"Adjust pH with NaOH or HCl.", safety:"" },
+  { name:"Sodium Phosphate Monobasic", aka:["nah2po4","sodium dihydrogen phosphate","monosodium phosphate"], formula:"NaH₂PO₄", mw:119.98, cat:"Buffers", state:"solid",
+    bufferRange:"5.8–8.0", phNote:"Combine with dibasic sodium phosphate to reach target pH (Henderson-Hasselbalch). No strong acid/base usually needed.", safety:"" },
+  { name:"Sodium Phosphate Dibasic", aka:["na2hpo4","disodium phosphate","disodium hydrogen phosphate"], formula:"Na₂HPO₄", mw:141.96, cat:"Buffers", state:"solid",
+    bufferRange:"5.8–8.0", phNote:"Combine with monobasic sodium phosphate to reach target pH.", safety:"" },
+  { name:"Potassium Phosphate Monobasic", aka:["kh2po4","monopotassium phosphate"], formula:"KH₂PO₄", mw:136.09, cat:"Buffers", state:"solid",
+    bufferRange:"5.8–8.0", phNote:"Combine with dibasic potassium phosphate.", safety:"" },
+  { name:"Potassium Phosphate Dibasic", aka:["k2hpo4","dipotassium phosphate"], formula:"K₂HPO₄", mw:174.18, cat:"Buffers", state:"solid",
+    bufferRange:"5.8–8.0", phNote:"Combine with monobasic potassium phosphate.", safety:"" },
+  { name:"Sodium Acetate (anhydrous)", aka:["naOAc","sodium acetate anhydrous"], formula:"CH₃COONa", mw:82.03, cat:"Buffers", state:"solid",
+    bufferRange:"3.6–5.6", phNote:"Adjust pH with glacial acetic acid.", safety:"" },
+  { name:"Sodium Acetate Trihydrate", aka:["naOAc trihydrate"], formula:"CH₃COONa·3H₂O", mw:136.08, cat:"Buffers", state:"solid",
+    bufferRange:"3.6–5.6", phNote:"Adjust pH with glacial acetic acid.", safety:"" },
+  { name:"Sodium Citrate Dihydrate", aka:["trisodium citrate"], formula:"Na₃C₆H₅O₇·2H₂O", mw:294.10, cat:"Buffers", state:"solid",
+    bufferRange:"3.0–6.2", phNote:"Adjust pH with citric acid or HCl.", safety:"" },
+  { name:"Citric Acid (anhydrous)", aka:["citric acid"], formula:"C₆H₈O₇", mw:192.12, cat:"Buffers", state:"solid",
+    bufferRange:"3.0–6.2", phNote:"Combine with sodium citrate or adjust with NaOH.", safety:"" },
+  { name:"Ammonium Bicarbonate", aka:["ambic","NH4HCO3"], formula:"NH₄HCO₃", mw:79.06, cat:"Buffers", state:"solid",
+    bufferRange:"7.0–8.5", phNote:"Self-buffering near pH 7.8–8.0. Volatile — do not autoclave; removes itself during lyophilization. Very common in proteomics sample prep.", safety:"" },
+  { name:"Ammonium Acetate", aka:[], formula:"CH₃COONH₄", mw:77.08, cat:"Buffers", state:"solid",
+    bufferRange:"3.8–5.8", phNote:"Self-buffering near pH ~4.75 and ~9.25. Volatile — useful in MS-compatible buffers.", safety:"" },
+  { name:"Sodium Bicarbonate", aka:["sodium hydrogen carbonate","NaHCO3","baking soda"], formula:"NaHCO₃", mw:84.01, cat:"Buffers", state:"solid",
+    bufferRange:"6.3–8.0 (carbonate system)", phNote:"For cell culture CO₂/bicarbonate buffering. Adjust pH with HCl or NaOH.", safety:"" },
+
+  // ── SALTS & COMMON REAGENTS ──
+  { name:"Sodium Chloride", aka:["NaCl","salt","sodium chloride"], formula:"NaCl", mw:58.44, cat:"Salts & Reagents", state:"solid", safety:"" },
+  { name:"Potassium Chloride", aka:["KCl"], formula:"KCl", mw:74.55, cat:"Salts & Reagents", state:"solid", safety:"" },
+  { name:"Calcium Chloride Dihydrate", aka:["CaCl2"], formula:"CaCl₂·2H₂O", mw:147.01, cat:"Salts & Reagents", state:"solid", safety:"" },
+  { name:"Magnesium Chloride Hexahydrate", aka:["MgCl2"], formula:"MgCl₂·6H₂O", mw:203.30, cat:"Salts & Reagents", state:"solid", safety:"" },
+  { name:"Magnesium Sulfate Heptahydrate", aka:["MgSO4","epsom salt"], formula:"MgSO₄·7H₂O", mw:246.47, cat:"Salts & Reagents", state:"solid", safety:"" },
+  { name:"Ammonium Sulfate", aka:["(NH4)2SO4","ammonium sulphate"], formula:"(NH₄)₂SO₄", mw:132.14, cat:"Salts & Reagents", state:"solid", safety:"" },
+  { name:"Sodium Hydroxide", aka:["NaOH","lye","caustic soda"], formula:"NaOH", mw:40.00, cat:"Salts & Reagents", state:"solid", safety:"Corrosive. Always add NaOH to water, not water to NaOH. Wear gloves and goggles." },
+  { name:"Hydrochloric Acid (conc. 37%)", aka:["HCl","muriatic acid"], formula:"HCl", mw:36.46, cat:"Salts & Reagents", state:"liquid", density:1.19, stockConc:12.1, stockUnit:"M",
+    safety:"Corrosive and produces fumes. Use in a fume hood. Add acid to water." },
+  { name:"Acetic Acid (glacial)", aka:["glacial acetic acid","GAA"], formula:"CH₃COOH", mw:60.05, cat:"Salts & Reagents", state:"liquid", density:1.05, stockConc:17.4, stockUnit:"M",
+    safety:"Corrosive. Strong vinegar odor. Use in fume hood." },
+  { name:"Sulfuric Acid (conc.)", aka:["H2SO4"], formula:"H₂SO₄", mw:98.08, cat:"Salts & Reagents", state:"liquid", density:1.84, stockConc:18.0, stockUnit:"M",
+    safety:"Highly corrosive and exothermic when mixed with water. Always add acid to water slowly." },
+  { name:"Formic Acid (≥98%)", aka:["FA","methanoic acid"], formula:"HCOOH", mw:46.03, cat:"Salts & Reagents", state:"liquid", density:1.22, stockConc:26.5, stockUnit:"M",
+    safety:"Corrosive. Use in fume hood. Common LC-MS mobile phase additive." },
+
+  // ── DETERGENTS ──
+  { name:"SDS", aka:["sodium dodecyl sulfate","sodium lauryl sulfate"], formula:"C₁₂H₂₅NaO₄S", mw:288.38, cat:"Detergents", state:"solid",
+    safety:"Irritant. Avoid inhaling powder — weigh in fume hood or use mask." },
+  { name:"Triton X-100", aka:["triton","tx-100"], formula:"Nonionic surfactant", mw:625, cat:"Detergents", state:"liquid", density:1.07, purityPct:100, isDetergent:true,
+    safety:"Mild irritant. Very viscous — cut pipette tip for easier handling." },
+  { name:"Tween 20", aka:["polysorbate 20","tween-20"], formula:"Polysorbate", mw:1228, cat:"Detergents", state:"liquid", density:1.10, purityPct:100, isDetergent:true,
+    safety:"Viscous liquid. Cut pipette tip." },
+  { name:"NP-40", aka:["nonidet p-40","igepal ca-630"], formula:"Nonionic surfactant", mw:603, cat:"Detergents", state:"liquid", density:1.06, purityPct:100, isDetergent:true,
+    safety:"" },
+  { name:"Sodium Deoxycholate", aka:["deoxycholic acid sodium salt","NaDOC","DOC"], formula:"C₂₄H₃₉NaO₄", mw:414.55, cat:"Detergents", state:"solid",
+    safety:"Light-sensitive. Prepare fresh or protect from light." },
+  { name:"CHAPS", aka:[], formula:"C₃₂H₅₈N₂O₇S", mw:614.88, cat:"Detergents", state:"solid", safety:"" },
+
+  // ── REDUCING AGENTS & PROTEASE INHIB ──
+  { name:"DTT", aka:["dithiothreitol","cleland's reagent"], formula:"C₄H₁₀O₂S₂", mw:154.25, cat:"Reducing Agents", state:"solid",
+    safety:"Prepare fresh or aliquot and store at −20°C. Unstable in solution." },
+  { name:"TCEP-HCl", aka:["tcep","tris(2-carboxyethyl)phosphine"], formula:"C₉H₁₅O₆P·HCl", mw:286.65, cat:"Reducing Agents", state:"solid",
+    safety:"More stable than DTT. Active across broader pH range. Does not need to be freshly prepared." },
+  { name:"β-Mercaptoethanol", aka:["BME","2-mercaptoethanol","beta-mercaptoethanol"], formula:"HOCH₂CH₂SH", mw:78.13, cat:"Reducing Agents", state:"liquid", density:1.114, stockConc:14.3, stockUnit:"M",
+    safety:"Toxic and strong odor. Always use in fume hood." },
+  { name:"Iodoacetamide", aka:["IAA","iodoacetamide"], formula:"C₂H₄INO", mw:184.96, cat:"Reducing Agents", state:"solid",
+    safety:"Light-sensitive — prepare in dark or wrap in foil. Alkylating agent." },
+  { name:"Chloroacetamide", aka:["CAA","2-chloroacetamide"], formula:"C₂H₄ClNO", mw:93.51, cat:"Reducing Agents", state:"solid",
+    safety:"Alternative to IAA for alkylation. Fewer artificial modifications in MS." },
+  { name:"PMSF", aka:["phenylmethylsulfonyl fluoride"], formula:"C₇H₇FO₂S", mw:174.19, cat:"Reducing Agents", state:"solid",
+    safety:"Toxic. Dissolve in isopropanol or ethanol (not water). Half-life ~30 min in aqueous solution — add immediately before use." },
+
+  // ── CHELATORS ──
+  { name:"EDTA Disodium Dihydrate", aka:["EDTA","edta","Na2EDTA"], formula:"Na₂C₁₀H₁₄N₂O₈·2H₂O", mw:372.24, cat:"Chelators", state:"solid",
+    safety:"Does not dissolve until pH is raised to ~8.0 with NaOH. Add NaOH during dissolution." },
+  { name:"EGTA", aka:[], formula:"C₁₄H₂₄N₂O₁₀", mw:380.35, cat:"Chelators", state:"solid",
+    safety:"More selective for Ca²⁺ over Mg²⁺ than EDTA. Requires NaOH to dissolve." },
+
+  // ── SUGARS & POLYOLS ──
+  { name:"Sucrose", aka:["table sugar"], formula:"C₁₂H₂₂O₁₁", mw:342.30, cat:"Sugars & Polyols", state:"solid", safety:"" },
+  { name:"Glucose", aka:["dextrose","d-glucose"], formula:"C₆H₁₂O₆", mw:180.16, cat:"Sugars & Polyols", state:"solid", safety:"" },
+  { name:"Glycerol", aka:["glycerin"], formula:"C₃H₈O₃", mw:92.09, cat:"Sugars & Polyols", state:"liquid", density:1.261, purityPct:100, isDetergent:false,
+    safety:"Very viscous. Use positive-displacement pipettes or weigh by mass for accuracy." },
+  { name:"Sorbitol", aka:["d-sorbitol"], formula:"C₆H₁₄O₆", mw:182.17, cat:"Sugars & Polyols", state:"solid", safety:"" },
+
+  // ── DENATURANTS ──
+  { name:"Urea", aka:[], formula:"CH₄N₂O", mw:60.06, cat:"Denaturants", state:"solid",
+    safety:"Prepare fresh. Do not heat above 37°C (causes carbamylation of proteins). Deionize with mixed-bed resin if needed for IEF." },
+  { name:"Guanidine Hydrochloride", aka:["guanidinium chloride","GdnHCl","GuHCl"], formula:"CH₅N₃·HCl", mw:95.53, cat:"Denaturants", state:"solid", safety:"" },
+
+  // ── STAINS & DYES ──
+  { name:"Coomassie Brilliant Blue G-250", aka:["coomassie","bradford reagent dye"], formula:"C₄₇H₄₈N₃NaO₇S₂", mw:854.02, cat:"Stains & Dyes", state:"solid", safety:"Stains skin and surfaces." },
+  { name:"Bromophenol Blue", aka:["BPB"], formula:"C₁₉H₁₀Br₄O₅S", mw:669.96, cat:"Stains & Dyes", state:"solid", safety:"" },
+  { name:"Ponceau S", aka:["ponceau stain"], formula:"C₂₂H₁₂N₄Na₄O₁₃S₄", mw:760.58, cat:"Stains & Dyes", state:"solid", safety:"" },
+
+  // ── ANTIBIOTICS ──
+  { name:"Ampicillin Sodium", aka:["amp"], formula:"C₁₆H₁₈N₃NaO₄S", mw:371.39, cat:"Antibiotics", state:"solid",
+    safety:"Typical working concentration: 100 µg/mL. Stock: 100 mg/mL in water, filter-sterilize, store at −20°C." },
+  { name:"Kanamycin Sulfate", aka:["kan"], formula:"C₁₈H₃₆N₄O₁₁·H₂SO₄", mw:582.58, cat:"Antibiotics", state:"solid",
+    safety:"Typical working concentration: 50 µg/mL. Stock: 50 mg/mL in water, filter-sterilize." },
+  { name:"Chloramphenicol", aka:["cam"], formula:"C₁₁H₁₂Cl₂N₂O₅", mw:323.13, cat:"Antibiotics", state:"solid",
+    safety:"Dissolve in 100% ethanol (insoluble in water). Typical working concentration: 25–34 µg/mL." },
+  { name:"Tetracycline-HCl", aka:["tet"], formula:"C₂₂H₂₄N₂O₈·HCl", mw:480.90, cat:"Antibiotics", state:"solid",
+    safety:"Light-sensitive — wrap in foil. Dissolve in 70% ethanol. Working conc: 12.5 µg/mL." },
+
+  // ── INDUCERS ──
+  { name:"IPTG", aka:["isopropyl β-d-1-thiogalactopyranoside"], formula:"C₉H₁₈O₅S", mw:238.30, cat:"Inducers", state:"solid",
+    safety:"Typical stock: 1 M in water (238.3 mg/mL), filter-sterilize, aliquot at −20°C." },
+
+  // ── ORGANICS / MS SOLVENTS ──
+  { name:"Acetonitrile (HPLC grade)", aka:["ACN","MeCN"], formula:"CH₃CN", mw:41.05, cat:"Solvents", state:"liquid", density:0.786, purityPct:100, isDetergent:false,
+    safety:"Flammable and toxic. Use in fume hood." },
+  { name:"Methanol (HPLC grade)", aka:["MeOH"], formula:"CH₃OH", mw:32.04, cat:"Solvents", state:"liquid", density:0.791, purityPct:100, isDetergent:false,
+    safety:"Toxic. Use in fume hood. Do not ingest." },
+  { name:"Ethanol (absolute)", aka:["EtOH"], formula:"C₂H₅OH", mw:46.07, cat:"Solvents", state:"liquid", density:0.789, purityPct:100, isDetergent:false,
+    safety:"Flammable. Keep away from open flames." },
+  { name:"DMSO", aka:["dimethyl sulfoxide"], formula:"(CH₃)₂SO", mw:78.13, cat:"Solvents", state:"liquid", density:1.10, purityPct:100, isDetergent:false,
+    safety:"Penetrates skin rapidly and carries dissolved solutes with it. Wear gloves." },
+  { name:"Trifluoroacetic Acid", aka:["TFA"], formula:"CF₃COOH", mw:114.02, cat:"Solvents", state:"liquid", density:1.489, stockConc:13.1, stockUnit:"M",
+    safety:"Corrosive. Use in fume hood. Common ion-pairing agent for RP-HPLC." },
+];
+
+// ═══════════════════════════════════════
+//  SEARCH & DROPDOWN
+// ═══════════════════════════════════════
+let selectedReagent = null;
+let highlightIdx = -1;
+let filteredItems = [];
+
+function matchScore(reagent, query) {
+  const q = query.toLowerCase();
+  const name = reagent.name.toLowerCase();
+  if (name === q) return 100;
+  if (name.startsWith(q)) return 90;
+  if (name.includes(q)) return 70;
+  for (const a of (reagent.aka || [])) {
+    if (a.toLowerCase() === q) return 95;
+    if (a.toLowerCase().startsWith(q)) return 85;
+    if (a.toLowerCase().includes(q)) return 65;
+  }
+  if (reagent.formula && reagent.formula.toLowerCase().includes(q)) return 60;
+  if (reagent.cat && reagent.cat.toLowerCase().includes(q)) return 40;
+  return 0;
+}
+
+function renderDropdown(query) {
+  const dd = document.getElementById('dropdown');
+  dd.innerHTML = '';
+  highlightIdx = -1;
+
+  if (!query || query.length < 1) {
+    // Show all, grouped by category
+    const cats = {};
+    reagents.forEach((r, i) => {
+      if (!cats[r.cat]) cats[r.cat] = [];
+      cats[r.cat].push({ r, i });
+    });
+    for (const [cat, items] of Object.entries(cats)) {
+      const catDiv = document.createElement('div');
+      catDiv.className = 'dropdown-cat';
+      catDiv.textContent = cat;
+      dd.appendChild(catDiv);
+      items.forEach(({ r, i }) => {
+        dd.appendChild(makeItem(r, i));
+      });
+    }
+    filteredItems = reagents.map((r, i) => i);
+    dd.classList.add('open');
+    return;
+  }
+
+  const scored = reagents.map((r, i) => ({ r, i, score: matchScore(r, query) }))
+    .filter(x => x.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  filteredItems = scored.map(x => x.i);
+
+  if (scored.length === 0) {
+    dd.innerHTML = '<div style="padding:14px;color:var(--text-dim);font-size:14px;">No matching reagents found</div>';
+    dd.classList.add('open');
+    return;
+  }
+
+  scored.forEach(({ r, i }) => dd.appendChild(makeItem(r, i)));
+  dd.classList.add('open');
+}
+
+function makeItem(r, idx) {
+  const div = document.createElement('div');
+  div.className = 'dropdown-item';
+  div.dataset.idx = idx;
+  div.innerHTML = '<span class="name">' + r.name + '</span><span class="meta">' + r.mw + ' g/mol</span>';
+  div.addEventListener('mousedown', function(e) {
+    e.preventDefault();
+    selectReagent(idx);
+  });
+  return div;
+}
+
+function selectReagent(idx) {
+  selectedReagent = reagents[idx];
+  document.getElementById('substance').value = selectedReagent.name;
+  document.getElementById('dropdown').classList.remove('open');
+  calculate();
+}
+
+function onSubstanceInput() {
+  selectedReagent = null;
+  const q = document.getElementById('substance').value.trim();
+  renderDropdown(q);
+
+  // Auto-select if exact match
+  const exact = reagents.findIndex(r =>
+    r.name.toLowerCase() === q.toLowerCase() ||
+    (r.aka || []).some(a => a.toLowerCase() === q.toLowerCase())
+  );
+  if (exact >= 0) {
+    selectedReagent = reagents[exact];
+    calculate();
+  } else {
+    document.getElementById('resultCard').classList.remove('visible');
+  }
+}
+
+function onSubstanceFocus() {
+  const q = document.getElementById('substance').value.trim();
+  renderDropdown(q);
+}
+
+function onSubstanceKey(e) {
+  const dd = document.getElementById('dropdown');
+  const items = dd.querySelectorAll('.dropdown-item');
+  if (!dd.classList.contains('open') || items.length === 0) return;
+
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    highlightIdx = Math.min(highlightIdx + 1, items.length - 1);
+    updateHighlight(items);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    highlightIdx = Math.max(highlightIdx - 1, 0);
+    updateHighlight(items);
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (highlightIdx >= 0 && highlightIdx < items.length) {
+      selectReagent(parseInt(items[highlightIdx].dataset.idx));
+    }
+  } else if (e.key === 'Escape') {
+    dd.classList.remove('open');
+  }
+}
+
+function updateHighlight(items) {
+  items.forEach((el, i) => el.classList.toggle('highlighted', i === highlightIdx));
+  if (highlightIdx >= 0) items[highlightIdx].scrollIntoView({ block: 'nearest' });
+}
+
+// Close dropdown on click outside
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.substance-field')) {
+    document.getElementById('dropdown').classList.remove('open');
+  }
+});
+
+// ═══════════════════════════════════════
+//  CALCULATION ENGINE
+// ═══════════════════════════════════════
+const volFactors = { 'L': 1, 'mL': 1e-3, 'µL': 1e-6 };
+const concMolarFactors = { 'M': 1, 'mM': 1e-3, 'µM': 1e-6, 'nM': 1e-9 };
+const concMassFactors = { 'mg/mL': 1e-3, 'µg/mL': 1e-6, 'g/L': 1e-3, 'mg/L': 1e-6 }; // to kg/mL... let's use g/L as base
+// Actually let's simplify: g/L is our mass/vol base
+
+function calculate() {
+  const volRaw = parseFloat(document.getElementById('vol').value);
+  const concRaw = parseFloat(document.getElementById('conc').value);
+  const volUnit = document.getElementById('vol-unit').value;
+  const concUnit = document.getElementById('conc-unit').value;
+  const r = selectedReagent;
+
+  const card = document.getElementById('resultCard');
+  const warn = document.getElementById('warnBox');
+  warn.classList.remove('visible');
+
+  if (isNaN(volRaw) || isNaN(concRaw) || volRaw <= 0 || concRaw <= 0 || !r) {
+    card.classList.remove('visible');
+    return;
+  }
+
+  const volL = volRaw * volFactors[volUnit]; // in liters
+
+  let massG = null;       // grams of solid to weigh
+  let volLiquid = null;    // liters of liquid to pipette
+  let resultText = '';
+  let resultUnit = '';
+  let detailHTML = '';
+  let stepsHTML = '';
+  let isMolar = !!concMolarFactors[concUnit];
+  let isMassVol = (concUnit === 'mg/mL' || concUnit === 'µg/mL' || concUnit === 'g/L' || concUnit === 'mg/L');
+  let isPct = (concUnit === '%(w/v)' || concUnit === '%(v/v)');
+  let isFold = (concUnit === 'x');
+
+  if (isMolar) {
+    // mass = M * V(L) * MW
+    const M = concRaw * concMolarFactors[concUnit];
+    massG = M * volL * r.mw;
+  } else if (isMassVol) {
+    // Convert to g/L then multiply by volume
+    const gPerL = {
+      'mg/mL': function(c) { return c * 1; }, // mg/mL = g/L
+      'µg/mL': function(c) { return c * 1e-3; },
+      'g/L':   function(c) { return c; },
+      'mg/L':  function(c) { return c * 1e-3; },
+    };
+    const gpl = gPerL[concUnit](concRaw);
+    massG = gpl * volL;
+  } else if (concUnit === '%(w/v)') {
+    // %(w/v) = g per 100 mL
+    massG = (concRaw / 100) * volL * 1000; // g
+  } else if (concUnit === '%(v/v)') {
+    // %(v/v) = mL per 100 mL
+    const mLNeeded = (concRaw / 100) * volL * 1000;
+    volLiquid = mLNeeded / 1000; // in liters
+    massG = null;
+  } else if (isFold) {
+    // fold: if reagent has a stockConc, dilute from it
+    if (r.stockConc) {
+      // volume = (desired fold / stock fold) * final volume
+      // Actually fold doesn't map well. Skip for now
+    }
+    warn.textContent = 'Fold (x) concentration requires a known stock. Use molar or mass/volume units instead.';
+    warn.classList.add('visible');
+    card.classList.remove('visible');
+    return;
+  }
+
+  // If reagent is liquid with stock concentration, convert mass to volume of stock
+  let useVolumeOfStock = false;
+  let stockVolL = null;
+  let stockLabel = '';
+
+  if (r.state === 'liquid' && massG !== null) {
+    if (r.stockConc && r.stockUnit) {
+      // Calculate volume of stock needed
+      // Stock is at r.stockConc in r.stockUnit
+      if (isMolar && r.stockUnit === 'M') {
+        const M = concRaw * concMolarFactors[concUnit];
+        stockVolL = (M * volL) / r.stockConc;
+        useVolumeOfStock = true;
+        stockLabel = r.stockConc + ' ' + r.stockUnit + ' stock';
+      } else {
+        // For mass-based, use density
+        if (r.density) {
+          // vol = mass / density
+          volLiquid = (massG / 1000) / r.density; // liters
+          useVolumeOfStock = true;
+          stockLabel = 'neat liquid (d = ' + r.density + ' g/mL)';
+        }
+      }
+    } else if (r.density && (r.purityPct !== undefined || r.isDetergent !== undefined)) {
+      // For things like glycerol, triton — treat as neat liquid
+      // For %(v/v): already handled above
+      if (volLiquid === null && massG !== null) {
+        volLiquid = (massG / 1000) / r.density; // liters
+        useVolumeOfStock = true;
+        stockLabel = 'neat liquid (d = ' + r.density + ' g/mL)';
+      }
+    }
+  }
+
+  // Format result
+  function fmtSmart(val) {
+    if (val >= 1000) return parseFloat(val.toPrecision(6)).toLocaleString();
+    if (val >= 0.01) return parseFloat(val.toPrecision(5)).toString();
+    if (val >= 1e-6) return val.toExponential(3);
+    return val.toExponential(2);
+  }
+
+  function bestMassUnit(g) {
+    if (g >= 1000) return { val: g / 1000, unit: 'kg' };
+    if (g >= 1) return { val: g, unit: 'g' };
+    if (g >= 0.001) return { val: g * 1000, unit: 'mg' };
+    return { val: g * 1e6, unit: 'µg' };
+  }
+
+  function bestVolUnit(L) {
+    if (L >= 1) return { val: L, unit: 'L' };
+    if (L >= 0.001) return { val: L * 1000, unit: 'mL' };
+    if (L >= 1e-6) return { val: L * 1e6, unit: 'µL' };
+    return { val: L * 1e9, unit: 'nL' };
+  }
+
+  // Build output
+  let mainAmount, mainUnit;
+
+  if (useVolumeOfStock && stockVolL !== null) {
+    const v = bestVolUnit(stockVolL);
+    mainAmount = fmtSmart(v.val);
+    mainUnit = v.unit + ' of ' + stockLabel;
+  } else if (volLiquid !== null && (concUnit === '%(v/v)' || useVolumeOfStock)) {
+    const v = bestVolUnit(volLiquid);
+    mainAmount = fmtSmart(v.val);
+    mainUnit = v.unit + (useVolumeOfStock ? ' of ' + stockLabel : ' of liquid');
+  } else if (massG !== null) {
+    const m = bestMassUnit(massG);
+    mainAmount = fmtSmart(m.val);
+    mainUnit = m.unit + ' of ' + r.name;
+  } else {
+    card.classList.remove('visible');
+    return;
+  }
+
+  document.getElementById('resultHeader').textContent = 'You need';
+  document.getElementById('resultAmount').textContent = mainAmount;
+  document.getElementById('resultUnitLabel').textContent = mainUnit;
+
+  // Detail line
+  const concDisplay = concRaw + ' ' + concUnit;
+  const volDisplay = volRaw + ' ' + volUnit;
+  document.getElementById('resultDetail').innerHTML =
+    'To make <strong>' + volDisplay + '</strong> of <strong>' + concDisplay + ' ' + r.name + '</strong>';
+
+  // Steps
+  const steps = [];
+  const approxVol = bestVolUnit(volL * 0.8);
+  const finalVol = volRaw + ' ' + volUnit;
+
+  if (r.state === 'solid' && !useVolumeOfStock) {
+    steps.push('Weigh out <strong>' + mainAmount + ' ' + bestMassUnit(massG).unit + '</strong> of ' + r.name + '.');
+    steps.push('Add to a beaker or volumetric flask with approximately <strong>' + fmtSmart(approxVol.val) + ' ' + approxVol.unit + '</strong> of deionized water.');
+    steps.push('Stir or vortex until fully dissolved.');
+    if (r.bufferRange) {
+      steps.push('Adjust pH to your target value with appropriate acid or base. ' + (r.phNote || ''));
+    }
+    steps.push('Bring to final volume of <strong>' + finalVol + '</strong> with deionized water.');
+    if (volL >= 0.1) {
+      steps.push('Filter-sterilize (0.22 µm) or autoclave if needed.');
+    }
+  } else {
+    // Liquid
+    const pipetteAmt = useVolumeOfStock && stockVolL !== null
+      ? fmtSmart(bestVolUnit(stockVolL).val) + ' ' + bestVolUnit(stockVolL).unit
+      : fmtSmart(bestVolUnit(volLiquid).val) + ' ' + bestVolUnit(volLiquid).unit;
+
+    if (concUnit === '%(v/v)') {
+      const solventVol = bestVolUnit(volL - volLiquid);
+      steps.push('Measure <strong>' + pipetteAmt + '</strong> of ' + r.name + '.');
+      steps.push('Add <strong>' + fmtSmart(solventVol.val) + ' ' + solventVol.unit + '</strong> of solvent to reach <strong>' + finalVol + '</strong> total.');
+      steps.push('Mix well.');
+    } else {
+      steps.push('Measure <strong>' + pipetteAmt + '</strong> of ' + (stockLabel || r.name) + '.');
+      steps.push('Add to approximately <strong>' + fmtSmart(approxVol.val) + ' ' + approxVol.unit + '</strong> of deionized water.');
+      steps.push('Mix thoroughly.');
+      if (r.bufferRange) {
+        steps.push('Adjust pH as needed. ' + (r.phNote || ''));
+      }
+      steps.push('Bring to final volume of <strong>' + finalVol + '</strong>.');
+    }
+  }
+
+  const stepsEl = document.getElementById('recipeSteps');
+  stepsEl.innerHTML = '<h3>Preparation Steps</h3>';
+  steps.forEach((s, i) => {
+    stepsEl.innerHTML += '<div class="step"><span class="step-num">' + (i + 1) + '</span><span class="step-text">' + s + '</span></div>';
+  });
+
+  // Reagent info box
+  let infoLines = [];
+  infoLines.push('<span class="ri-label">MW</span> ' + r.mw + ' g/mol');
+  if (r.formula) infoLines.push('<span class="ri-label">Formula</span> ' + r.formula);
+  if (r.bufferRange) infoLines.push('<span class="ri-label">Buffer range</span> pH ' + r.bufferRange);
+  if (r.safety) infoLines.push('<span class="ri-label">Safety</span> ' + r.safety);
+
+  document.getElementById('reagentInfo').innerHTML = infoLines.join('<br>');
+
+  // Special warnings
+  if (r.name.includes('EDTA') && isMolar) {
+    warn.innerHTML = '<strong>Tip:</strong> EDTA will not dissolve until pH is raised to ~8.0. Add NaOH pellets or 10 N NaOH gradually while stirring.';
+    warn.classList.add('visible');
+  } else if (r.name === 'Urea' && isMolar) {
+    const molarConc = concRaw * concMolarFactors[concUnit];
+    if (molarConc >= 4) {
+      warn.innerHTML = '<strong>Tip:</strong> High-molar urea solutions (' + fmtSmart(molarConc) + ' M) have significant volume displacement. Dissolve urea first, then bring to final volume — do not add water to the line first.';
+      warn.classList.add('visible');
+    }
+  } else if (r.name === 'PMSF') {
+    warn.innerHTML = '<strong>Tip:</strong> PMSF is insoluble in water. Dissolve in isopropanol or absolute ethanol to make a concentrated stock (e.g. 100 mM), then dilute into your aqueous buffer immediately before use.';
+    warn.classList.add('visible');
+  } else if (r.name === 'Chloramphenicol') {
+    warn.innerHTML = '<strong>Tip:</strong> Chloramphenicol is poorly soluble in water. Dissolve in 100% ethanol to make your stock.';
+    warn.classList.add('visible');
+  }
+
+  card.classList.add('visible');
+}
+</script>
+</body>
+</html>

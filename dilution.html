@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dilution Calculator (C1V1=C2V2) — LabCalc</title>
+<meta name="description" content="Free C1V1=C2V2 dilution calculator with unit conversion. Supports M, mM, µM, mg/mL, µg/mL, µL, mL, L and more. Serial dilution calculator included.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0b1120;
+    --bg-card: #111827;
+    --border: #1e2d3d;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --accent: #818cf8;
+    --accent-glow: rgba(129, 140, 248, 0.15);
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+    --input-bg: #0d1526;
+    --focus-ring: rgba(129, 140, 248, 0.4);
+    --teal: #2dd4bf;
+  }
+
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; line-height: 1.6; }
+
+  .grain {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 9999;
+  }
+
+  nav { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 16px; }
+  nav a.logo-link { font-family: var(--font-mono); font-size: 13px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; color: var(--teal); text-decoration: none; }
+  nav a.logo-link span { color: var(--text-dim); }
+  nav .sep { color: var(--border); font-size: 18px; }
+  nav .page-name { font-size: 14px; color: var(--text-dim); }
+
+  .container { max-width: 720px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  h1 { font-size: clamp(26px, 4vw, 36px); font-weight: 700; letter-spacing: -0.5px; margin-bottom: 8px; }
+  .subtitle { color: var(--text-dim); font-size: 15px; margin-bottom: 36px; }
+
+  .tabs {
+    display: flex; gap: 4px; margin-bottom: 20px;
+    background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; padding: 4px;
+  }
+  .tabs button {
+    flex: 1; font-family: var(--font-body); font-size: 14px; font-weight: 500;
+    padding: 10px 16px; border-radius: 8px; border: none;
+    background: transparent; color: var(--text-dim); cursor: pointer; transition: all 0.2s;
+  }
+  .tabs button.active { background: var(--accent-glow); color: var(--accent); }
+
+  .calc-card {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 32px 28px;
+  }
+
+  .formula-bar {
+    font-family: var(--font-mono); font-size: 15px; color: var(--text-dim);
+    background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px 14px; margin-bottom: 28px; text-align: center; letter-spacing: 0.5px;
+  }
+  .formula-bar em { color: var(--accent); font-style: normal; font-weight: 600; }
+
+  .solve-for { margin-bottom: 24px; }
+  .solve-for > label { display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-dim); margin-bottom: 10px; }
+  .solve-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .solve-btns button {
+    font-family: var(--font-mono); font-size: 13px; font-weight: 500;
+    padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--input-bg); color: var(--text-dim); cursor: pointer; transition: all 0.2s;
+  }
+  .solve-btns button:hover { border-color: var(--accent); color: var(--text); }
+  .solve-btns button.active { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); }
+
+  .divider-row {
+    display: flex; align-items: center; gap: 16px; margin: 22px 0;
+  }
+  .divider-row .line { flex: 1; height: 1px; background: var(--border); }
+  .divider-row .label {
+    font-family: var(--font-mono); font-size: 12px; color: var(--text-dim);
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  .field { display: flex; flex-direction: column; }
+  .field > label { font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--text-dim); }
+
+  .input-with-unit {
+    display: flex;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: var(--input-bg);
+  }
+
+  .input-with-unit:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--focus-ring);
+  }
+
+  .input-with-unit.is-result {
+    background: var(--accent-glow);
+    border-color: var(--accent);
+  }
+
+  .input-with-unit input {
+    flex: 1;
+    min-width: 0;
+    font-family: var(--font-mono); font-size: 16px; font-weight: 500;
+    padding: 12px 14px;
+    border: none; background: transparent; color: var(--text);
+    outline: none;
+    -moz-appearance: textfield;
+  }
+
+  .input-with-unit.is-result input {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .input-with-unit input::-webkit-outer-spin-button,
+  .input-with-unit input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  .input-with-unit input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .input-with-unit select {
+    font-family: var(--font-mono); font-size: 13px; font-weight: 500;
+    padding: 0 10px;
+    border: none; border-left: 1px solid var(--border);
+    background: rgba(255,255,255, 0.03); color: var(--accent);
+    cursor: pointer; outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    min-width: 72px;
+    text-align: center;
+  }
+
+  .input-with-unit select option {
+    background: var(--bg-card);
+    color: var(--text);
+  }
+
+  .result-box {
+    margin-top: 24px; padding: 20px; border-radius: 10px;
+    background: var(--accent-glow); border: 1px solid rgba(129, 140, 248, 0.25);
+    text-align: center; display: none;
+  }
+  .result-box.visible { display: block; }
+  .result-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-dim); margin-bottom: 6px; }
+  .result-value { font-family: var(--font-mono); font-size: 28px; font-weight: 600; color: var(--accent); }
+  .result-value .result-unit { font-size: 15px; color: var(--text-dim); font-weight: 400; margin-left: 6px; }
+
+  .note-box {
+    margin-top: 16px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    background: rgba(251, 191, 36, 0.08);
+    border: 1px solid rgba(251, 191, 36, 0.2);
+    font-size: 13px;
+    color: #fbbf24;
+    display: none;
+  }
+  .note-box.visible { display: block; }
+
+  /* Serial dilution section */
+  .serial-fields { display: flex; flex-direction: column; gap: 16px; }
+  .serial-table-wrap { margin-top: 20px; overflow-x: auto; }
+  .serial-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .serial-table th {
+    text-align: left; font-weight: 600; color: var(--text-dim); font-size: 11px;
+    text-transform: uppercase; letter-spacing: 1px; padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .serial-table td {
+    padding: 8px 12px; border-bottom: 1px solid var(--border);
+    font-family: var(--font-mono); color: var(--text);
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .info-section { margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border); }
+  .info-section h2 { font-size: 20px; font-weight: 600; margin-bottom: 12px; }
+  .info-section p { color: var(--text-dim); font-size: 15px; margin-bottom: 12px; }
+
+  footer { text-align: center; padding: 24px; border-top: 1px solid var(--border); color: var(--text-dim); font-size: 13px; }
+  footer a { color: var(--teal); text-decoration: none; }
+
+  @media (max-width: 540px) {
+    .pair { grid-template-columns: 1fr; }
+    .container { padding: 32px 16px 60px; }
+    .calc-card { padding: 24px 16px; }
+    .input-with-unit select { min-width: 64px; font-size: 12px; padding: 0 6px; }
+  }
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<nav>
+  <a class="logo-link" href="index.html">Lab<span>Calc</span></a>
+  <span class="sep">›</span>
+  <span class="page-name">Dilution Calculator</span>
+</nav>
+
+<div class="container">
+  <h1>Dilution Calculator</h1>
+  <p class="subtitle">C₁V₁ = C₂V₂ — mix and match any concentration and volume units.</p>
+
+  <div class="tabs">
+    <button class="active" onclick="showPanel('simple')">Simple Dilution</button>
+    <button onclick="showPanel('serial')">Serial Dilution</button>
+  </div>
+
+  <!-- ============ Simple Dilution ============ -->
+  <div class="panel active" id="panel-simple">
+    <div class="calc-card">
+      <div class="formula-bar">
+        <em>C₁</em> × <em>V₁</em> = <em>C₂</em> × <em>V₂</em>
+      </div>
+
+      <div class="solve-for">
+        <label>Solve for</label>
+        <div class="solve-btns" id="solveBtns">
+          <button class="active" data-target="v1" onclick="setSimpleSolve('v1')">V₁ (stock vol)</button>
+          <button data-target="v2" onclick="setSimpleSolve('v2')">V₂ (final vol)</button>
+          <button data-target="c2" onclick="setSimpleSolve('c2')">C₂ (final conc)</button>
+          <button data-target="c1" onclick="setSimpleSolve('c1')">C₁ (stock conc)</button>
+        </div>
+      </div>
+
+      <!-- Stock -->
+      <div class="divider-row">
+        <span class="line"></span>
+        <span class="label">Stock Solution</span>
+        <span class="line"></span>
+      </div>
+
+      <div class="pair">
+        <div class="field">
+          <label>C₁ — Stock Concentration</label>
+          <div class="input-with-unit" id="wrap-c1">
+            <input type="number" id="c1" step="any" placeholder="—" oninput="calcSimple()">
+            <select id="c1-unit" onchange="calcSimple()">
+              <option value="M">M</option>
+              <option value="mM" selected>mM</option>
+              <option value="µM">µM</option>
+              <option value="nM">nM</option>
+              <option value="pM">pM</option>
+              <option value="mg/mL">mg/mL</option>
+              <option value="µg/mL">µg/mL</option>
+              <option value="ng/mL">ng/mL</option>
+              <option value="g/L">g/L</option>
+              <option value="mg/L">mg/L</option>
+              <option value="%(w/v)">%(w/v)</option>
+              <option value="%(v/v)">%(v/v)</option>
+              <option value="x">x</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>V₁ — Stock Volume</label>
+          <div class="input-with-unit" id="wrap-v1">
+            <input type="number" id="v1" step="any" placeholder="—" oninput="calcSimple()">
+            <select id="v1-unit" onchange="calcSimple()">
+              <option value="L">L</option>
+              <option value="mL">mL</option>
+              <option value="µL" selected>µL</option>
+              <option value="nL">nL</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Final -->
+      <div class="divider-row">
+        <span class="line"></span>
+        <span class="label">Final Solution</span>
+        <span class="line"></span>
+      </div>
+
+      <div class="pair">
+        <div class="field">
+          <label>C₂ — Final Concentration</label>
+          <div class="input-with-unit" id="wrap-c2">
+            <input type="number" id="c2" step="any" placeholder="—" oninput="calcSimple()">
+            <select id="c2-unit" onchange="calcSimple()">
+              <option value="M">M</option>
+              <option value="mM" selected>mM</option>
+              <option value="µM">µM</option>
+              <option value="nM">nM</option>
+              <option value="pM">pM</option>
+              <option value="mg/mL">mg/mL</option>
+              <option value="µg/mL">µg/mL</option>
+              <option value="ng/mL">ng/mL</option>
+              <option value="g/L">g/L</option>
+              <option value="mg/L">mg/L</option>
+              <option value="%(w/v)">%(w/v)</option>
+              <option value="%(v/v)">%(v/v)</option>
+              <option value="x">x</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>V₂ — Final Volume</label>
+          <div class="input-with-unit" id="wrap-v2">
+            <input type="number" id="v2" step="any" placeholder="—" oninput="calcSimple()">
+            <select id="v2-unit" onchange="calcSimple()">
+              <option value="L">L</option>
+              <option value="mL" selected>mL</option>
+              <option value="µL">µL</option>
+              <option value="nL">nL</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="result-box" id="simpleResult">
+        <div class="result-label" id="simpleLabel">Result</div>
+        <div class="result-value" id="simpleValue">—</div>
+      </div>
+
+      <div class="note-box" id="noteBox"></div>
+    </div>
+  </div>
+
+  <!-- ============ Serial Dilution ============ -->
+  <div class="panel" id="panel-serial">
+    <div class="calc-card">
+      <div class="formula-bar">
+        <em>Cₙ</em> = <em>C₁</em> × ( 1 / <em>DF</em> )ⁿ⁻¹
+      </div>
+
+      <div class="serial-fields">
+        <div class="pair">
+          <div class="field">
+            <label>Starting Concentration</label>
+            <div class="input-with-unit">
+              <input type="number" id="serial-c" step="any" placeholder="e.g. 100" oninput="calcSerial()">
+              <select id="serial-c-unit" onchange="calcSerial()">
+                <option value="M">M</option>
+                <option value="mM">mM</option>
+                <option value="µM" selected>µM</option>
+                <option value="nM">nM</option>
+                <option value="mg/mL">mg/mL</option>
+                <option value="µg/mL">µg/mL</option>
+                <option value="ng/mL">ng/mL</option>
+                <option value="x">x</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Dilution Factor</label>
+            <div class="input-with-unit">
+              <input type="number" id="serial-df" step="any" placeholder="e.g. 10" oninput="calcSerial()">
+              <select disabled style="min-width:48px;background:transparent;color:var(--text-dim);"><option>fold</option></select>
+            </div>
+          </div>
+        </div>
+        <div class="pair">
+          <div class="field">
+            <label>Number of Dilutions</label>
+            <div class="input-with-unit">
+              <input type="number" id="serial-n" step="1" min="1" max="20" placeholder="e.g. 6" oninput="calcSerial()">
+              <select disabled style="min-width:48px;background:transparent;color:var(--text-dim);"><option>steps</option></select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Final Volume per Tube</label>
+            <div class="input-with-unit">
+              <input type="number" id="serial-vol" step="any" placeholder="e.g. 1000" oninput="calcSerial()">
+              <select id="serial-vol-unit" onchange="calcSerial()">
+                <option value="L">L</option>
+                <option value="mL">mL</option>
+                <option value="µL" selected>µL</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="serial-table-wrap" id="serialTableWrap" style="display:none;">
+        <table class="serial-table">
+          <thead>
+            <tr>
+              <th>Tube</th>
+              <th>Concentration</th>
+              <th>Transfer Vol</th>
+              <th>Diluent Vol</th>
+            </tr>
+          </thead>
+          <tbody id="serialBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-section">
+    <h2>How dilution calculations work</h2>
+    <p>The equation C₁V₁ = C₂V₂ is based on conservation of solute — the total amount of substance remains constant before and after dilution. This calculator handles unit conversion automatically: you can enter C₁ in mM and C₂ in µM, or V₁ in µL and V₂ in mL, and it will convert internally before solving.</p>
+    <p><strong>Important:</strong> C₁ and C₂ must be in compatible concentration families. You can mix molar units (M, mM, µM, nM, pM) with each other, or mass/volume units (mg/mL, µg/mL, g/L) with each other, but you cannot mix across families (e.g., mM and mg/mL) without knowing the molecular weight — the calculator will warn you if this happens.</p>
+    <p>For serial dilutions, each tube is diluted by the same factor. The transfer volume equals the final volume divided by (dilution factor − 1), and the diluent volume is the remainder.</p>
+
+    <h2 style="margin-top:24px;">Supported units</h2>
+    <p><strong>Concentration:</strong> M, mM, µM, nM, pM, mg/mL, µg/mL, ng/mL, g/L, mg/L, %(w/v), %(v/v), and fold (x).</p>
+    <p><strong>Volume:</strong> L, mL, µL, and nL.</p>
+  </div>
+</div>
+
+<footer>
+  <a href="index.html">← Back to all calculators</a> &nbsp;·&nbsp; © 2026 LabCalc
+</footer>
+
+<script>
+// ── Unit conversion factors ──
+const concFamilies = {
+  'M':      { family: 'molar',   toBase: 1 },
+  'mM':     { family: 'molar',   toBase: 1e-3 },
+  'µM':     { family: 'molar',   toBase: 1e-6 },
+  'nM':     { family: 'molar',   toBase: 1e-9 },
+  'pM':     { family: 'molar',   toBase: 1e-12 },
+  'mg/mL':  { family: 'massvol', toBase: 1 },
+  'µg/mL':  { family: 'massvol', toBase: 1e-3 },
+  'ng/mL':  { family: 'massvol', toBase: 1e-6 },
+  'g/L':    { family: 'massvol', toBase: 1 },
+  'mg/L':   { family: 'massvol', toBase: 1e-3 },
+  '%(w/v)': { family: 'pct_wv',  toBase: 1 },
+  '%(v/v)': { family: 'pct_vv',  toBase: 1 },
+  'x':      { family: 'fold',    toBase: 1 },
+};
+
+const volFactors = { 'L': 1, 'mL': 1e-3, 'µL': 1e-6, 'nL': 1e-9 };
+
+function concToBase(val, unit) { return val * concFamilies[unit].toBase; }
+function baseToConc(val, unit) { return val / concFamilies[unit].toBase; }
+function volToBase(val, unit)  { return val * volFactors[unit]; }
+function baseToVol(val, unit)  { return val / volFactors[unit]; }
+function concFamily(unit)      { return concFamilies[unit].family; }
+
+// ── Simple dilution ──
+let simpleSolve = 'v1';
+
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  document.querySelectorAll('.tabs button').forEach((b, i) => {
+    b.classList.toggle('active', (i === 0 && name === 'simple') || (i === 1 && name === 'serial'));
+  });
+}
+
+function setSimpleSolve(target) {
+  simpleSolve = target;
+  document.querySelectorAll('#solveBtns button').forEach(b => {
+    b.classList.toggle('active', b.dataset.target === target);
+  });
+  ['c1','v1','c2','v2'].forEach(id => {
+    document.getElementById(id).disabled = false;
+    document.getElementById('wrap-' + id).classList.remove('is-result');
+  });
+  document.getElementById(target).disabled = true;
+  document.getElementById(target).value = '';
+  document.getElementById('wrap-' + target).classList.add('is-result');
+  calcSimple();
+}
+
+function fmt(val) {
+  if (val === null || val === undefined || isNaN(val) || !isFinite(val)) return null;
+  if (val === 0) return '0';
+  if (Math.abs(val) >= 0.001 && Math.abs(val) < 1e7) {
+    return parseFloat(val.toPrecision(6)).toString();
+  }
+  return val.toExponential(4);
+}
+
+function calcSimple() {
+  const c1Raw = parseFloat(document.getElementById('c1').value);
+  const v1Raw = parseFloat(document.getElementById('v1').value);
+  const c2Raw = parseFloat(document.getElementById('c2').value);
+  const v2Raw = parseFloat(document.getElementById('v2').value);
+
+  const c1Unit = document.getElementById('c1-unit').value;
+  const v1Unit = document.getElementById('v1-unit').value;
+  const c2Unit = document.getElementById('c2-unit').value;
+  const v2Unit = document.getElementById('v2-unit').value;
+
+  const box = document.getElementById('simpleResult');
+  const noteBox = document.getElementById('noteBox');
+  noteBox.classList.remove('visible');
+
+  // Check concentration family compatibility when both conc are inputs
+  const solvingForConc = (simpleSolve === 'c1' || simpleSolve === 'c2');
+  if (!solvingForConc) {
+    const f1 = concFamily(c1Unit);
+    const f2 = concFamily(c2Unit);
+    if (f1 !== f2) {
+      box.classList.remove('visible');
+      noteBox.innerHTML = '\u26A0 Cannot mix <strong>' + c1Unit + '</strong> with <strong>' + c2Unit + '</strong> \u2014 choose compatible concentration units (e.g., both molar or both mass/volume).';
+      noteBox.classList.add('visible');
+      return;
+    }
+  }
+
+  // Convert to base units
+  const c1 = isNaN(c1Raw) ? NaN : concToBase(c1Raw, c1Unit);
+  const v1 = isNaN(v1Raw) ? NaN : volToBase(v1Raw, v1Unit);
+  const c2 = isNaN(c2Raw) ? NaN : concToBase(c2Raw, c2Unit);
+  const v2 = isNaN(v2Raw) ? NaN : volToBase(v2Raw, v2Unit);
+
+  let result = null, label = '', unit = '';
+
+  switch (simpleSolve) {
+    case 'v1':
+      if (!isNaN(c1) && !isNaN(c2) && !isNaN(v2) && c1 !== 0) {
+        result = baseToVol((c2 * v2) / c1, v1Unit);
+        unit = v1Unit;
+      }
+      label = 'V\u2081 (Stock Volume)';
+      break;
+    case 'v2':
+      if (!isNaN(c1) && !isNaN(v1) && !isNaN(c2) && c2 !== 0) {
+        result = baseToVol((c1 * v1) / c2, v2Unit);
+        unit = v2Unit;
+      }
+      label = 'V\u2082 (Final Volume)';
+      break;
+    case 'c2':
+      if (!isNaN(c1) && !isNaN(v1) && !isNaN(v2) && v2 !== 0) {
+        result = baseToConc((c1 * v1) / v2, c2Unit);
+        unit = c2Unit;
+      }
+      label = 'C\u2082 (Final Concentration)';
+      break;
+    case 'c1':
+      if (!isNaN(c2) && !isNaN(v2) && !isNaN(v1) && v1 !== 0) {
+        result = baseToConc((c2 * v2) / v1, c1Unit);
+        unit = c1Unit;
+      }
+      label = 'C\u2081 (Stock Concentration)';
+      break;
+  }
+
+  const formatted = fmt(result);
+  if (formatted !== null && result > 0) {
+    document.getElementById('simpleLabel').textContent = label;
+    document.getElementById('simpleValue').innerHTML = formatted + '<span class="result-unit">' + unit + '</span>';
+    box.classList.add('visible');
+    document.getElementById(simpleSolve).value = formatted;
+
+    // Check if V1 > V2
+    let v1Chk, v2Chk;
+    if (simpleSolve === 'v1') { v1Chk = volToBase(result, v1Unit); v2Chk = v2; }
+    else if (simpleSolve === 'v2') { v1Chk = v1; v2Chk = volToBase(result, v2Unit); }
+    else { v1Chk = v1; v2Chk = v2; }
+    if (!isNaN(v1Chk) && !isNaN(v2Chk) && v1Chk > v2Chk * 1.0001) {
+      noteBox.textContent = '\u26A0 V\u2081 exceeds V\u2082 \u2014 you cannot dilute to a higher concentration. Check your values.';
+      noteBox.classList.add('visible');
+    }
+  } else {
+    box.classList.remove('visible');
+  }
+}
+
+// ── Serial dilution ──
+function calcSerial() {
+  const c = parseFloat(document.getElementById('serial-c').value);
+  const cUnit = document.getElementById('serial-c-unit').value;
+  const df = parseFloat(document.getElementById('serial-df').value);
+  const n = parseInt(document.getElementById('serial-n').value);
+  const vol = parseFloat(document.getElementById('serial-vol').value);
+  const volUnit = document.getElementById('serial-vol-unit').value;
+
+  const wrap = document.getElementById('serialTableWrap');
+  const body = document.getElementById('serialBody');
+
+  if (isNaN(c) || isNaN(df) || isNaN(n) || isNaN(vol) || df <= 1 || n < 1 || n > 20) {
+    wrap.style.display = 'none';
+    return;
+  }
+
+  const transferVol = vol / (df - 1);
+  const diluentVol = vol - transferVol;
+
+  body.innerHTML = '';
+  let conc = c;
+  for (let i = 0; i < n; i++) {
+    if (i > 0) conc = conc / df;
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td>' + (i + 1) + '</td>'
+      + '<td>' + fmt(conc) + ' ' + cUnit + '</td>'
+      + '<td>' + (i === 0 ? '(stock)' : fmt(transferVol) + ' ' + volUnit) + '</td>'
+      + '<td>' + (i === 0 ? '\u2014' : fmt(diluentVol) + ' ' + volUnit) + '</td>';
+    body.appendChild(tr);
+  }
+  wrap.style.display = 'block';
+}
+
+// Initialize
+setSimpleSolve('v1');
+</script>
+</body>
+</html>

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RCF ↔ RPM Converter — LabCalc</title>
+<meta name="description" content="Free RCF to RPM and RPM to RCF converter. Enter rotor radius and convert between relative centrifugal force and rotations per minute instantly.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0b1120;
+    --bg-card: #111827;
+    --border: #1e2d3d;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --accent: #f472b6;
+    --accent-glow: rgba(244, 114, 182, 0.15);
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+    --input-bg: #0d1526;
+    --focus-ring: rgba(244, 114, 182, 0.4);
+  }
+
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; line-height: 1.6; }
+
+  .grain {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 9999;
+  }
+
+  nav { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 16px; }
+  nav a.logo-link { font-family: var(--font-mono); font-size: 13px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; color: #2dd4bf; text-decoration: none; }
+  nav a.logo-link span { color: var(--text-dim); }
+  nav .sep { color: var(--border); font-size: 18px; }
+  nav .page-name { font-size: 14px; color: var(--text-dim); }
+
+  .container { max-width: 680px; margin: 0 auto; padding: 48px 24px 80px; }
+  h1 { font-size: clamp(26px, 4vw, 36px); font-weight: 700; letter-spacing: -0.5px; margin-bottom: 8px; }
+  .subtitle { color: var(--text-dim); font-size: 15px; margin-bottom: 36px; }
+
+  .calc-card {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 32px 28px;
+  }
+
+  .formula-bar {
+    font-family: var(--font-mono); font-size: 13px; color: var(--text-dim);
+    background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px 14px; margin-bottom: 28px; text-align: center; letter-spacing: 0.3px;
+  }
+  .formula-bar em { color: var(--accent); font-style: normal; font-weight: 500; }
+
+  .mode-toggle {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 4px;
+  }
+
+  .mode-toggle button {
+    flex: 1; font-family: var(--font-body); font-size: 14px; font-weight: 500;
+    padding: 10px 16px; border-radius: 8px; border: none;
+    background: transparent; color: var(--text-dim); cursor: pointer; transition: all 0.2s;
+  }
+  .mode-toggle button.active { background: var(--accent-glow); color: var(--accent); }
+
+  .fields { display: flex; flex-direction: column; gap: 16px; }
+
+  .field { display: flex; flex-direction: column; }
+  .field label { font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--text-dim); }
+  .field label .unit { font-family: var(--font-mono); font-size: 11px; color: var(--accent); margin-left: 4px; }
+
+  .field input {
+    width: 100%; font-family: var(--font-mono); font-size: 18px; font-weight: 500;
+    padding: 14px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--input-bg); color: var(--text); outline: none; transition: border-color 0.2s;
+    -moz-appearance: textfield;
+  }
+  .field input::-webkit-outer-spin-button, .field input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--focus-ring); }
+
+  .swap-icon {
+    align-self: center;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--accent);
+    font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin: -4px 0;
+  }
+
+  .swap-icon:hover {
+    background: var(--accent-glow);
+    border-color: var(--accent);
+    transform: rotate(180deg);
+  }
+
+  .result-box {
+    margin-top: 24px; padding: 24px; border-radius: 10px;
+    background: var(--accent-glow); border: 1px solid rgba(244, 114, 182, 0.25);
+    text-align: center; display: none;
+  }
+  .result-box.visible { display: block; }
+  .result-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-dim); margin-bottom: 6px; }
+  .result-value { font-family: var(--font-mono); font-size: 32px; font-weight: 600; color: var(--accent); }
+  .result-value .result-unit { font-size: 16px; color: var(--text-dim); font-weight: 400; margin-left: 6px; }
+
+  .rotor-section {
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .rotor-section h3 {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+
+  .rotor-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .rotor-presets button {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+    padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--input-bg); color: var(--text-dim); cursor: pointer; transition: all 0.15s;
+  }
+  .rotor-presets button:hover { border-color: var(--accent); color: var(--text); }
+
+  .info-section { margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border); }
+  .info-section h2 { font-size: 20px; font-weight: 600; margin-bottom: 12px; }
+  .info-section p { color: var(--text-dim); font-size: 15px; margin-bottom: 12px; }
+
+  footer { text-align: center; padding: 24px; border-top: 1px solid var(--border); color: var(--text-dim); font-size: 13px; }
+  footer a { color: #2dd4bf; text-decoration: none; }
+
+  @media (max-width: 500px) {
+    .container { padding: 32px 16px 60px; }
+    .calc-card { padding: 24px 18px; }
+  }
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<nav>
+  <a class="logo-link" href="index.html">Lab<span>Calc</span></a>
+  <span class="sep">›</span>
+  <span class="page-name">RCF ↔ RPM Converter</span>
+</nav>
+
+<div class="container">
+  <h1>RCF ↔ RPM Converter</h1>
+  <p class="subtitle">Convert between relative centrifugal force (×g) and rotations per minute. Just enter your rotor radius.</p>
+
+  <div class="calc-card">
+    <div class="formula-bar">
+      <em>RCF</em> = 1.118 × 10⁻⁵ × <em>r</em> × <em>RPM</em>²
+    </div>
+
+    <div class="mode-toggle">
+      <button class="active" onclick="setMode('rpm-to-rcf')">RPM → RCF</button>
+      <button onclick="setMode('rcf-to-rpm')">RCF → RPM</button>
+    </div>
+
+    <div class="fields">
+      <div class="field">
+        <label>Rotor Radius <span class="unit">mm (center to bottom of tube)</span></label>
+        <input type="number" id="radius" step="any" placeholder="e.g. 87" oninput="convert()">
+      </div>
+
+      <div class="field" id="inputField">
+        <label id="inputLabel">RPM <span class="unit">revolutions per minute</span></label>
+        <input type="number" id="inputVal" step="any" placeholder="e.g. 14000" oninput="convert()">
+      </div>
+
+      <div class="swap-icon" onclick="toggleMode()" title="Swap direction">⇅</div>
+
+      <div class="result-box" id="resultBox">
+        <div class="result-label" id="resultLabel">RCF</div>
+        <div class="result-value" id="resultValue">—</div>
+      </div>
+    </div>
+
+    <div class="rotor-section">
+      <h3>Common rotor radii (click to use)</h3>
+      <div class="rotor-presets">
+        <button onclick="setRadius(64)">Microcentrifuge (64 mm)</button>
+        <button onclick="setRadius(87)">Tabletop fixed (87 mm)</button>
+        <button onclick="setRadius(104)">Tabletop swing (104 mm)</button>
+        <button onclick="setRadius(137)">Floor model (137 mm)</button>
+        <button onclick="setRadius(171)">High-speed (171 mm)</button>
+        <button onclick="setRadius(230)">Ultracentrifuge (230 mm)</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-section">
+    <h2>Why use RCF instead of RPM?</h2>
+    <p>RCF (relative centrifugal force, reported in ×g) is the actual force experienced by your sample and is comparable across different centrifuges. RPM depends on rotor radius — 10,000 RPM in a microcentrifuge produces a very different force than 10,000 RPM in a floor-model centrifuge.</p>
+    <p>Protocols should always specify RCF rather than RPM to ensure reproducibility. The radius to use is the distance from the center of rotation to the <em>bottom</em> of your tube (where your pellet forms), often labeled r<sub>max</sub> in rotor specifications.</p>
+
+    <h2 style="margin-top: 24px;">Common centrifugation speeds</h2>
+    <p>Cell pelleting: 300–500 ×g. Protein precipitation: 10,000–16,000 ×g. Bacterial pelleting: 3,000–5,000 ×g. DNA/RNA precipitation: 12,000–16,000 ×g. Subcellular fractionation: 100,000+ ×g (ultracentrifuge).</p>
+  </div>
+</div>
+
+<footer>
+  <a href="index.html">← Back to all calculators</a> &nbsp;·&nbsp; &copy; 2026 LabCalc
+</footer>
+
+<script>
+let mode = 'rpm-to-rcf';
+
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll('.mode-toggle button').forEach((b, i) => {
+    b.classList.toggle('active', (i === 0 && m === 'rpm-to-rcf') || (i === 1 && m === 'rcf-to-rpm'));
+  });
+  updateLabels();
+  document.getElementById('inputVal').value = '';
+  document.getElementById('resultBox').classList.remove('visible');
+}
+
+function toggleMode() {
+  setMode(mode === 'rpm-to-rcf' ? 'rcf-to-rpm' : 'rpm-to-rcf');
+}
+
+function updateLabels() {
+  const inputLabel = document.getElementById('inputLabel');
+  const resultLabel = document.getElementById('resultLabel');
+  if (mode === 'rpm-to-rcf') {
+    inputLabel.innerHTML = 'RPM <span class="unit">revolutions per minute</span>';
+    document.getElementById('inputVal').placeholder = 'e.g. 14000';
+  } else {
+    inputLabel.innerHTML = 'RCF <span class="unit">× g</span>';
+    document.getElementById('inputVal').placeholder = 'e.g. 21000';
+  }
+}
+
+function setRadius(r) {
+  document.getElementById('radius').value = r;
+  convert();
+}
+
+function fmt(val) {
+  if (val === null || isNaN(val) || !isFinite(val)) return null;
+  if (val === 0) return '0';
+  if (Math.abs(val) >= 1 && Math.abs(val) < 1e6) return Math.round(val).toLocaleString();
+  if (Math.abs(val) < 1) return parseFloat(val.toPrecision(4)).toString();
+  return val.toExponential(3);
+}
+
+function convert() {
+  const r = parseFloat(document.getElementById('radius').value);
+  const input = parseFloat(document.getElementById('inputVal').value);
+  const box = document.getElementById('resultBox');
+
+  if (isNaN(r) || isNaN(input) || r <= 0) {
+    box.classList.remove('visible');
+    return;
+  }
+
+  // RCF = 1.118e-5 * r(mm) * RPM^2
+  // RPM = sqrt(RCF / (1.118e-5 * r))
+  let result, label, unit;
+
+  if (mode === 'rpm-to-rcf') {
+    result = 1.118e-5 * r * input * input;
+    label = 'RCF';
+    unit = '× g';
+  } else {
+    result = Math.sqrt(input / (1.118e-5 * r));
+    label = 'RPM';
+    unit = 'rev/min';
+  }
+
+  const formatted = fmt(result);
+  if (formatted) {
+    document.getElementById('resultLabel').textContent = label;
+    document.getElementById('resultValue').innerHTML = `${formatted}<span class="result-unit">${unit}</span>`;
+    box.classList.add('visible');
+  } else {
+    box.classList.remove('visible');
+  }
+}
+</script>
+</body>
+</html>

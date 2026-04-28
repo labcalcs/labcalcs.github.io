@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Molarity Calculator — LabCalc</title>
+<meta name="description" content="Free molarity calculator. Calculate moles, molarity, volume, or mass from molecular weight. Instant results for chemistry and lab work.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0b1120;
+    --bg-card: #111827;
+    --border: #1e2d3d;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --accent: #2dd4bf;
+    --accent-glow: rgba(45, 212, 191, 0.15);
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+    --input-bg: #0d1526;
+    --focus-ring: rgba(45, 212, 191, 0.4);
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  .grain {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 9999;
+  }
+
+  nav {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  nav a.logo-link {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  nav a.logo-link span { color: var(--text-dim); }
+
+  nav .sep { color: var(--border); font-size: 18px; }
+
+  nav .page-name {
+    font-size: 14px;
+    color: var(--text-dim);
+  }
+
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  h1 {
+    font-size: clamp(26px, 4vw, 36px);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    color: var(--text-dim);
+    font-size: 15px;
+    margin-bottom: 36px;
+  }
+
+  .calc-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 32px 28px;
+  }
+
+  .formula-bar {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text-dim);
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 28px;
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+
+  .formula-bar em {
+    color: var(--accent);
+    font-style: normal;
+    font-weight: 500;
+  }
+
+  .solve-for {
+    margin-bottom: 24px;
+  }
+
+  .solve-for label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+  }
+
+  .solve-btns {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .solve-btns button {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--input-bg);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .solve-btns button:hover {
+    border-color: var(--accent);
+    color: var(--text);
+  }
+
+  .solve-btns button.active {
+    background: var(--accent-glow);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .field.full { grid-column: 1 / -1; }
+
+  .field label {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--text-dim);
+  }
+
+  .field label .unit {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    margin-left: 4px;
+  }
+
+  .input-wrap {
+    position: relative;
+  }
+
+  .field input, .field select {
+    width: 100%;
+    font-family: var(--font-mono);
+    font-size: 16px;
+    font-weight: 500;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--input-bg);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+    -moz-appearance: textfield;
+  }
+
+  .field input::-webkit-outer-spin-button,
+  .field input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
+
+  .field input:focus, .field select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--focus-ring);
+  }
+
+  .field input.is-result {
+    background: var(--accent-glow);
+    border-color: var(--accent);
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .field input:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .result-box {
+    margin-top: 24px;
+    padding: 20px;
+    border-radius: 10px;
+    background: var(--accent-glow);
+    border: 1px solid rgba(45, 212, 191, 0.25);
+    text-align: center;
+    display: none;
+  }
+
+  .result-box.visible { display: block; }
+
+  .result-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+
+  .result-value {
+    font-family: var(--font-mono);
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .result-value .result-unit {
+    font-size: 16px;
+    color: var(--text-dim);
+    font-weight: 400;
+    margin-left: 4px;
+  }
+
+  .info-section {
+    margin-top: 48px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+
+  .info-section h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .info-section p {
+    color: var(--text-dim);
+    font-size: 15px;
+    margin-bottom: 12px;
+  }
+
+  .common-mw {
+    margin-top: 16px;
+  }
+
+  .common-mw summary {
+    cursor: pointer;
+    color: var(--accent);
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+
+  .mw-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-top: 8px;
+  }
+
+  .mw-table th {
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-dim);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mw-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  .mw-table td:last-child {
+    font-family: var(--font-mono);
+    color: var(--accent);
+  }
+
+  .mw-table tr { cursor: pointer; transition: background 0.15s; }
+  .mw-table tbody tr:hover { background: var(--accent-glow); }
+
+  footer {
+    text-align: center;
+    padding: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 13px;
+  }
+
+  footer a { color: var(--accent); text-decoration: none; }
+
+  @media (max-width: 500px) {
+    .fields { grid-template-columns: 1fr; }
+    .container { padding: 32px 16px 60px; }
+    .calc-card { padding: 24px 18px; }
+  }
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<nav>
+  <a class="logo-link" href="index.html">Lab<span>Calc</span></a>
+  <span class="sep">›</span>
+  <span class="page-name">Molarity Calculator</span>
+</nav>
+
+<div class="container">
+  <h1>Molarity Calculator</h1>
+  <p class="subtitle">Calculate molarity, mass, volume, or moles — leave one field blank to solve for it.</p>
+
+  <div class="calc-card">
+    <div class="formula-bar">
+      <em>M</em> = <em>mass</em> / ( <em>MW</em> × <em>V</em> )  &nbsp;→&nbsp;  <em>M</em> = <em>n</em> / <em>V</em>
+    </div>
+
+    <div class="solve-for">
+      <label>Solve for</label>
+      <div class="solve-btns">
+        <button class="active" data-target="molarity" onclick="setSolve('molarity')">Molarity (M)</button>
+        <button data-target="mass" onclick="setSolve('mass')">Mass (g)</button>
+        <button data-target="volume" onclick="setSolve('volume')">Volume (L)</button>
+        <button data-target="moles" onclick="setSolve('moles')">Moles (mol)</button>
+      </div>
+    </div>
+
+    <div class="fields">
+      <div class="field">
+        <label>Molarity <span class="unit">mol/L</span></label>
+        <input type="number" id="molarity" step="any" placeholder="—" oninput="calculate()">
+      </div>
+      <div class="field">
+        <label>Volume <span class="unit">L</span></label>
+        <input type="number" id="volume" step="any" placeholder="—" oninput="calculate()">
+      </div>
+      <div class="field">
+        <label>Mass <span class="unit">g</span></label>
+        <input type="number" id="mass" step="any" placeholder="—" oninput="calculate()">
+      </div>
+      <div class="field">
+        <label>Molecular Weight <span class="unit">g/mol</span></label>
+        <input type="number" id="mw" step="any" placeholder="e.g. 58.44" oninput="calculate()">
+      </div>
+      <div class="field">
+        <label>Moles <span class="unit">mol</span></label>
+        <input type="number" id="moles" step="any" placeholder="—" oninput="calculate()">
+      </div>
+    </div>
+
+    <div class="result-box" id="resultBox">
+      <div class="result-label" id="resultLabel">Result</div>
+      <div class="result-value" id="resultValue">—</div>
+    </div>
+  </div>
+
+  <div class="info-section">
+    <h2>How to use this calculator</h2>
+    <p>Select what you want to solve for, fill in the known values, and the result updates instantly. Molarity (M) is defined as moles of solute per liter of solution.</p>
+    <p>When solving for <strong>molarity</strong> or <strong>mass</strong>, you need to provide the molecular weight (MW) of your compound. When solving for <strong>moles</strong>, MW is not required.</p>
+
+    <details class="common-mw">
+      <summary>Common molecular weights (click to autofill)</summary>
+      <table class="mw-table">
+        <thead><tr><th>Compound</th><th>Formula</th><th>MW (g/mol)</th></tr></thead>
+        <tbody id="mwTable">
+        </tbody>
+      </table>
+    </details>
+  </div>
+</div>
+
+<footer>
+  <a href="index.html">← Back to all calculators</a> &nbsp;·&nbsp; &copy; 2026 LabCalc
+</footer>
+
+<script>
+const compounds = [
+  ["Sodium Chloride", "NaCl", 58.44],
+  ["Tris Base", "C₄H₁₁NO₃", 121.14],
+  ["Tris-HCl", "C₄H₁₁NO₃·HCl", 157.60],
+  ["EDTA (disodium)", "Na₂C₁₀H₁₄N₂O₈·2H₂O", 372.24],
+  ["SDS", "C₁₂H₂₅NaO₄S", 288.38],
+  ["Glucose", "C₆H₁₂O₆", 180.16],
+  ["Sucrose", "C₁₂H₂₂O₁₁", 342.30],
+  ["Urea", "CH₄N₂O", 60.06],
+  ["HEPES", "C₈H₁₈N₂O₄S", 238.30],
+  ["DTT", "C₄H₁₀O₂S₂", 154.25],
+  ["Calcium Chloride", "CaCl₂", 110.98],
+  ["Magnesium Chloride", "MgCl₂·6H₂O", 203.30],
+  ["Potassium Chloride", "KCl", 74.55],
+  ["Ammonium Sulfate", "(NH₄)₂SO₄", 132.14],
+  ["Sodium Hydroxide", "NaOH", 40.00],
+  ["Hydrochloric Acid", "HCl", 36.46],
+  ["Acetic Acid", "CH₃COOH", 60.05],
+  ["Ethanol", "C₂H₅OH", 46.07],
+  ["Glycerol", "C₃H₈O₃", 92.09],
+  ["BSA", "Protein", 66430],
+];
+
+const tbody = document.getElementById('mwTable');
+compounds.forEach(([name, formula, mw]) => {
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td>${name}</td><td>${formula}</td><td>${mw}</td>`;
+  tr.addEventListener('click', () => {
+    document.getElementById('mw').value = mw;
+    calculate();
+  });
+  tbody.appendChild(tr);
+});
+
+let solveFor = 'molarity';
+
+function setSolve(target) {
+  solveFor = target;
+  document.querySelectorAll('.solve-btns button').forEach(b => {
+    b.classList.toggle('active', b.dataset.target === target);
+  });
+  document.querySelectorAll('.fields input').forEach(i => {
+    i.disabled = false;
+    i.classList.remove('is-result');
+  });
+  const el = document.getElementById(target);
+  el.disabled = true;
+  el.value = '';
+  el.classList.add('is-result');
+  calculate();
+}
+
+function formatResult(val) {
+  if (val === null || val === undefined || isNaN(val) || !isFinite(val)) return null;
+  if (val === 0) return '0';
+  if (Math.abs(val) >= 0.001 && Math.abs(val) < 1e6) {
+    return parseFloat(val.toPrecision(6)).toString();
+  }
+  return val.toExponential(4);
+}
+
+function calculate() {
+  const M = parseFloat(document.getElementById('molarity').value);
+  const V = parseFloat(document.getElementById('volume').value);
+  const mass = parseFloat(document.getElementById('mass').value);
+  const mw = parseFloat(document.getElementById('mw').value);
+  const n = parseFloat(document.getElementById('moles').value);
+
+  let result = null;
+  let label = '';
+  let unit = '';
+
+  switch (solveFor) {
+    case 'molarity':
+      // M = n / V  or  M = mass / (MW * V)
+      if (!isNaN(n) && !isNaN(V) && V > 0) {
+        result = n / V;
+      } else if (!isNaN(mass) && !isNaN(mw) && !isNaN(V) && mw > 0 && V > 0) {
+        result = mass / (mw * V);
+      }
+      label = 'Molarity';
+      unit = 'mol/L';
+      break;
+    case 'mass':
+      // mass = M * V * MW  or  mass = n * MW
+      if (!isNaN(M) && !isNaN(V) && !isNaN(mw)) {
+        result = M * V * mw;
+      } else if (!isNaN(n) && !isNaN(mw)) {
+        result = n * mw;
+      }
+      label = 'Mass';
+      unit = 'g';
+      break;
+    case 'volume':
+      // V = n / M  or  V = mass / (MW * M)
+      if (!isNaN(n) && !isNaN(M) && M > 0) {
+        result = n / M;
+      } else if (!isNaN(mass) && !isNaN(mw) && !isNaN(M) && mw > 0 && M > 0) {
+        result = mass / (mw * M);
+      }
+      label = 'Volume';
+      unit = 'L';
+      break;
+    case 'moles':
+      // n = M * V  or  n = mass / MW
+      if (!isNaN(M) && !isNaN(V)) {
+        result = M * V;
+      } else if (!isNaN(mass) && !isNaN(mw) && mw > 0) {
+        result = mass / mw;
+      }
+      label = 'Moles';
+      unit = 'mol';
+      break;
+  }
+
+  const box = document.getElementById('resultBox');
+  const valEl = document.getElementById('resultValue');
+  const labEl = document.getElementById('resultLabel');
+
+  const formatted = formatResult(result);
+  if (formatted !== null) {
+    labEl.textContent = label;
+    valEl.innerHTML = `${formatted}<span class="result-unit">${unit}</span>`;
+    box.classList.add('visible');
+    document.getElementById(solveFor).value = formatted;
+  } else {
+    box.classList.remove('visible');
+  }
+}
+
+// Initialize
+setSolve('molarity');
+</script>
+</body>
+</html>
