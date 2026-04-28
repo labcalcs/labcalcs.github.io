@@ -136,6 +136,7 @@ a:hover { text-decoration: underline; }
 }
 
 .nav-dropdown.open .nav-dropdown-menu { display: block; }
+.nav-dropdown:hover .nav-dropdown-menu { display: block; }
 
 .nav-dropdown-menu a {
   display: block;
