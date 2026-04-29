@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arrhenius Equation Calculator — LabCalcs</title>
+<meta name="description" content="Free Arrhenius equation calculator. Calculate rate constants, activation energy, or pre-exponential factor. Includes two-temperature form for finding Ea from experimental data.">
+<link rel="canonical" href="https://labcalcs.github.io/physical-chemistry/arrhenius-equation-calculator.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="cat-physical">
+<div class="grain"></div>
+<nav class="site-nav" id="site-nav"></nav>
+<div class="breadcrumb" id="breadcrumb"></div>
+<div class="ad-slot" id="ad-top"></div>
+
+<div class="container">
+  <h1 class="page-title">Arrhenius Equation Calculator</h1>
+  <p class="page-subtitle">Calculate rate constants, activation energy, or pre-exponential factor from temperature data.</p>
+
+  <div class="calc-card">
+    <div class="tabs" id="modeTabs">
+      <button class="active" onclick="setMode('single')">Single Temperature</button>
+      <button onclick="setMode('two')">Two Temperatures (find Ea)</button>
+    </div>
+
+    <div id="singleMode">
+      <div class="formula-bar"><em>k</em> = <em>A</em> × e<sup>−<em>Ea</em>/(<em>RT</em>)</sup></div>
+
+      <div class="solve-for">
+        <label>Solve for</label>
+        <div class="solve-btns" id="solveBtns1">
+          <button class="active" data-target="k" onclick="setSolve1('k')">k (rate constant)</button>
+          <button data-target="Ea" onclick="setSolve1('Ea')">Ea (activation energy)</button>
+          <button data-target="A" onclick="setSolve1('A')">A (pre-exponential)</button>
+        </div>
+      </div>
+
+      <div class="fields">
+        <div class="field">
+          <label>k — Rate Constant</label>
+          <input type="number" id="k" step="any" placeholder="e.g. 0.045" oninput="calcSingle()">
+        </div>
+        <div class="field">
+          <label>A — Pre-exponential Factor</label>
+          <input type="number" id="A" step="any" placeholder="e.g. 1.5e10" oninput="calcSingle()">
+        </div>
+        <div class="field">
+          <label>Ea — Activation Energy</label>
+          <div class="input-with-unit">
+            <input type="number" id="Ea" step="any" placeholder="e.g. 75" oninput="calcSingle()">
+            <select id="Ea-unit" onchange="calcSingle()"><option value="kJ/mol" selected>kJ/mol</option><option value="J/mol">J/mol</option><option value="kcal/mol">kcal/mol</option></select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Temperature</label>
+          <div class="input-with-unit">
+            <input type="number" id="T1" step="any" value="298.15" placeholder="298.15" oninput="calcSingle()">
+            <select id="T1-unit" onchange="calcSingle()"><option value="K" selected>K</option><option value="C">°C</option></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="result-box" id="resultBox1">
+        <div class="result-label" id="resultLabel1">Result</div>
+        <div class="result-value" id="resultValue1">—</div>
+      </div>
+    </div>
+
+    <div id="twoMode" style="display:none;">
+      <div class="formula-bar">ln(<em>k₂</em>/<em>k₁</em>) = (<em>Ea</em>/<em>R</em>) × (1/<em>T₁</em> − 1/<em>T₂</em>)</div>
+
+      <div class="solve-for">
+        <label>Solve for</label>
+        <div class="solve-btns" id="solveBtns2">
+          <button class="active" data-target="Ea2" onclick="setSolve2('Ea2')">Ea</button>
+          <button data-target="k2b" onclick="setSolve2('k2b')">k₂</button>
+        </div>
+      </div>
+
+      <div class="divider-row"><span class="line"></span><span class="label">Condition 1</span><span class="line"></span></div>
+      <div class="fields">
+        <div class="field">
+          <label>k₁ — Rate Constant at T₁</label>
+          <input type="number" id="k1_two" step="any" placeholder="e.g. 0.015" oninput="calcTwo()">
+        </div>
+        <div class="field">
+          <label>T₁</label>
+          <div class="input-with-unit">
+            <input type="number" id="T1_two" step="any" placeholder="e.g. 300" oninput="calcTwo()">
+            <select id="T1_two_unit" onchange="calcTwo()"><option value="K" selected>K</option><option value="C">°C</option></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider-row"><span class="line"></span><span class="label">Condition 2</span><span class="line"></span></div>
+      <div class="fields">
+        <div class="field">
+          <label>k₂ — Rate Constant at T₂</label>
+          <input type="number" id="k2_two" step="any" placeholder="e.g. 0.12" oninput="calcTwo()">
+        </div>
+        <div class="field">
+          <label>T₂</label>
+          <div class="input-with-unit">
+            <input type="number" id="T2_two" step="any" placeholder="e.g. 350" oninput="calcTwo()">
+            <select id="T2_two_unit" onchange="calcTwo()"><option value="K" selected>K</option><option value="C">°C</option></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="result-box" id="resultBox2">
+        <div class="result-label" id="resultLabel2">Result</div>
+        <div class="result-value" id="resultValue2">—</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ad-slot" id="ad-mid"></div>
+
+  <div class="info-section">
+    <h2>How to Use This Calculator</h2>
+    <p><strong>Single Temperature mode:</strong> Enter any two of k, A, and Ea (plus temperature) to solve for the third. This is useful when you know the Arrhenius parameters and want to predict the rate constant at a specific temperature.</p>
+    <p><strong>Two Temperature mode:</strong> Enter rate constants measured at two different temperatures to determine the activation energy. This is the standard experimental approach — measure k at two (or more) temperatures and extract Ea from the slope.</p>
+
+    <h2>The Math Behind It</h2>
+    <p>The Arrhenius equation <strong>k = A × e^(−Ea/RT)</strong> describes how reaction rate constants depend on temperature. A is the pre-exponential (frequency) factor, Ea is the activation energy, R = 8.314 J/(mol·K), and T is absolute temperature in Kelvin.</p>
+    <p>The two-temperature form rearranges to: <strong>ln(k₂/k₁) = (Ea/R) × (1/T₁ − 1/T₂)</strong>, allowing Ea to be determined from just two rate constant measurements.</p>
+    <p><strong>Worked example:</strong> A reaction has k = 0.015 s⁻¹ at 300 K and k = 0.12 s⁻¹ at 350 K. Ea = R × ln(k₂/k₁) / (1/T₁ − 1/T₂) = 8.314 × ln(0.12/0.015) / (1/300 − 1/350) = 8.314 × 2.079 / (4.76×10⁻⁴) = 36,300 J/mol = 36.3 kJ/mol.</p>
+    <p><strong>Rule of thumb:</strong> For many reactions near room temperature, a 10°C increase roughly doubles the rate. This corresponds to an activation energy of about 50–60 kJ/mol.</p>
+  </div>
+
+  <div class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a class="related-card" href="gibbs-free-energy-calculator.html"><h3>Gibbs Free Energy</h3><p>ΔG = ΔH − TΔS thermodynamics.</p></a>
+      <a class="related-card" href="nernst-equation-calculator.html"><h3>Nernst Equation</h3><p>Electrochemistry and cell potential.</p></a>
+      <a class="related-card" href="ideal-gas-law-calculator.html"><h3>Ideal Gas Law</h3><p>PV = nRT with flexible units.</p></a>
+    </div>
+  </div>
+</div>
+
+<div class="ad-slot" id="ad-bot"></div>
+<footer class="site-footer"><a href="../">← Back to all categories</a> · © 2026 LabCalcs</footer>
+
+<script>LC = window.LC || {}; LC.basePath = '..';</script>
+<script src="../js/analytics.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() { buildBreadcrumb('physical', 'Arrhenius Equation Calculator'); });
+
+var R = 8.314462;
+function toK(v,u){return u==='C'?v+273.15:v;}
+function toJmol(v,u){if(u==='kJ/mol')return v*1000;if(u==='kcal/mol')return v*4184;return v;}
+function fromJmol(v,u){if(u==='kJ/mol')return v/1000;if(u==='kcal/mol')return v/4184;return v;}
+function fmt(v){if(v==null||isNaN(v)||!isFinite(v))return null;if(v===0)return'0';if(Math.abs(v)>=0.001&&Math.abs(v)<1e8)return parseFloat(v.toPrecision(5)).toString();return v.toExponential(4);}
+
+function setMode(m) {
+  document.getElementById('singleMode').style.display = m==='single'?'':'none';
+  document.getElementById('twoMode').style.display = m==='two'?'':'none';
+  document.querySelectorAll('#modeTabs button').forEach(function(b,i){b.classList.toggle('active',(i===0&&m==='single')||(i===1&&m==='two'));});
+}
+
+var solve1 = 'k';
+function setSolve1(t) {
+  solve1 = t;
+  document.querySelectorAll('#solveBtns1 button').forEach(function(b){b.classList.toggle('active',b.dataset.target===t);});
+  ['k','A','Ea'].forEach(function(id){document.getElementById(id).disabled=(id===t);});
+  document.getElementById(t).value='';
+  calcSingle();
+}
+
+function calcSingle() {
+  var k=parseFloat(document.getElementById('k').value);
+  var A=parseFloat(document.getElementById('A').value);
+  var EaRaw=parseFloat(document.getElementById('Ea').value);
+  var Eu=document.getElementById('Ea-unit').value;
+  var Ea=isNaN(EaRaw)?NaN:toJmol(EaRaw,Eu);
+  var T=toK(parseFloat(document.getElementById('T1').value),document.getElementById('T1-unit').value);
+  var box=document.getElementById('resultBox1');
+  var result,label,unit;
+
+  switch(solve1){
+    case'k':if(!isNaN(A)&&!isNaN(Ea)&&!isNaN(T)&&T>0){result=A*Math.exp(-Ea/(R*T));label='Rate Constant (k)';unit='';}break;
+    case'Ea':if(!isNaN(k)&&!isNaN(A)&&!isNaN(T)&&T>0&&k>0&&A>0){var EaJ=-R*T*Math.log(k/A);result=fromJmol(EaJ,Eu);label='Activation Energy';unit=Eu;document.getElementById('Ea').value=fmt(result);}break;
+    case'A':if(!isNaN(k)&&!isNaN(Ea)&&!isNaN(T)&&T>0){result=k/Math.exp(-Ea/(R*T));label='Pre-exponential Factor (A)';unit='';}break;
+  }
+  var f=fmt(result);
+  if(f!==null){
+    document.getElementById('resultLabel1').textContent=label;
+    document.getElementById('resultValue1').innerHTML=f+(unit?'<span class="result-unit">'+unit+'</span>':'');
+    box.classList.add('visible');
+    if(solve1==='k')document.getElementById('k').value=f;
+    if(solve1==='A')document.getElementById('A').value=f;
+  }else{box.classList.remove('visible');}
+}
+
+var solve2='Ea2';
+function setSolve2(t){
+  solve2=t;
+  document.querySelectorAll('#solveBtns2 button').forEach(function(b){b.classList.toggle('active',b.dataset.target===t);});
+  if(t==='Ea2'){document.getElementById('k2_two').disabled=false;document.getElementById('k1_two').disabled=false;}
+  else{document.getElementById('k2_two').disabled=true;document.getElementById('k2_two').value='';}
+  calcTwo();
+}
+
+function calcTwo(){
+  var k1=parseFloat(document.getElementById('k1_two').value);
+  var k2=parseFloat(document.getElementById('k2_two').value);
+  var T1=toK(parseFloat(document.getElementById('T1_two').value),document.getElementById('T1_two_unit').value);
+  var T2=toK(parseFloat(document.getElementById('T2_two').value),document.getElementById('T2_two_unit').value);
+  var box=document.getElementById('resultBox2');
+
+  if(solve2==='Ea2'){
+    if(!isNaN(k1)&&!isNaN(k2)&&!isNaN(T1)&&!isNaN(T2)&&k1>0&&k2>0&&T1>0&&T2>0&&T1!==T2){
+      var EaJ=R*Math.log(k2/k1)/(1/T1-1/T2);
+      var EakJ=EaJ/1000;
+      document.getElementById('resultLabel2').textContent='Activation Energy (Ea)';
+      document.getElementById('resultValue2').innerHTML=fmt(EakJ)+'<span class="result-unit">kJ/mol</span>&nbsp;&nbsp;=&nbsp;&nbsp;'+fmt(EaJ)+'<span class="result-unit">J/mol</span>';
+      box.classList.add('visible');
+    }else{box.classList.remove('visible');}
+  }else{
+    // Solve for k2 given Ea from k1, T1, T2
+    if(!isNaN(k1)&&!isNaN(T1)&&!isNaN(T2)&&T1>0&&T2>0){
+      // Need Ea — grab from single mode
+      var EaRaw2=parseFloat(document.getElementById('Ea').value);
+      var Eu2=document.getElementById('Ea-unit').value;
+      var Ea2=isNaN(EaRaw2)?NaN:toJmol(EaRaw2,Eu2);
+      if(!isNaN(Ea2)){
+        var k2calc=k1*Math.exp((Ea2/R)*(1/T1-1/T2));
+        document.getElementById('k2_two').value=fmt(k2calc);
+        document.getElementById('resultLabel2').textContent='k₂ at T₂';
+        document.getElementById('resultValue2').innerHTML=fmt(k2calc);
+        box.classList.add('visible');
+      }else{box.classList.remove('visible');}
+    }else{box.classList.remove('visible');}
+  }
+}
+
+setSolve1('k');
+</script>
+</body>
+</html>

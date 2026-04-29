@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cell Counting & Hemocytometer Calculator — LabCalcs</title>
+<meta name="description" content="Free cell counting calculator for hemocytometer. Calculate cell concentration, viability, total cell number, and dilution needed for seeding. Supports Trypan blue exclusion.">
+<link rel="canonical" href="https://labcalcs.github.io/biology-biochemistry/cell-counting-calculator.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="cat-biology">
+<div class="grain"></div>
+<nav class="site-nav" id="site-nav"></nav>
+<div class="breadcrumb" id="breadcrumb"></div>
+<div class="ad-slot" id="ad-top"></div>
+
+<div class="container">
+  <h1 class="page-title">Cell Counting Calculator</h1>
+  <p class="page-subtitle">Calculate cell concentration, viability, and seeding volumes from hemocytometer counts.</p>
+
+  <div class="calc-card">
+    <div class="formula-bar"><em>cells/mL</em> = ( <em>cell count</em> / <em>squares counted</em> ) × <em>dilution factor</em> × 10⁴</div>
+
+    <div style="margin-bottom:20px;">
+      <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:10px;">Hemocytometer Counts</div>
+      <div class="fields">
+        <div class="field">
+          <label>Live Cells Counted <span class="unit">(unstained / clear)</span></label>
+          <input type="number" id="liveCells" step="1" min="0" placeholder="e.g. 185" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>Dead Cells Counted <span class="unit">(stained / blue)</span></label>
+          <input type="number" id="deadCells" step="1" min="0" value="0" placeholder="e.g. 15" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>Number of Squares Counted</label>
+          <select id="squares" style="width:100%;font-family:var(--font-mono);font-size:15px;padding:12px 14px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);outline:none;cursor:pointer;" onchange="calc()">
+            <option value="4" selected>4 corner squares (standard)</option>
+            <option value="5">5 squares (4 corners + center)</option>
+            <option value="1">1 square</option>
+            <option value="custom">Custom number</option>
+          </select>
+        </div>
+        <div class="field" id="customSqField" style="display:none;">
+          <label>Custom Number of Squares</label>
+          <input type="number" id="customSq" step="1" min="1" placeholder="e.g. 4" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>Dilution Factor <span class="unit">(e.g. 2 for 1:1 Trypan blue mix)</span></label>
+          <input type="number" id="dilFactor" step="any" value="2" placeholder="2" oninput="calc()">
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div style="padding:20px;border-radius:10px;background:var(--accent-glow);border:1px solid var(--accent-border);text-align:center;">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:6px;font-weight:600;">Live Cell Concentration</div>
+        <div id="concResult" style="font-family:var(--font-mono);font-size:22px;font-weight:600;color:var(--accent);">—</div>
+      </div>
+      <div style="padding:20px;border-radius:10px;background:var(--accent-glow);border:1px solid var(--accent-border);text-align:center;">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:6px;font-weight:600;">Viability</div>
+        <div id="viabilityResult" style="font-family:var(--font-mono);font-size:22px;font-weight:600;color:var(--accent);">—</div>
+      </div>
+    </div>
+
+    <div class="divider-row"><span class="line"></span><span class="label">Total Yield & Seeding (optional)</span><span class="line"></span></div>
+
+    <div class="fields">
+      <div class="field">
+        <label>Total Suspension Volume <span class="unit">mL</span></label>
+        <input type="number" id="totalVol" step="any" placeholder="e.g. 10" oninput="calcSeeding()">
+      </div>
+      <div class="field">
+        <label>Total Live Cells</label>
+        <div id="totalCellsResult" style="font-family:var(--font-mono);font-size:16px;padding:12px;background:var(--input-bg);border:1px solid var(--border);border-radius:8px;color:var(--text-dim);min-height:44px;display:flex;align-items:center;">Enter volume above</div>
+      </div>
+    </div>
+
+    <div class="divider-row"><span class="line"></span><span class="label">Seeding Calculator</span><span class="line"></span></div>
+
+    <div class="fields">
+      <div class="field">
+        <label>Desired Cells per Well/Dish</label>
+        <input type="number" id="desiredCells" step="any" placeholder="e.g. 500000" oninput="calcSeeding()">
+      </div>
+      <div class="field">
+        <label>Final Volume per Well <span class="unit">mL</span></label>
+        <input type="number" id="wellVol" step="any" placeholder="e.g. 2" oninput="calcSeeding()">
+      </div>
+      <div class="field full">
+        <label>Seeding Instructions</label>
+        <div id="seedingResult" style="font-family:var(--font-mono);font-size:14px;padding:14px;background:var(--input-bg);border:1px solid var(--border);border-radius:8px;color:var(--text-dim);line-height:1.8;">Enter desired cells and well volume above</div>
+      </div>
+    </div>
+
+    <div class="note-box" id="noteBox"></div>
+  </div>
+
+  <div class="ad-slot" id="ad-mid"></div>
+
+  <div class="info-section">
+    <h2>How to Use This Calculator</h2>
+    <p>Count live (clear/bright) and dead (blue-stained) cells in the large corner squares of your hemocytometer after mixing with Trypan blue (typically 1:1, giving a dilution factor of 2). Enter the counts and the calculator gives you concentration, viability, and total cell number. Use the seeding section to calculate how much suspension to add per well.</p>
+
+    <h2>The Math Behind It</h2>
+    <p><strong>Concentration:</strong> Each large square on a hemocytometer holds 0.1 µL (0.0001 mL). So: cells/mL = (cells counted / squares counted) × dilution factor × 10⁴.</p>
+    <p><strong>Viability:</strong> % viability = (live cells / total cells) × 100. Healthy cultures typically show &gt;90% viability. Below 80% suggests problems with culture conditions, passage number, or handling.</p>
+    <p><strong>Worked example:</strong> You count 185 live and 15 dead cells across 4 squares with a 1:1 Trypan blue dilution (DF = 2). Live cell concentration = (185/4) × 2 × 10⁴ = 9.25 × 10⁵ cells/mL. Viability = 185/(185+15) × 100 = 92.5%.</p>
+    <p><strong>Accuracy tips:</strong> Count cells touching the top and left borders of each square but not the bottom and right borders (to avoid double-counting). Aim for 100–200 total cells across 4 squares for statistical reliability — if you see fewer than 50, reduce your dilution; if more than 300, increase it.</p>
+  </div>
+
+  <div class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a class="related-card" href="../general-lab/dilution-calculator.html"><h3>Dilution Calculator</h3><p>C₁V₁ = C₂V₂ with flexible units.</p></a>
+      <a class="related-card" href="pcr-master-mix-calculator.html"><h3>PCR Master Mix</h3><p>Scale PCR reactions with overage.</p></a>
+      <a class="related-card" href="../general-lab/molarity-calculator.html"><h3>Molarity Calculator</h3><p>Moles, concentration, volume, mass.</p></a>
+    </div>
+  </div>
+</div>
+
+<div class="ad-slot" id="ad-bot"></div>
+<footer class="site-footer"><a href="../">← Back to all categories</a> · © 2026 LabCalcs</footer>
+
+<script>LC = window.LC || {}; LC.basePath = '..';</script>
+<script src="../js/analytics.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() { buildBreadcrumb('biology', 'Cell Counting Calculator'); });
+
+document.getElementById('squares').addEventListener('change', function() {
+  document.getElementById('customSqField').style.display = this.value === 'custom' ? '' : 'none';
+});
+
+var liveConc = 0;
+
+function fmt(v) { if(v==null||isNaN(v)||!isFinite(v))return'—'; if(v===0)return'0'; if(v>=1e6)return(v/1e6).toPrecision(4)+' × 10⁶'; if(v>=1e4)return(v/1e4).toPrecision(4)+' × 10⁴'; return parseFloat(v.toPrecision(4)).toString(); }
+
+function calc() {
+  var live = parseInt(document.getElementById('liveCells').value);
+  var dead = parseInt(document.getElementById('deadCells').value) || 0;
+  var sqSel = document.getElementById('squares').value;
+  var sq = sqSel === 'custom' ? parseInt(document.getElementById('customSq').value) : parseInt(sqSel);
+  var df = parseFloat(document.getElementById('dilFactor').value) || 1;
+  var note = document.getElementById('noteBox'); note.classList.remove('visible');
+
+  if (isNaN(live) || isNaN(sq) || sq <= 0) {
+    document.getElementById('concResult').textContent = '—';
+    document.getElementById('viabilityResult').textContent = '—';
+    liveConc = 0;
+    return;
+  }
+
+  liveConc = (live / sq) * df * 1e4;
+  var totalConc = ((live + dead) / sq) * df * 1e4;
+  var viability = live / (live + dead) * 100;
+
+  document.getElementById('concResult').innerHTML = fmt(liveConc) + ' <span style="font-size:13px;color:var(--text-dim);">cells/mL</span>';
+  document.getElementById('viabilityResult').innerHTML = viability.toFixed(1) + '<span style="font-size:13px;color:var(--text-dim);">%</span>';
+
+  if (viability < 80) {
+    note.innerHTML = '⚠ Viability below 80% — check culture conditions, passage number, or trypsinization time.';
+    note.classList.add('visible');
+  } else if (live + dead < 50) {
+    note.innerHTML = '⚠ Low total count (' + (live+dead) + ' cells) — consider reducing your Trypan blue dilution for more accurate counting.';
+    note.style.color='var(--accent)'; note.style.background='var(--accent-glow)'; note.style.borderColor='var(--accent-border)';
+    note.classList.add('visible');
+  } else if (live + dead > 300) {
+    note.innerHTML = '⚠ High total count (' + (live+dead) + ' cells) — consider increasing your dilution to improve counting accuracy.';
+    note.style.color='var(--accent)'; note.style.background='var(--accent-glow)'; note.style.borderColor='var(--accent-border)';
+    note.classList.add('visible');
+  }
+
+  calcSeeding();
+}
+
+function calcSeeding() {
+  var totalVol = parseFloat(document.getElementById('totalVol').value);
+  var totalEl = document.getElementById('totalCellsResult');
+
+  if (!isNaN(totalVol) && liveConc > 0) {
+    var total = liveConc * totalVol;
+    totalEl.innerHTML = '<span style="color:var(--accent);font-weight:600;">' + fmt(total) + ' live cells</span>';
+  } else {
+    totalEl.textContent = 'Enter volume above';
+    totalEl.style.color = 'var(--text-dim)';
+  }
+
+  var desired = parseFloat(document.getElementById('desiredCells').value);
+  var wellVol = parseFloat(document.getElementById('wellVol').value);
+  var seedEl = document.getElementById('seedingResult');
+
+  if (isNaN(desired) || isNaN(wellVol) || liveConc <= 0) {
+    seedEl.textContent = 'Enter desired cells and well volume above';
+    return;
+  }
+
+  var volNeeded = desired / liveConc; // mL of suspension
+  var mediaNeeded = wellVol - volNeeded;
+
+  if (volNeeded > wellVol) {
+    seedEl.innerHTML = '<span style="color:#fbbf24;">⚠ Cell concentration too low.</span> You need ' + (volNeeded*1000).toPrecision(4) + ' µL of suspension but the well volume is only ' + (wellVol*1000) + ' µL. Concentrate your cells or reduce the seeding density.';
+  } else if (volNeeded < 0.001) {
+    seedEl.innerHTML = '<span style="color:#fbbf24;">⚠ Very small volume needed (' + (volNeeded*1e6).toPrecision(3) + ' µL).</span> Consider making an intermediate dilution for more accurate pipetting.';
+  } else {
+    var volUL = volNeeded * 1000;
+    var mediaUL = mediaNeeded * 1000;
+    seedEl.innerHTML = 'Add <strong style="color:var(--accent);">' + volUL.toPrecision(4) + ' µL</strong> of cell suspension + <strong>' + mediaUL.toPrecision(4) + ' µL</strong> media per well<br>(' + fmt(desired) + ' cells in ' + wellVol + ' mL total volume)';
+  }
+}
+</script>
+</body>
+</html>

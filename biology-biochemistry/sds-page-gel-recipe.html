@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SDS-PAGE Gel Recipe Calculator — LabCalcs</title>
+<meta name="description" content="Free SDS-PAGE gel recipe calculator. Get exact volumes for resolving and stacking gels at any percentage. Supports Tris-Glycine (Laemmli) mini and midi gels.">
+<link rel="canonical" href="https://labcalcs.github.io/biology-biochemistry/sds-page-gel-recipe.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="cat-biology">
+<div class="grain"></div>
+<nav class="site-nav" id="site-nav"></nav>
+<div class="breadcrumb" id="breadcrumb"></div>
+<div class="ad-slot" id="ad-top"></div>
+
+<div class="container">
+  <h1 class="page-title">SDS-PAGE Gel Recipe Calculator</h1>
+  <p class="page-subtitle">Get exact volumes for Tris-Glycine (Laemmli) resolving and stacking gels at any acrylamide percentage.</p>
+
+  <div class="calc-card">
+    <div class="fields" style="margin-bottom:20px;">
+      <div class="field">
+        <label>Resolving Gel Percentage <span class="unit">%</span></label>
+        <select id="gelPct" style="width:100%;font-family:var(--font-mono);font-size:15px;padding:12px 14px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);outline:none;cursor:pointer;" onchange="calc()">
+          <option value="6">6%</option>
+          <option value="8">8%</option>
+          <option value="10" selected>10%</option>
+          <option value="12">12%</option>
+          <option value="15">15%</option>
+          <option value="custom">Custom %</option>
+        </select>
+      </div>
+      <div class="field" id="customPctField" style="display:none;">
+        <label>Custom Percentage <span class="unit">%</span></label>
+        <input type="number" id="customPct" step="0.5" min="4" max="20" placeholder="e.g. 7.5" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Number of Gels</label>
+        <input type="number" id="numGels" step="1" min="1" value="2" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Gel Size</label>
+        <select id="gelSize" style="width:100%;font-family:var(--font-mono);font-size:15px;padding:12px 14px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);outline:none;cursor:pointer;" onchange="calc()">
+          <option value="5" selected>Mini gel (5 mL resolving)</option>
+          <option value="10">Midi gel (10 mL resolving)</option>
+          <option value="15">Large gel (15 mL resolving)</option>
+          <option value="custom_vol">Custom volume</option>
+        </select>
+      </div>
+      <div class="field" id="customVolField" style="display:none;">
+        <label>Custom Resolving Gel Volume <span class="unit">mL per gel</span></label>
+        <input type="number" id="customVol" step="0.5" min="1" max="50" placeholder="e.g. 8" oninput="calc()">
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div>
+        <div style="font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent);margin-bottom:12px;">Resolving Gel</div>
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead><tr>
+            <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);color:var(--text-dim);font-size:10px;text-transform:uppercase;letter-spacing:1px;">Component</th>
+            <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border);color:var(--accent);font-size:10px;text-transform:uppercase;letter-spacing:1px;">Volume (mL)</th>
+          </tr></thead>
+          <tbody id="resolvingBody"></tbody>
+          <tfoot><tr style="border-top:2px solid var(--border);">
+            <td style="padding:8px;font-weight:600;color:var(--text);">Total</td>
+            <td id="resolvingTotal" style="text-align:right;padding:8px;font-family:var(--font-mono);font-weight:600;color:var(--accent);"></td>
+          </tr></tfoot>
+        </table>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent);margin-bottom:12px;">Stacking Gel (4%)</div>
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead><tr>
+            <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);color:var(--text-dim);font-size:10px;text-transform:uppercase;letter-spacing:1px;">Component</th>
+            <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border);color:var(--accent);font-size:10px;text-transform:uppercase;letter-spacing:1px;">Volume (mL)</th>
+          </tr></thead>
+          <tbody id="stackingBody"></tbody>
+          <tfoot><tr style="border-top:2px solid var(--border);">
+            <td style="padding:8px;font-weight:600;color:var(--text);">Total</td>
+            <td id="stackingTotal" style="text-align:right;padding:8px;font-family:var(--font-mono);font-weight:600;color:var(--accent);"></td>
+          </tr></tfoot>
+        </table>
+      </div>
+    </div>
+
+    <div class="note-box" id="noteBox" style="margin-top:16px;"></div>
+
+    <div style="margin-top:20px;padding:14px 16px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid var(--border);font-size:13px;color:var(--text-dim);line-height:1.7;">
+      <span style="font-family:var(--font-mono);font-size:11px;color:var(--accent);margin-right:6px;">GUIDE</span>
+      <strong style="color:var(--text);">6–8%:</strong> Large proteins (100–250 kDa) &nbsp;|&nbsp;
+      <strong style="color:var(--text);">10%:</strong> Mid-range (25–100 kDa) &nbsp;|&nbsp;
+      <strong style="color:var(--text);">12%:</strong> Small-mid (15–75 kDa) &nbsp;|&nbsp;
+      <strong style="color:var(--text);">15%:</strong> Small proteins (10–40 kDa)
+    </div>
+  </div>
+
+  <div class="ad-slot" id="ad-mid"></div>
+
+  <div class="info-section">
+    <h2>How to Use This Calculator</h2>
+    <p>Select your desired resolving gel percentage based on the size of your target protein(s), choose the number of gels and gel format, and the calculator provides exact volumes for both the resolving and stacking gels. APS and TEMED are added last — they initiate polymerization, so work quickly after adding them.</p>
+
+    <h2>The Recipe</h2>
+    <p>This calculator uses the standard Tris-Glycine (Laemmli) discontinuous buffer system with 30% acrylamide/bis-acrylamide (29:1 ratio), 1.5 M Tris-HCl pH 8.8 for the resolving gel, and 0.5 M Tris-HCl pH 6.8 for the stacking gel. SDS concentration is 10% (w/v) stock.</p>
+    <p><strong>Preparation tips:</strong> Degas the acrylamide solution briefly before adding APS and TEMED. Pour the resolving gel first, overlay with water-saturated butanol or isopropanol, wait 30–45 minutes for polymerization, rinse off the overlay, then pour the stacking gel and insert the comb. The stacking gel polymerizes in ~15 minutes.</p>
+    <p><strong>Safety:</strong> Unpolymerized acrylamide is a neurotoxin. Always wear gloves when handling acrylamide solutions and dispose of waste properly. Never pour unpolymerized acrylamide down the drain — add excess APS/TEMED to polymerize waste before disposal.</p>
+  </div>
+
+  <div class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a class="related-card" href="henderson-hasselbalch-calculator.html"><h3>Henderson-Hasselbalch</h3><p>Buffer pH from pKa and ratio.</p></a>
+      <a class="related-card" href="../general-lab/stock-solution-calculator.html"><h3>Stock Solution Calculator</h3><p>Weigh reagents for 60+ compounds.</p></a>
+      <a class="related-card" href="../spectroscopy/a280-protein-concentration.html"><h3>A280 Protein Conc.</h3><p>Protein concentration from UV absorbance.</p></a>
+    </div>
+  </div>
+</div>
+
+<div class="ad-slot" id="ad-bot"></div>
+<footer class="site-footer"><a href="../">← Back to all categories</a> · © 2026 LabCalcs</footer>
+
+<script>LC = window.LC || {}; LC.basePath = '..';</script>
+<script src="../js/analytics.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() { buildBreadcrumb('biology', 'SDS-PAGE Gel Recipe'); });
+
+document.getElementById('gelPct').addEventListener('change', function() {
+  document.getElementById('customPctField').style.display = this.value === 'custom' ? '' : 'none';
+});
+document.getElementById('gelSize').addEventListener('change', function() {
+  document.getElementById('customVolField').style.display = this.value === 'custom_vol' ? '' : 'none';
+});
+
+function fmt(v) { return parseFloat(v.toPrecision(4)).toString(); }
+
+function calc() {
+  var pctSel = document.getElementById('gelPct').value;
+  var pct = pctSel === 'custom' ? parseFloat(document.getElementById('customPct').value) : parseFloat(pctSel);
+  var numGels = parseInt(document.getElementById('numGels').value) || 1;
+  var sizeSel = document.getElementById('gelSize').value;
+  var resVolPerGel = sizeSel === 'custom_vol' ? parseFloat(document.getElementById('customVol').value) : parseFloat(sizeSel);
+
+  if (isNaN(pct) || isNaN(resVolPerGel) || pct < 4 || pct > 20) return;
+
+  var totalResVol = resVolPerGel * numGels;
+  var stackVolPerGel = resVolPerGel * 0.4;
+  var totalStackVol = stackVolPerGel * numGels;
+
+  // Resolving gel recipe (30% acrylamide stock, 1.5M Tris pH 8.8, 10% SDS)
+  var res = {
+    water: totalResVol - (totalResVol * pct / 30) - (totalResVol * 0.25) - (totalResVol * 0.01) - (totalResVol * 0.01) - (totalResVol * 0.001),
+    acrylamide: totalResVol * pct / 30,
+    tris: totalResVol * 0.25,
+    sds: totalResVol * 0.01,
+    aps: totalResVol * 0.01,
+    temed: totalResVol * 0.001,
+  };
+  res.water = totalResVol - res.acrylamide - res.tris - res.sds - res.aps - res.temed;
+
+  // Stacking gel recipe (4% acrylamide, 0.5M Tris pH 6.8, 10% SDS)
+  var stk = {
+    acrylamide: totalStackVol * 4 / 30,
+    tris: totalStackVol * 0.25,
+    sds: totalStackVol * 0.01,
+    aps: totalStackVol * 0.01,
+    temed: totalStackVol * 0.001,
+  };
+  stk.water = totalStackVol - stk.acrylamide - stk.tris - stk.sds - stk.aps - stk.temed;
+
+  // Render resolving gel
+  var resBody = document.getElementById('resolvingBody');
+  resBody.innerHTML = '';
+  var resRows = [
+    ['Water (dH₂O)', res.water],
+    ['30% Acrylamide/Bis (29:1)', res.acrylamide],
+    ['1.5 M Tris-HCl, pH 8.8', res.tris],
+    ['10% SDS', res.sds],
+    ['10% APS (fresh)', res.aps],
+    ['TEMED', res.temed],
+  ];
+  resRows.forEach(function(r) {
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td style="padding:6px 8px;border-bottom:1px solid var(--border);color:var(--text);">'+r[0]+'</td><td style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border);font-family:var(--font-mono);color:var(--text);">'+fmt(r[1])+'</td>';
+    resBody.appendChild(tr);
+  });
+  document.getElementById('resolvingTotal').textContent = fmt(totalResVol) + ' mL';
+
+  // Render stacking gel
+  var stkBody = document.getElementById('stackingBody');
+  stkBody.innerHTML = '';
+  var stkRows = [
+    ['Water (dH₂O)', stk.water],
+    ['30% Acrylamide/Bis (29:1)', stk.acrylamide],
+    ['0.5 M Tris-HCl, pH 6.8', stk.tris],
+    ['10% SDS', stk.sds],
+    ['10% APS (fresh)', stk.aps],
+    ['TEMED', stk.temed],
+  ];
+  stkRows.forEach(function(r) {
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td style="padding:6px 8px;border-bottom:1px solid var(--border);color:var(--text);">'+r[0]+'</td><td style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border);font-family:var(--font-mono);color:var(--text);">'+fmt(r[1])+'</td>';
+    stkBody.appendChild(tr);
+  });
+  document.getElementById('stackingTotal').textContent = fmt(totalStackVol) + ' mL';
+
+  // Notes
+  var note = document.getElementById('noteBox');
+  note.classList.remove('visible');
+  if (pct >= 12) {
+    note.innerHTML = '<strong>Tip:</strong> High-percentage gels (≥12%) polymerize faster. Work quickly after adding APS and TEMED.';
+    note.style.color='var(--accent)'; note.style.background='var(--accent-glow)'; note.style.borderColor='var(--accent-border)';
+    note.classList.add('visible');
+  }
+}
+
+calc();
+</script>
+</body>
+</html>

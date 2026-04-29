@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oxidation State Calculator — LabCalcs</title>
+<meta name="description" content="Free oxidation state calculator. Determine oxidation numbers for elements in any chemical compound or ion. Handles complex compounds, polyatomic ions, and transition metals.">
+<link rel="canonical" href="https://labcalcs.github.io/inorganic-chemistry/oxidation-state-calculator.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="cat-inorganic">
+<div class="grain"></div>
+<nav class="site-nav" id="site-nav"></nav>
+<div class="breadcrumb" id="breadcrumb"></div>
+<div class="ad-slot" id="ad-top"></div>
+
+<div class="container">
+  <h1 class="page-title">Oxidation State Calculator</h1>
+  <p class="page-subtitle">Enter a chemical formula to determine the oxidation state of each element.</p>
+
+  <div class="calc-card">
+    <div class="fields" style="margin-bottom:16px;">
+      <div class="field">
+        <label>Chemical Formula</label>
+        <input type="text" id="formula" placeholder="e.g. KMnO4, H2SO4, CrO4 2-" style="font-size:18px;" oninput="calc()" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Overall Charge <span class="unit">(0 for neutral, e.g. −2 for CrO₄²⁻)</span></label>
+        <input type="number" id="charge" step="1" value="0" placeholder="0" oninput="calc()">
+      </div>
+    </div>
+
+    <div id="resultArea" style="display:none;">
+      <div style="padding:20px;border-radius:10px;background:var(--accent-glow);border:1px solid var(--accent-border);margin-bottom:16px;">
+        <div style="font-size:12px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:12px;font-weight:600;">Oxidation States</div>
+        <div id="oxResults" style="font-family:var(--font-mono);font-size:16px;line-height:2;"></div>
+      </div>
+      <div id="oxExplanation" style="font-size:13px;color:var(--text-dim);line-height:1.7;padding:12px 16px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:8px;"></div>
+    </div>
+
+    <div class="note-box" id="noteBox"></div>
+
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+      <label style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);display:block;margin-bottom:10px;">Examples (click to fill)</label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;" id="examples"></div>
+    </div>
+  </div>
+
+  <div class="ad-slot" id="ad-mid"></div>
+
+  <div class="info-section">
+    <h2>How to Use This Calculator</h2>
+    <p>Type a chemical formula using standard notation (e.g., KMnO4, H2SO4, Na2Cr2O7). For polyatomic ions, set the overall charge (e.g., CrO4 with charge −2 for chromate). The calculator applies standard oxidation state rules to determine each element's oxidation number.</p>
+
+    <h2>The Rules Behind It</h2>
+    <p>Oxidation states are assigned using a hierarchy of rules: (1) Free elements have oxidation state 0. (2) Monatomic ions equal their charge. (3) Fluorine is always −1. (4) Oxygen is usually −2 (except in peroxides: −1, and OF₂: +2). (5) Hydrogen is usually +1 (except in metal hydrides: −1). (6) Group 1 metals are +1, Group 2 are +2. (7) The sum of all oxidation states equals the overall charge of the species.</p>
+    <p>For compounds with one unknown oxidation state (most cases), the calculator solves algebraically: assign known states to all elements with fixed rules, then solve for the remaining element. This handles transition metals, main-group elements in unusual states, and complex oxoanions.</p>
+    <p><strong>Worked example:</strong> In KMnO₄: K = +1 (Group 1), O = −2 (standard). Sum must equal 0 (neutral compound). So: +1 + Mn + 4(−2) = 0 → Mn = +7.</p>
+  </div>
+
+  <div class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a class="related-card" href="electron-configuration.html"><h3>Electron Configuration</h3><p>Configurations for all 118 elements.</p></a>
+      <a class="related-card" href="../physical-chemistry/nernst-equation-calculator.html"><h3>Nernst Equation</h3><p>Cell potential and electrochemistry.</p></a>
+      <a class="related-card" href="../general-lab/molarity-calculator.html"><h3>Molarity Calculator</h3><p>Moles, concentration, volume, mass.</p></a>
+    </div>
+  </div>
+</div>
+
+<div class="ad-slot" id="ad-bot"></div>
+<footer class="site-footer"><a href="../">← Back to all categories</a> · © 2026 LabCalcs</footer>
+
+<script>LC = window.LC || {}; LC.basePath = '..';</script>
+<script src="../js/analytics.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() { buildBreadcrumb('inorganic', 'Oxidation State Calculator'); });
+
+var examples = [
+  ["KMnO4",0],["H2SO4",0],["Na2Cr2O7",0],["CrO4",-2],["MnO4",-1],
+  ["Fe2O3",0],["HNO3",0],["K2Cr2O7",0],["NaClO3",0],["H3PO4",0],
+  ["SO4",-2],["NO3",-1],["NH4",1],["ClO",-1],["H2O2",0],
+  ["Na2O2",0],["OF2",0],["CH4",0],["CO2",0],["KIO3",0],
+];
+
+var exDiv = document.getElementById('examples');
+examples.forEach(function(e) {
+  var btn = document.createElement('button');
+  btn.style.cssText = 'font-family:var(--font-mono);font-size:12px;padding:6px 10px;border-radius:6px;border:1px solid var(--border);background:var(--input-bg);color:var(--text-dim);cursor:pointer;transition:all 0.15s;';
+  btn.textContent = e[0] + (e[1] !== 0 ? ' (' + (e[1]>0?'+':'') + e[1] + ')' : '');
+  btn.addEventListener('click', function() {
+    document.getElementById('formula').value = e[0];
+    document.getElementById('charge').value = e[1];
+    calc();
+  });
+  btn.addEventListener('mouseenter', function() { this.style.borderColor='var(--accent)'; this.style.color='var(--text)'; });
+  btn.addEventListener('mouseleave', function() { this.style.borderColor='var(--border)'; this.style.color='var(--text-dim)'; });
+  exDiv.appendChild(btn);
+});
+
+// Fixed oxidation states by element
+var fixedStates = {
+  'F': -1,
+  'Li': 1, 'Na': 1, 'K': 1, 'Rb': 1, 'Cs': 1, 'Fr': 1,
+  'Be': 2, 'Mg': 2, 'Ca': 2, 'Sr': 2, 'Ba': 2, 'Ra': 2,
+  'Al': 3, 'Zn': 2, 'Ag': 1,
+};
+
+function parseFormula(f) {
+  var tokens = f.match(/[A-Z][a-z]?\d*/g) || [];
+  var elems = {};
+  tokens.forEach(function(tok) {
+    var el = tok.match(/[A-Z][a-z]?/)[0];
+    var num = tok.replace(el, '');
+    var n = num ? parseInt(num) : 1;
+    elems[el] = (elems[el] || 0) + n;
+  });
+  return elems;
+}
+
+function calc() {
+  var f = document.getElementById('formula').value.trim();
+  var charge = parseInt(document.getElementById('charge').value) || 0;
+  var area = document.getElementById('resultArea');
+  var note = document.getElementById('noteBox');
+  note.classList.remove('visible');
+
+  if (!f) { area.style.display = 'none'; return; }
+
+  var elems = parseFormula(f);
+  var keys = Object.keys(elems);
+  if (keys.length === 0) { area.style.display = 'none'; return; }
+
+  // Single element
+  if (keys.length === 1 && charge === 0) {
+    var el = keys[0];
+    document.getElementById('oxResults').innerHTML = '<span style="color:var(--accent);font-weight:600;">' + el + '</span> = <strong>0</strong> (free element)';
+    document.getElementById('oxExplanation').textContent = 'Free elements in their standard state always have an oxidation state of 0.';
+    area.style.display = 'block';
+    return;
+  }
+
+  // Single element ion
+  if (keys.length === 1 && charge !== 0) {
+    var el = keys[0];
+    var ox = charge / elems[el];
+    document.getElementById('oxResults').innerHTML = '<span style="color:var(--accent);font-weight:600;">' + el + '</span> = <strong>' + (ox > 0 ? '+' : '') + ox + '</strong>';
+    document.getElementById('oxExplanation').textContent = 'Monatomic ion: oxidation state equals the charge (' + (charge > 0 ? '+' : '') + charge + ') divided by the number of atoms (' + elems[el] + ').';
+    area.style.display = 'block';
+    return;
+  }
+
+  // Assign known states
+  var states = {};
+  var unknown = [];
+  var explanation = [];
+
+  keys.forEach(function(el) {
+    if (fixedStates[el] !== undefined) {
+      states[el] = fixedStates[el];
+      explanation.push(el + ' = ' + (states[el]>0?'+':'') + states[el] + ' (fixed rule)');
+    } else if (el === 'O') {
+      // Check for peroxide (H2O2, Na2O2) or OF2
+      if (elems['F']) {
+        states['O'] = 2;
+        explanation.push('O = +2 (bonded to F)');
+      } else if (keys.length === 2 && elems['O'] === 2 && (elems['H'] === 2 || elems['Na'] === 2 || elems['K'] === 2 || elems['Ba'] === 1)) {
+        // Check if it could be a peroxide
+        var otherEl = keys.find(function(k){return k!=='O';});
+        var otherOx = fixedStates[otherEl];
+        if (otherOx !== undefined) {
+          var testOx = (charge - otherOx * elems[otherEl]) / elems['O'];
+          if (Math.abs(testOx - (-1)) < 0.01) {
+            states['O'] = -1;
+            explanation.push('O = −1 (peroxide)');
+          } else {
+            states['O'] = -2;
+            explanation.push('O = −2 (standard rule)');
+          }
+        } else {
+          states['O'] = -2;
+          explanation.push('O = −2 (standard rule)');
+        }
+      } else {
+        states['O'] = -2;
+        explanation.push('O = −2 (standard rule)');
+      }
+    } else if (el === 'H') {
+      // H is -1 in metal hydrides, +1 otherwise
+      var hasMetalOnly = keys.every(function(k) { return k === 'H' || fixedStates[k] !== undefined; });
+      if (hasMetalOnly && !elems['O'] && !elems['F'] && !elems['N'] && !elems['C'] && !elems['S']) {
+        states['H'] = -1;
+        explanation.push('H = −1 (metal hydride)');
+      } else {
+        states['H'] = 1;
+        explanation.push('H = +1 (standard rule)');
+      }
+    } else {
+      unknown.push(el);
+    }
+  });
+
+  if (unknown.length === 0) {
+    // All known — just display
+    var html = '';
+    keys.forEach(function(el) {
+      html += '<span style="color:var(--accent);font-weight:600;">' + el + '</span> = <strong>' + (states[el]>0?'+':'') + states[el] + '</strong> &nbsp;&nbsp;';
+    });
+    document.getElementById('oxResults').innerHTML = html;
+    document.getElementById('oxExplanation').innerHTML = explanation.join('<br>');
+    area.style.display = 'block';
+  } else if (unknown.length === 1) {
+    // Solve for the unknown
+    var knownSum = 0;
+    keys.forEach(function(el) {
+      if (states[el] !== undefined) knownSum += states[el] * elems[el];
+    });
+    var unk = unknown[0];
+    var unkOx = (charge - knownSum) / elems[unk];
+
+    states[unk] = unkOx;
+    explanation.push(unk + ' = (' + charge + ' − (' + knownSum + ')) / ' + elems[unk] + ' = ' + (unkOx>0?'+':'') + unkOx + ' (solved algebraically)');
+
+    var html = '';
+    keys.forEach(function(el) {
+      var v = states[el];
+      var vs = Number.isInteger(v) ? (v>0?'+':'')+v : (v>0?'+':'')+v.toFixed(2);
+      html += '<span style="color:var(--accent);font-weight:600;">' + el + '</span> = <strong>' + vs + '</strong> &nbsp;&nbsp;';
+    });
+    document.getElementById('oxResults').innerHTML = html;
+    document.getElementById('oxExplanation').innerHTML = explanation.join('<br>');
+    area.style.display = 'block';
+
+    if (!Number.isInteger(unkOx)) {
+      note.textContent = '⚠ Non-integer oxidation state (' + unkOx.toFixed(2) + ') — this can occur in mixed-valence compounds (e.g., Fe₃O₄ where Fe averages +8/3).';
+      note.classList.add('visible');
+    }
+  } else {
+    // Multiple unknowns — can't solve uniquely
+    note.textContent = 'Multiple elements with unknown oxidation states (' + unknown.join(', ') + '). Cannot determine uniquely without additional information. Try specifying a simpler compound or ion.';
+    note.classList.add('visible');
+    area.style.display = 'none';
+  }
+}
+</script>
+</body>
+</html>

@@ -29,9 +29,10 @@ LC.tools = [
 
   // Biology & Biochemistry
   { name: 'Henderson-Hasselbalch Calculator', cat: 'biology', path: '/biology-biochemistry/henderson-hasselbalch-calculator.html', aka: ['buffer pH','pKa','acid base'], desc: 'Calculate buffer pH from component ratios.' },
+  { name: 'Cell Counting Calculator', cat: 'biology', path: '/biology-biochemistry/cell-counting-calculator.html', aka: ['hemocytometer','trypan blue','viability','seeding','cell culture'], desc: 'Concentration, viability, and seeding from hemocytometer counts.' },
   { name: 'DNA/RNA Concentration', cat: 'biology', path: '/biology-biochemistry/dna-rna-concentration.html', aka: ['A260','nanodrop','nucleic acid','absorbance','260nm','purity'], desc: 'Concentration and purity from A260 absorbance.' },
   { name: 'PCR Master Mix Calculator', cat: 'biology', path: '/biology-biochemistry/pcr-master-mix-calculator.html', aka: ['polymerase','reaction','Taq','primer'], desc: 'Scale PCR reactions with overage.' },
-  { name: 'SDS-PAGE Gel Recipe', cat: 'biology', path: '/biology-biochemistry/sds-page-gel-recipe.html', aka: ['acrylamide','gel percentage','stacking','separating'], desc: 'Get exact volumes for pouring gels.', soon: true },
+  { name: 'SDS-PAGE Gel Recipe', cat: 'biology', path: '/biology-biochemistry/sds-page-gel-recipe.html', aka: ['acrylamide','gel percentage','stacking','separating'], desc: 'Get exact volumes for pouring gels.' },
 
   // Spectroscopy
   { name: 'Beer-Lambert Calculator', cat: 'spectroscopy', path: '/spectroscopy/beer-lambert-calculator.html', aka: ['absorbance','extinction coefficient','path length','A=elc'], desc: 'Solve A = εlc for any variable.', soon: true },
@@ -43,11 +44,12 @@ LC.tools = [
   { name: 'Degree of Unsaturation', cat: 'organic', path: '/organic-chemistry/degree-of-unsaturation-calculator.html', aka: ['DoU','IHD','index of hydrogen deficiency','double bond equivalents'], desc: 'Calculate degrees of unsaturation from formula.' },
 
   // Inorganic Chemistry
-  { name: 'Oxidation State Calculator', cat: 'inorganic', path: '/inorganic-chemistry/oxidation-state-calculator.html', aka: ['oxidation number','redox'], desc: 'Determine oxidation states in compounds.', soon: true },
+  { name: 'Oxidation State Calculator', cat: 'inorganic', path: '/inorganic-chemistry/oxidation-state-calculator.html', aka: ['oxidation number','redox'], desc: 'Determine oxidation states in compounds.' },
   { name: 'Electron Configuration', cat: 'inorganic', path: '/inorganic-chemistry/electron-configuration.html', aka: ['orbital','aufbau','periodic table'], desc: 'Generate electron configurations.' },
 
   // Physical Chemistry
   { name: 'Ideal Gas Law Calculator', cat: 'physical', path: '/physical-chemistry/ideal-gas-law-calculator.html', aka: ['PV=nRT','pressure','volume','temperature','gas'], desc: 'Solve PV=nRT for any variable.' },
+  { name: 'Arrhenius Equation Calculator', cat: 'physical', path: '/physical-chemistry/arrhenius-equation-calculator.html', aka: ['activation energy','rate constant','pre-exponential','kinetics','temperature dependence'], desc: 'Rate constants and activation energy from temperature data.' },
   { name: 'Boiling/Freezing Point Calculator', cat: 'physical', path: '/physical-chemistry/boiling-freezing-point-calculator.html', aka: ['colligative','ebullioscopic','cryoscopic','molality','van\'t Hoff'], desc: 'Boiling point elevation and freezing point depression.' },
   { name: 'Nernst Equation Calculator', cat: 'physical', path: '/physical-chemistry/nernst-equation-calculator.html', aka: ['cell potential','electrochemistry','EMF'], desc: 'Calculate cell potential at non-standard conditions.' },
   { name: 'Gibbs Free Energy Calculator', cat: 'physical', path: '/physical-chemistry/gibbs-free-energy-calculator.html', aka: ['delta G','enthalpy','entropy','spontaneous'], desc: 'Calculate ΔG from ΔH and ΔS.', soon: true },
@@ -121,24 +123,42 @@ function buildNav() {
   overlay.innerHTML = mobileHTML;
 
   // Dropdown behavior — position fixed menus relative to buttons
+  var closeTimer = null;
+
   function positionDropdown(dd) {
     const btn = dd.querySelector('button');
     const menu = dd.querySelector('.nav-dropdown-menu');
     if (!btn || !menu) return;
     const rect = btn.getBoundingClientRect();
-    menu.style.top = (rect.bottom + 4) + 'px';
+    menu.style.top = rect.bottom + 'px';
     menu.style.left = rect.left + 'px';
   }
 
-  document.querySelectorAll('.nav-dropdown').forEach(dd => {
-    dd.addEventListener('mouseenter', function() {
+  function openDropdown(dd) {
+    if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
+    document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('open'));
+    positionDropdown(dd);
+    dd.classList.add('open');
+  }
+
+  function scheduleClose() {
+    closeTimer = setTimeout(function() {
       document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('open'));
-      positionDropdown(this);
-      this.classList.add('open');
-    });
-    dd.addEventListener('mouseleave', function() {
-      this.classList.remove('open');
-    });
+    }, 150);
+  }
+
+  document.querySelectorAll('.nav-dropdown').forEach(dd => {
+    dd.addEventListener('mouseenter', function() { openDropdown(this); });
+    dd.addEventListener('mouseleave', function() { scheduleClose(); });
+
+    // Keep menu open when hovering over the fixed-position dropdown menu
+    var menu = dd.querySelector('.nav-dropdown-menu');
+    if (menu) {
+      menu.addEventListener('mouseenter', function() {
+        if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
+      });
+      menu.addEventListener('mouseleave', function() { scheduleClose(); });
+    }
   });
 
   document.querySelectorAll('.nav-dropdown > button').forEach(btn => {
@@ -148,13 +168,13 @@ function buildNav() {
       const wasOpen = dd.classList.contains('open');
       document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('open'));
       if (!wasOpen) {
-        positionDropdown(dd);
-        dd.classList.add('open');
+        openDropdown(dd);
       }
     });
   });
 
   document.addEventListener('click', () => {
+    if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
     document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('open'));
   });
 
