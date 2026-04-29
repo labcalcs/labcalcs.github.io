@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Degree of Unsaturation Calculator (IHD/DoU) — LabCalcs</title>
+<meta name="description" content="Free degree of unsaturation calculator. Calculate the index of hydrogen deficiency (IHD) or double bond equivalents (DBE) from a molecular formula. Supports C, H, N, O, S, F, Cl, Br, I.">
+<link rel="canonical" href="https://labcalcs.github.io/organic-chemistry/degree-of-unsaturation-calculator.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="cat-organic">
+<div class="grain"></div>
+<nav class="site-nav" id="site-nav"></nav>
+<div class="breadcrumb" id="breadcrumb"></div>
+<div class="ad-slot" id="ad-top"></div>
+
+<div class="container">
+  <h1 class="page-title">Degree of Unsaturation Calculator</h1>
+  <p class="page-subtitle">Calculate the index of hydrogen deficiency (IHD) from a molecular formula — tells you how many rings and/or double bonds a molecule has.</p>
+
+  <div class="calc-card">
+    <div class="formula-bar"><em>DoU</em> = (2C + 2 + N − H − X) / 2</div>
+
+    <div class="fields">
+      <div class="field"><label>Carbon <span class="unit">C</span></label><input type="number" id="C" step="1" min="0" value="" placeholder="e.g. 6" oninput="calc()"></div>
+      <div class="field"><label>Hydrogen <span class="unit">H</span></label><input type="number" id="H" step="1" min="0" value="" placeholder="e.g. 6" oninput="calc()"></div>
+      <div class="field"><label>Nitrogen <span class="unit">N</span></label><input type="number" id="N" step="1" min="0" value="0" oninput="calc()"></div>
+      <div class="field"><label>Oxygen <span class="unit">O</span></label><input type="number" id="O" step="1" min="0" value="0" oninput="calc()"></div>
+      <div class="field"><label>Halogens <span class="unit">F + Cl + Br + I</span></label><input type="number" id="X" step="1" min="0" value="0" oninput="calc()"></div>
+      <div class="field"><label>Sulfur <span class="unit">S</span></label><input type="number" id="S" step="1" min="0" value="0" oninput="calc()"></div>
+    </div>
+
+    <div style="margin-top:12px;text-align:center;">
+      <label style="font-size:13px;color:var(--text-dim);">Or enter a formula directly:</label>
+      <input type="text" id="formulaInput" placeholder="e.g. C6H6 or C8H10N4O2" style="margin-top:6px;width:100%;max-width:300px;font-family:var(--font-mono);font-size:16px;padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);outline:none;text-align:center;" oninput="parseFormula()">
+    </div>
+
+    <div class="result-box" id="resultBox" style="margin-top:20px;">
+      <div class="result-label">Degree of Unsaturation (IHD)</div>
+      <div class="result-value" id="resultValue">—</div>
+    </div>
+
+    <div class="note-box" id="noteBox"></div>
+
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+      <label style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);display:block;margin-bottom:10px;">Quick Examples (click to fill)</label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;" id="examples"></div>
+    </div>
+  </div>
+
+  <div class="ad-slot" id="ad-mid"></div>
+
+  <div class="info-section">
+    <h2>How to Use This Calculator</h2>
+    <p>Enter the number of each atom in your molecular formula, or type the formula directly (e.g., "C6H6" or "C8H10N4O2"). The calculator instantly determines the degree of unsaturation, which tells you the total number of rings plus double bonds in the molecule. Oxygen and sulfur don't appear in the formula — they don't affect the calculation.</p>
+
+    <h2>The Math Behind It</h2>
+    <p>The degree of unsaturation (DoU), also called the index of hydrogen deficiency (IHD) or double bond equivalents (DBE), is calculated as: <strong>DoU = (2C + 2 + N − H − X) / 2</strong>, where C = carbons, H = hydrogens, N = nitrogens, and X = halogens (F, Cl, Br, I). Oxygen and sulfur are divalent and don't change the count.</p>
+    <p><strong>Interpreting the result:</strong> Each double bond contributes 1 DoU. Each ring contributes 1 DoU. A triple bond contributes 2 DoU. A benzene ring contributes 4 DoU (3 double bonds + 1 ring). So benzene (C₆H₆) has DoU = 4, and caffeine (C₈H₁₀N₄O₂) has DoU = 6.</p>
+    <p><strong>Worked example:</strong> Aspirin is C₉H₈O₄. DoU = (2×9 + 2 − 8) / 2 = (18 + 2 − 8) / 2 = 6. This accounts for the benzene ring (4 DoU) + 2 C=O double bonds (2 DoU).</p>
+  </div>
+
+  <div class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a class="related-card" href="theoretical-yield-calculator.html"><h3>Theoretical Yield</h3><p>Calculate max product from reactants.</p></a>
+      <a class="related-card" href="percent-yield-calculator.html"><h3>Percent Yield</h3><p>Calculate reaction efficiency.</p></a>
+      <a class="related-card" href="../general-lab/molarity-calculator.html"><h3>Molarity Calculator</h3><p>Moles, concentration, volume, mass.</p></a>
+    </div>
+  </div>
+</div>
+
+<div class="ad-slot" id="ad-bot"></div>
+<footer class="site-footer"><a href="../">← Back to all categories</a> · © 2026 LabCalcs</footer>
+
+<script>LC = window.LC || {}; LC.basePath = '..';</script>
+<script src="../js/analytics.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() { buildBreadcrumb('organic', 'Degree of Unsaturation'); });
+
+var examples = [
+  ["Benzene","C6H6"],["Caffeine","C8H10N4O2"],["Aspirin","C9H8O4"],["Glucose","C6H12O6"],
+  ["Cholesterol","C27H46O"],["Naphthalene","C10H8"],["Acetone","C3H6O"],["Chloroform","CHCl3"],
+  ["Ibuprofen","C13H18O2"],["Nicotine","C10H14N2"],
+];
+
+var exDiv = document.getElementById('examples');
+examples.forEach(function(e) {
+  var btn = document.createElement('button');
+  btn.style.cssText = 'font-family:var(--font-mono);font-size:11px;padding:6px 10px;border-radius:6px;border:1px solid var(--border);background:var(--input-bg);color:var(--text-dim);cursor:pointer;transition:all 0.15s;';
+  btn.textContent = e[0] + ' (' + e[1] + ')';
+  btn.addEventListener('click', function() { document.getElementById('formulaInput').value = e[1]; parseFormula(); });
+  btn.addEventListener('mouseenter', function() { this.style.borderColor='var(--accent)';this.style.color='var(--text)'; });
+  btn.addEventListener('mouseleave', function() { this.style.borderColor='var(--border)';this.style.color='var(--text-dim)'; });
+  exDiv.appendChild(btn);
+});
+
+function parseFormula() {
+  var f = document.getElementById('formulaInput').value.trim();
+  if (!f) return;
+  var atoms = {C:0,H:0,N:0,O:0,S:0};
+  var halogens = 0;
+  var re = /([A-Z][a-z]?)(\d*)/g;
+  var m;
+  while ((m = re.exec(f)) !== null) {
+    if (!m[1]) continue;
+    var el = m[1];
+    var n = m[2] ? parseInt(m[2]) : 1;
+    if (el === 'C' || el === 'H' || el === 'N' || el === 'O' || el === 'S') atoms[el] = n;
+    else if (el === 'F' || el === 'I') halogens += n;
+    else if (el === 'Cl' || el === 'Br') halogens += n;
+  }
+  // Handle Cl and Br (two-char)
+  var f2 = f;
+  var clMatch = f2.match(/Cl(\d*)/g);
+  if (clMatch) clMatch.forEach(function(cm) { var nn = cm.replace('Cl',''); halogens += nn ? parseInt(nn) : 1; });
+  var brMatch = f2.match(/Br(\d*)/g);
+  if (brMatch) brMatch.forEach(function(bm) { var nn = bm.replace('Br',''); halogens += nn ? parseInt(nn) : 1; });
+  // Subtract double-counted Cl/Br 'C' and 'l'/'r' from the simple regex
+  // Actually the regex handles Cl as C + l, so we need to fix C count
+  var clCount = (f.match(/Cl/g) || []).length;
+  var brCount = (f.match(/Br/g) || []).length;
+  // Recalculate C properly
+  atoms.C = 0;
+  var cMatches = f.match(/C(?!l)(\d*)/g);
+  if (cMatches) cMatches.forEach(function(cm) { var nn = cm.replace('C',''); atoms.C += nn ? parseInt(nn) : 1; });
+  // Recalculate halogens properly
+  halogens = 0;
+  var fMatches = f.match(/F(\d*)/g);
+  if (fMatches) fMatches.forEach(function(fm) { var nn = fm.replace('F',''); halogens += nn ? parseInt(nn) : 1; });
+  var iMatches = f.match(/I(\d*)/g);
+  if (iMatches) iMatches.forEach(function(im) { var nn = im.replace('I',''); halogens += nn ? parseInt(nn) : 1; });
+  if (clMatch) { halogens = 0; }
+  // Simpler approach: just parse properly
+  atoms = {C:0,H:0,N:0,O:0,S:0};
+  halogens = 0;
+  var tokens = f.match(/[A-Z][a-z]?\d*/g) || [];
+  tokens.forEach(function(tok) {
+    var el = tok.match(/[A-Z][a-z]?/)[0];
+    var num = tok.replace(el, '');
+    var n = num ? parseInt(num) : 1;
+    if (atoms.hasOwnProperty(el)) atoms[el] = n;
+    else if (el==='F'||el==='Cl'||el==='Br'||el==='I') halogens += n;
+  });
+
+  document.getElementById('C').value = atoms.C;
+  document.getElementById('H').value = atoms.H;
+  document.getElementById('N').value = atoms.N;
+  document.getElementById('O').value = atoms.O;
+  document.getElementById('S').value = atoms.S;
+  document.getElementById('X').value = halogens;
+  calc();
+}
+
+function calc() {
+  var C = parseInt(document.getElementById('C').value) || 0;
+  var H = parseInt(document.getElementById('H').value) || 0;
+  var N = parseInt(document.getElementById('N').value) || 0;
+  var X = parseInt(document.getElementById('X').value) || 0;
+  var box = document.getElementById('resultBox');
+  var note = document.getElementById('noteBox');
+  note.classList.remove('visible');
+
+  if (C === 0 && H === 0) { box.classList.remove('visible'); return; }
+
+  var dou = (2*C + 2 + N - H - X) / 2;
+  document.getElementById('resultValue').textContent = dou;
+  box.classList.add('visible');
+
+  if (dou < 0) { note.textContent = '⚠ Negative DoU — check your molecular formula. This usually means more hydrogens than possible for the given framework.'; note.classList.add('visible'); }
+  else if (dou === 0) { note.textContent = 'DoU = 0 → fully saturated, no rings or double bonds (e.g., an alkane).'; note.classList.add('visible'); note.style.color='var(--accent)';note.style.background='var(--accent-glow)';note.style.borderColor='var(--accent-border)'; }
+  else if (dou >= 4) { note.textContent = 'DoU ≥ 4 → likely contains an aromatic ring (benzene = 4 DoU).'; note.classList.add('visible'); note.style.color='var(--accent)';note.style.background='var(--accent-glow)';note.style.borderColor='var(--accent-border)'; }
+}
+</script>
+</body>
+</html>

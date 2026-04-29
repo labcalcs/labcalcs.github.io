@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nernst Equation Calculator — LabCalcs</title>
+<meta name="description" content="Free Nernst equation calculator. Calculate cell potential at non-standard conditions from E°, temperature, electrons transferred, and reaction quotient Q.">
+<link rel="canonical" href="https://labcalcs.github.io/physical-chemistry/nernst-equation-calculator.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="cat-physical">
+<div class="grain"></div>
+<nav class="site-nav" id="site-nav"></nav>
+<div class="breadcrumb" id="breadcrumb"></div>
+<div class="ad-slot" id="ad-top"></div>
+
+<div class="container">
+  <h1 class="page-title">Nernst Equation Calculator</h1>
+  <p class="page-subtitle">Calculate cell potential at non-standard conditions, or solve for any variable in the Nernst equation.</p>
+
+  <div class="calc-card">
+    <div class="formula-bar"><em>E</em> = <em>E°</em> − ( <em>RT</em> / <em>nF</em> ) × ln(<em>Q</em>)</div>
+
+    <div class="solve-for">
+      <label>Solve for</label>
+      <div class="solve-btns" id="solveBtns">
+        <button class="active" data-target="E" onclick="setSolve('E')">E (cell potential)</button>
+        <button data-target="E0" onclick="setSolve('E0')">E° (standard)</button>
+        <button data-target="Q" onclick="setSolve('Q')">Q (reaction quotient)</button>
+      </div>
+    </div>
+
+    <div class="fields">
+      <div class="field">
+        <label>E° — Standard Cell Potential <span class="unit">V</span></label>
+        <input type="number" id="E0" step="any" placeholder="e.g. 1.10" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>E — Cell Potential <span class="unit">V</span></label>
+        <input type="number" id="E" step="any" placeholder="—" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>n — Electrons Transferred</label>
+        <input type="number" id="n" step="1" min="1" placeholder="e.g. 2" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Q — Reaction Quotient</label>
+        <input type="number" id="Q" step="any" placeholder="e.g. 0.01" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Temperature</label>
+        <div class="input-with-unit">
+          <input type="number" id="T" step="any" value="25" oninput="calc()">
+          <select id="Tunit" onchange="calc()"><option value="C" selected>°C</option><option value="K">K</option></select>
+        </div>
+      </div>
+    </div>
+
+    <div class="result-box" id="resultBox">
+      <div class="result-label" id="resultLabel">Result</div>
+      <div class="result-value" id="resultValue">—</div>
+    </div>
+
+    <div class="note-box" id="noteBox"></div>
+
+    <div style="margin-top:20px;padding:14px 16px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid var(--border);font-size:13px;color:var(--text-dim);line-height:1.7;">
+      <span style="font-family:var(--font-mono);font-size:11px;color:var(--accent);margin-right:6px;">AT 25°C</span> The Nernst equation simplifies to: <strong style="color:var(--text);">E = E° − (0.02569/n) × ln(Q)</strong> &nbsp;or equivalently&nbsp; <strong style="color:var(--text);">E = E° − (0.05916/n) × log₁₀(Q)</strong>
+    </div>
+  </div>
+
+  <div class="ad-slot" id="ad-mid"></div>
+
+  <div class="info-section">
+    <h2>How to Use This Calculator</h2>
+    <p>Enter the standard cell potential (E°), number of electrons transferred (n), reaction quotient (Q), and temperature. The calculator finds the cell potential (E) at those non-standard conditions. You can also solve for E° or Q by selecting the appropriate button.</p>
+    <p>For half-cell calculations, use the standard reduction potential for E° and the concentration ratio for Q. For full cell calculations, E° is the difference between cathode and anode standard potentials.</p>
+
+    <h2>The Math Behind It</h2>
+    <p>The Nernst equation relates the cell potential to the standard potential and the concentrations of reactants and products: <strong>E = E° − (RT/nF) × ln(Q)</strong>, where R is the gas constant (8.314 J/(mol·K)), T is temperature in Kelvin, n is electrons transferred, F is Faraday's constant (96,485 C/mol), and Q is the reaction quotient.</p>
+    <p><strong>Worked example:</strong> A Daniell cell (Zn/Cu) has E° = 1.10 V with n = 2. If [Zn²⁺] = 1.0 M and [Cu²⁺] = 0.01 M, then Q = [Zn²⁺]/[Cu²⁺] = 100. At 25°C: E = 1.10 − (0.02569/2) × ln(100) = 1.10 − 0.0591 = 1.041 V.</p>
+    <p>At equilibrium, E = 0 and Q = K (the equilibrium constant). This gives the relationship <strong>ln(K) = nFE°/RT</strong>, which connects thermodynamics to electrochemistry.</p>
+    <p><strong>ΔG and E:</strong> The Gibbs free energy change is related to cell potential by <strong>ΔG = −nFE</strong>. A positive E means spontaneous (ΔG &lt; 0), while a negative E means non-spontaneous.</p>
+  </div>
+
+  <div class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a class="related-card" href="ideal-gas-law-calculator.html"><h3>Ideal Gas Law</h3><p>PV = nRT with flexible units.</p></a>
+      <a class="related-card" href="../general-lab/molarity-calculator.html"><h3>Molarity Calculator</h3><p>Moles, concentration, volume, mass.</p></a>
+    </div>
+  </div>
+</div>
+
+<div class="ad-slot" id="ad-bot"></div>
+<footer class="site-footer"><a href="../">← Back to all categories</a> · © 2026 LabCalcs</footer>
+
+<script>LC = window.LC || {}; LC.basePath = '..';</script>
+<script src="../js/analytics.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() { buildBreadcrumb('physical', 'Nernst Equation Calculator'); });
+
+var R = 8.314462, F = 96485.33212;
+var solveFor = 'E';
+
+function setSolve(t) {
+  solveFor = t;
+  document.querySelectorAll('#solveBtns button').forEach(b => b.classList.toggle('active', b.dataset.target === t));
+  ['E0','E','n','Q','T'].forEach(id => { document.getElementById(id).disabled = (id === t); });
+  document.getElementById(t).value = '';
+  calc();
+}
+
+function fmt(v) { if(v==null||isNaN(v)||!isFinite(v))return null; if(v===0)return'0'; if(Math.abs(v)>=0.0001&&Math.abs(v)<1e7)return parseFloat(v.toPrecision(5)).toString(); return v.toExponential(4); }
+
+function getT() {
+  var v = parseFloat(document.getElementById('T').value);
+  if(isNaN(v)) return NaN;
+  return document.getElementById('Tunit').value === 'C' ? v + 273.15 : v;
+}
+
+function calc() {
+  var E0 = parseFloat(document.getElementById('E0').value);
+  var E = parseFloat(document.getElementById('E').value);
+  var n = parseFloat(document.getElementById('n').value);
+  var Q = parseFloat(document.getElementById('Q').value);
+  var T = getT();
+  var box = document.getElementById('resultBox');
+  var note = document.getElementById('noteBox'); note.classList.remove('visible');
+  var result, label, unit;
+
+  switch(solveFor) {
+    case 'E':
+      if(!isNaN(E0)&&!isNaN(n)&&!isNaN(Q)&&!isNaN(T)&&n>0&&Q>0&&T>0) {
+        result = E0 - (R*T/(n*F)) * Math.log(Q);
+        label = 'Cell Potential (E)'; unit = 'V';
+        if(result < 0) { note.textContent = 'E < 0 — the reaction is non-spontaneous under these conditions (ΔG > 0).'; note.classList.add('visible'); }
+      } break;
+    case 'E0':
+      if(!isNaN(E)&&!isNaN(n)&&!isNaN(Q)&&!isNaN(T)&&n>0&&Q>0&&T>0) {
+        result = E + (R*T/(n*F)) * Math.log(Q);
+        label = 'Standard Cell Potential (E°)'; unit = 'V';
+      } break;
+    case 'Q':
+      if(!isNaN(E0)&&!isNaN(E)&&!isNaN(n)&&!isNaN(T)&&n>0&&T>0) {
+        result = Math.exp((E0 - E) * n * F / (R * T));
+        label = 'Reaction Quotient (Q)'; unit = '';
+      } break;
+  }
+
+  var f = fmt(result);
+  if(f!==null) {
+    document.getElementById('resultLabel').textContent = label;
+    document.getElementById('resultValue').innerHTML = f + (unit ? '<span class="result-unit">'+unit+'</span>' : '');
+    box.classList.add('visible');
+    document.getElementById(solveFor).value = f;
+    // Also show ΔG
+    if(solveFor==='E'&&!isNaN(n)) {
+      var dG = -n * F * result / 1000;
+      note.innerHTML = (note.innerHTML || '') + (note.classList.contains('visible') ? '<br>' : '') + 'ΔG = ' + fmt(dG) + ' kJ/mol';
+      note.classList.add('visible');
+      note.style.color='var(--accent)';note.style.background='var(--accent-glow)';note.style.borderColor='var(--accent-border)';
+    }
+  } else { box.classList.remove('visible'); }
+}
+setSolve('E');
+</script>
+</body>
+</html>

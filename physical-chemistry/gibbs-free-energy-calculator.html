@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gibbs Free Energy Calculator — LabCalcs</title>
+<meta name="description" content="Free Gibbs free energy calculator. Calculate ΔG from ΔH and ΔS at any temperature. Determine spontaneity and equilibrium temperature.">
+<link rel="canonical" href="https://labcalcs.github.io/physical-chemistry/gibbs-free-energy-calculator.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="cat-physical">
+<div class="grain"></div>
+<nav class="site-nav" id="site-nav"></nav>
+<div class="breadcrumb" id="breadcrumb"></div>
+<div class="ad-slot" id="ad-top"></div>
+
+<div class="container">
+  <h1 class="page-title">Gibbs Free Energy Calculator</h1>
+  <p class="page-subtitle">Calculate ΔG from ΔH and ΔS, or find the temperature at which a reaction becomes spontaneous.</p>
+
+  <div class="calc-card">
+    <div class="formula-bar"><em>ΔG</em> = <em>ΔH</em> − <em>T</em><em>ΔS</em></div>
+
+    <div class="solve-for">
+      <label>Solve for</label>
+      <div class="solve-btns" id="solveBtns">
+        <button class="active" data-target="dG" onclick="setSolve('dG')">ΔG</button>
+        <button data-target="dH" onclick="setSolve('dH')">ΔH</button>
+        <button data-target="dS" onclick="setSolve('dS')">ΔS</button>
+        <button data-target="T" onclick="setSolve('T')">T (equilibrium)</button>
+      </div>
+    </div>
+
+    <div class="fields">
+      <div class="field">
+        <label>ΔH — Enthalpy Change</label>
+        <div class="input-with-unit">
+          <input type="number" id="dH" step="any" placeholder="e.g. −285.8" oninput="calc()">
+          <select id="dH-unit" onchange="calc()"><option value="kJ/mol" selected>kJ/mol</option><option value="J/mol">J/mol</option><option value="kcal/mol">kcal/mol</option></select>
+        </div>
+      </div>
+      <div class="field">
+        <label>ΔS — Entropy Change</label>
+        <div class="input-with-unit">
+          <input type="number" id="dS" step="any" placeholder="e.g. −163.2" oninput="calc()">
+          <select id="dS-unit" onchange="calc()"><option value="J/(mol·K)" selected>J/(mol·K)</option><option value="kJ/(mol·K)">kJ/(mol·K)</option></select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Temperature</label>
+        <div class="input-with-unit">
+          <input type="number" id="T" step="any" value="298.15" placeholder="298.15" oninput="calc()">
+          <select id="T-unit" onchange="calc()"><option value="K" selected>K</option><option value="C">°C</option></select>
+        </div>
+      </div>
+      <div class="field">
+        <label>ΔG — Gibbs Free Energy</label>
+        <div class="input-with-unit" id="wrap-dG">
+          <input type="number" id="dG" step="any" placeholder="—" oninput="calc()">
+          <select id="dG-unit" onchange="calc()"><option value="kJ/mol" selected>kJ/mol</option><option value="J/mol">J/mol</option><option value="kcal/mol">kcal/mol</option></select>
+        </div>
+      </div>
+    </div>
+
+    <div class="result-box" id="resultBox">
+      <div class="result-label" id="resultLabel">Result</div>
+      <div class="result-value" id="resultValue">—</div>
+    </div>
+
+    <div class="note-box" id="noteBox"></div>
+  </div>
+
+  <div class="ad-slot" id="ad-mid"></div>
+
+  <div class="info-section">
+    <h2>How to Use This Calculator</h2>
+    <p>Enter ΔH (enthalpy change), ΔS (entropy change), and temperature to calculate ΔG. Or solve for any other variable. When solving for T, the calculator finds the temperature at which ΔG = 0 — the crossover point between spontaneous and non-spontaneous.</p>
+    <p><strong>Watch your units:</strong> ΔH is commonly in kJ/mol while ΔS is in J/(mol·K). The calculator handles conversion automatically, but make sure you select the correct units from the dropdowns.</p>
+
+    <h2>The Math Behind It</h2>
+    <p>The Gibbs free energy equation <strong>ΔG = ΔH − TΔS</strong> determines whether a process is thermodynamically spontaneous at a given temperature.</p>
+    <p><strong>Interpreting ΔG:</strong> If ΔG &lt; 0, the reaction is spontaneous (thermodynamically favorable). If ΔG &gt; 0, the reaction is non-spontaneous. If ΔG = 0, the system is at equilibrium.</p>
+    <p><strong>Worked example:</strong> The combustion of methane has ΔH = −890.3 kJ/mol and ΔS = −242.2 J/(mol·K). At 25°C (298.15 K): ΔG = −890.3 − (298.15 × −0.2422) = −890.3 + 72.2 = −818.1 kJ/mol. Strongly spontaneous.</p>
+    <p><strong>Temperature dependence:</strong> For reactions where ΔH and ΔS have the same sign, there's a crossover temperature T = ΔH/ΔS where spontaneity switches. Exothermic reactions with negative ΔS (like combustion) are spontaneous at low T but not at very high T. Endothermic reactions with positive ΔS (like melting ice) become spontaneous above the crossover temperature.</p>
+    <p><strong>Relationship to K:</strong> ΔG° = −RT ln(K), connecting thermodynamics to the equilibrium constant.</p>
+  </div>
+
+  <div class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a class="related-card" href="nernst-equation-calculator.html"><h3>Nernst Equation</h3><p>Cell potential and electrochemistry.</p></a>
+      <a class="related-card" href="ideal-gas-law-calculator.html"><h3>Ideal Gas Law</h3><p>PV = nRT with flexible units.</p></a>
+      <a class="related-card" href="../general-lab/molarity-calculator.html"><h3>Molarity Calculator</h3><p>Moles, concentration, volume, mass.</p></a>
+    </div>
+  </div>
+</div>
+
+<div class="ad-slot" id="ad-bot"></div>
+<footer class="site-footer"><a href="../">← Back to all categories</a> · © 2026 LabCalcs</footer>
+
+<script>LC = window.LC || {}; LC.basePath = '..';</script>
+<script src="../js/analytics.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() { buildBreadcrumb('physical', 'Gibbs Free Energy Calculator'); });
+
+var solveFor = 'dG';
+function setSolve(t) {
+  solveFor = t;
+  document.querySelectorAll('#solveBtns button').forEach(function(b){b.classList.toggle('active', b.dataset.target === t);});
+  ['dH','dS','T','dG'].forEach(function(id){document.getElementById(id).disabled = (id === t);});
+  document.getElementById(t).value = '';
+  calc();
+}
+function fmt(v){if(v==null||isNaN(v)||!isFinite(v))return null;if(v===0)return'0';if(Math.abs(v)>=0.001&&Math.abs(v)<1e7)return parseFloat(v.toPrecision(5)).toString();return v.toExponential(4);}
+
+function toJmol(val, unit) {
+  if (unit==='kJ/mol') return val*1000;
+  if (unit==='kcal/mol') return val*4184;
+  return val;
+}
+function fromJmol(val, unit) {
+  if (unit==='kJ/mol') return val/1000;
+  if (unit==='kcal/mol') return val/4184;
+  return val;
+}
+function dStoJmolK(val, unit) {
+  if (unit==='kJ/(mol·K)') return val*1000;
+  return val;
+}
+function toK(val, unit) { return unit==='C' ? val+273.15 : val; }
+function fromK(val, unit) { return unit==='C' ? val-273.15 : val; }
+
+function calc() {
+  var dHraw = parseFloat(document.getElementById('dH').value);
+  var dSraw = parseFloat(document.getElementById('dS').value);
+  var Traw = parseFloat(document.getElementById('T').value);
+  var dGraw = parseFloat(document.getElementById('dG').value);
+
+  var dH = isNaN(dHraw)?NaN:toJmol(dHraw, document.getElementById('dH-unit').value);
+  var dS = isNaN(dSraw)?NaN:dStoJmolK(dSraw, document.getElementById('dS-unit').value);
+  var T = isNaN(Traw)?NaN:toK(Traw, document.getElementById('T-unit').value);
+  var dG = isNaN(dGraw)?NaN:toJmol(dGraw, document.getElementById('dG-unit').value);
+
+  var box = document.getElementById('resultBox');
+  var note = document.getElementById('noteBox'); note.classList.remove('visible');
+  var result, label, unit;
+
+  switch(solveFor) {
+    case 'dG':
+      if(!isNaN(dH)&&!isNaN(dS)&&!isNaN(T)) {
+        var rJ = dH - T*dS;
+        var outUnit = document.getElementById('dG-unit').value;
+        result = fromJmol(rJ, outUnit);
+        label = 'ΔG'; unit = outUnit;
+        document.getElementById('dG').value = fmt(result);
+        if(rJ<0){note.innerHTML='<strong>ΔG &lt; 0</strong> — reaction is spontaneous at this temperature.';note.style.color='var(--accent)';note.style.background='var(--accent-glow)';note.style.borderColor='var(--accent-border)';}
+        else if(rJ>0){note.innerHTML='<strong>ΔG &gt; 0</strong> — reaction is non-spontaneous at this temperature.';note.style.color='#fbbf24';note.style.background='rgba(251,191,36,0.08)';note.style.borderColor='rgba(251,191,36,0.2)';}
+        else{note.innerHTML='<strong>ΔG = 0</strong> — system is at equilibrium.';}
+        note.classList.add('visible');
+      } break;
+    case 'dH':
+      if(!isNaN(dG)&&!isNaN(dS)&&!isNaN(T)) {
+        var rJ = dG + T*dS;
+        result = fromJmol(rJ, document.getElementById('dH-unit').value);
+        label = 'ΔH'; unit = document.getElementById('dH-unit').value;
+        document.getElementById('dH').value = fmt(result);
+      } break;
+    case 'dS':
+      if(!isNaN(dH)&&!isNaN(dG)&&!isNaN(T)&&T!==0) {
+        var rJ = (dH - dG) / T;
+        var su = document.getElementById('dS-unit').value;
+        result = su==='kJ/(mol·K)' ? rJ/1000 : rJ;
+        label = 'ΔS'; unit = su;
+        document.getElementById('dS').value = fmt(result);
+      } break;
+    case 'T':
+      if(!isNaN(dH)&&!isNaN(dS)&&dS!==0) {
+        var Tk = dH / dS;
+        result = fromK(Tk, document.getElementById('T-unit').value);
+        label = 'Equilibrium Temperature'; unit = document.getElementById('T-unit').value==='C'?'°C':'K';
+        document.getElementById('T').value = fmt(result);
+        if(Tk<0){note.textContent='⚠ Negative absolute temperature — the reaction is either always spontaneous or never spontaneous at any temperature (ΔH and ΔS have opposite signs).';note.classList.add('visible');}
+        else{note.innerHTML='At <strong>'+fmt(result)+' '+unit+'</strong>, ΔG = 0. Above this temperature: '+(dS>0?'spontaneous':'non-spontaneous')+'. Below: '+(dS>0?'non-spontaneous':'spontaneous')+'.';note.style.color='var(--accent)';note.style.background='var(--accent-glow)';note.style.borderColor='var(--accent-border)';note.classList.add('visible');}
+      } break;
+  }
+
+  var f = fmt(result);
+  if(f!==null){
+    document.getElementById('resultLabel').textContent = label;
+    document.getElementById('resultValue').innerHTML = f+'<span class="result-unit">'+unit+'</span>';
+    box.classList.add('visible');
+  } else { box.classList.remove('visible'); }
+}
+setSolve('dG');
+</script>
+</body>
+</html>

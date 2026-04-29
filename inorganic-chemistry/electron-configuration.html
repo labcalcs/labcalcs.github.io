@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Electron Configuration Generator — LabCalcs</title>
+<meta name="description" content="Free electron configuration generator for all 118 elements. Shows full configuration, noble gas shorthand, orbital diagram, and valence electrons. Supports ions.">
+<link rel="canonical" href="https://labcalcs.github.io/inorganic-chemistry/electron-configuration.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="cat-inorganic">
+<div class="grain"></div>
+<nav class="site-nav" id="site-nav"></nav>
+<div class="breadcrumb" id="breadcrumb"></div>
+<div class="ad-slot" id="ad-top"></div>
+
+<div class="container">
+  <h1 class="page-title">Electron Configuration Generator</h1>
+  <p class="page-subtitle">Get the full electron configuration, noble gas shorthand, and valence electrons for any element or ion.</p>
+
+  <div class="calc-card">
+    <div class="fields" style="margin-bottom:16px;">
+      <div class="field">
+        <label>Element (name, symbol, or Z)</label>
+        <input type="text" id="elemInput" placeholder="e.g. Fe, Iron, or 26" oninput="generate()" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Charge <span class="unit">(0 for neutral atom)</span></label>
+        <input type="number" id="charge" step="1" value="0" placeholder="0" oninput="generate()">
+      </div>
+    </div>
+
+    <div id="resultArea" style="display:none;">
+      <div style="margin-bottom:16px;padding:16px;border-radius:10px;background:var(--accent-glow);border:1px solid var(--accent-border);">
+        <div style="font-size:12px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:4px;">Element</div>
+        <div id="elemName" style="font-size:24px;font-weight:700;color:var(--text);"></div>
+        <div id="elemMeta" style="font-family:var(--font-mono);font-size:13px;color:var(--text-dim);margin-top:4px;"></div>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <div style="font-size:12px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:8px;font-weight:600;">Full Electron Configuration</div>
+        <div id="fullConfig" style="font-family:var(--font-mono);font-size:15px;color:var(--text);padding:12px;background:var(--input-bg);border:1px solid var(--border);border-radius:8px;word-break:break-all;"></div>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <div style="font-size:12px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:8px;font-weight:600;">Noble Gas Shorthand</div>
+        <div id="shortConfig" style="font-family:var(--font-mono);font-size:15px;color:var(--accent);padding:12px;background:var(--input-bg);border:1px solid var(--border);border-radius:8px;"></div>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <div style="font-size:12px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:8px;font-weight:600;">Valence Electrons</div>
+        <div id="valence" style="font-family:var(--font-mono);font-size:18px;font-weight:600;color:var(--accent);padding:12px;background:var(--input-bg);border:1px solid var(--border);border-radius:8px;"></div>
+      </div>
+    </div>
+
+    <div class="note-box" id="noteBox"></div>
+  </div>
+
+  <div class="ad-slot" id="ad-mid"></div>
+
+  <div class="info-section">
+    <h2>How to Use This Calculator</h2>
+    <p>Type an element name (e.g., "Iron"), symbol ("Fe"), or atomic number ("26"). To get the configuration of an ion, set the charge (e.g., +2 for Fe²⁺ or −1 for Cl⁻). The tool handles all 118 elements including the exceptions to the Aufbau principle (like Cr, Cu, and the transition metals).</p>
+
+    <h2>The Math Behind It</h2>
+    <p>Electrons fill orbitals following the Aufbau principle (lowest energy first), the Pauli exclusion principle (max 2 electrons per orbital), and Hund's rule (maximize unpaired electrons in degenerate orbitals). The filling order is: 1s → 2s → 2p → 3s → 3p → 4s → 3d → 4p → 5s → 4d → 5p → 6s → 4f → 5d → 6p → 7s → 5f → 6d → 7p.</p>
+    <p><strong>Notable exceptions:</strong> Chromium is [Ar] 3d⁵ 4s¹ (not 3d⁴ 4s²) and Copper is [Ar] 3d¹⁰ 4s¹ (not 3d⁹ 4s²) because half-filled and fully-filled d subshells provide extra stability. Similar exceptions occur in the 4d and 5d series.</p>
+    <p><strong>Ion configurations:</strong> When forming cations, electrons are removed from the highest principal energy level first (not the last orbital filled). For transition metals, 4s electrons are removed before 3d electrons. So Fe²⁺ is [Ar] 3d⁶, not [Ar] 3d⁴ 4s².</p>
+  </div>
+
+  <div class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a class="related-card" href="../physical-chemistry/nernst-equation-calculator.html"><h3>Nernst Equation</h3><p>Cell potential and electrochemistry.</p></a>
+      <a class="related-card" href="../general-lab/molarity-calculator.html"><h3>Molarity Calculator</h3><p>Moles, concentration, volume, mass.</p></a>
+    </div>
+  </div>
+</div>
+
+<div class="ad-slot" id="ad-bot"></div>
+<footer class="site-footer"><a href="../">← Back to all categories</a> · © 2026 LabCalcs</footer>
+
+<script>LC = window.LC || {}; LC.basePath = '..';</script>
+<script src="../js/analytics.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() { buildBreadcrumb('inorganic', 'Electron Configuration'); });
+
+var elements = [
+  ["H","Hydrogen"],["He","Helium"],["Li","Lithium"],["Be","Beryllium"],["B","Boron"],
+  ["C","Carbon"],["N","Nitrogen"],["O","Oxygen"],["F","Fluorine"],["Ne","Neon"],
+  ["Na","Sodium"],["Mg","Magnesium"],["Al","Aluminium"],["Si","Silicon"],["P","Phosphorus"],
+  ["S","Sulfur"],["Cl","Chlorine"],["Ar","Argon"],["K","Potassium"],["Ca","Calcium"],
+  ["Sc","Scandium"],["Ti","Titanium"],["V","Vanadium"],["Cr","Chromium"],["Mn","Manganese"],
+  ["Fe","Iron"],["Co","Cobalt"],["Ni","Nickel"],["Cu","Copper"],["Zn","Zinc"],
+  ["Ga","Gallium"],["Ge","Germanium"],["As","Arsenic"],["Se","Selenium"],["Br","Bromine"],
+  ["Kr","Krypton"],["Rb","Rubidium"],["Sr","Strontium"],["Y","Yttrium"],["Zr","Zirconium"],
+  ["Nb","Niobium"],["Mo","Molybdenum"],["Tc","Technetium"],["Ru","Ruthenium"],["Rh","Rhodium"],
+  ["Pd","Palladium"],["Ag","Silver"],["Cd","Cadmium"],["In","Indium"],["Sn","Tin"],
+  ["Sb","Antimony"],["Te","Tellurium"],["I","Iodine"],["Xe","Xenon"],["Cs","Cesium"],
+  ["Ba","Barium"],["La","Lanthanum"],["Ce","Cerium"],["Pr","Praseodymium"],["Nd","Neodymium"],
+  ["Pm","Promethium"],["Sm","Samarium"],["Eu","Europium"],["Gd","Gadolinium"],["Tb","Terbium"],
+  ["Dy","Dysprosium"],["Ho","Holmium"],["Er","Erbium"],["Tm","Thulium"],["Yb","Ytterbium"],
+  ["Lu","Lutetium"],["Hf","Hafnium"],["Ta","Tantalum"],["W","Tungsten"],["Re","Rhenium"],
+  ["Os","Osmium"],["Ir","Iridium"],["Pt","Platinum"],["Au","Gold"],["Hg","Mercury"],
+  ["Tl","Thallium"],["Pb","Lead"],["Bi","Bismuth"],["Po","Polonium"],["At","Astatine"],
+  ["Rn","Radon"],["Fr","Francium"],["Ra","Radium"],["Ac","Actinium"],["Th","Thorium"],
+  ["Pa","Protactinium"],["U","Uranium"],["Np","Neptunium"],["Pu","Plutonium"],["Am","Americium"],
+  ["Cm","Curium"],["Bk","Berkelium"],["Cf","Californium"],["Es","Einsteinium"],["Fm","Fermium"],
+  ["Md","Mendelevium"],["No","Nobelium"],["Lr","Lawrencium"],["Rf","Rutherfordium"],["Db","Dubnium"],
+  ["Sg","Seaborgium"],["Bh","Bohrium"],["Hs","Hassium"],["Mt","Meitnerium"],["Ds","Darmstadtium"],
+  ["Rg","Roentgenium"],["Cn","Copernicium"],["Nh","Nihonium"],["Fl","Flerovium"],["Mc","Moscovium"],
+  ["Lv","Livermorium"],["Ts","Tennessine"],["Og","Oganesson"]
+];
+
+var nobleGases = {2:'He',10:'Ne',18:'Ar',36:'Kr',54:'Xe',86:'Rn'};
+var fillingOrder = ['1s','2s','2p','3s','3p','4s','3d','4p','5s','4d','5p','6s','4f','5d','6p','7s','5f','6d','7p'];
+var maxElectrons = {s:2,p:6,d:10,f:14};
+
+// Known exceptions (Z -> config override as array of [orbital, count])
+var exceptions = {
+  24: [['1s',2],['2s',2],['2p',6],['3s',2],['3p',6],['4s',1],['3d',5]], // Cr
+  29: [['1s',2],['2s',2],['2p',6],['3s',2],['3p',6],['4s',1],['3d',10]], // Cu
+  41: [['1s',2],['2s',2],['2p',6],['3s',2],['3p',6],['4s',2],['3d',10],['4p',6],['5s',1],['4d',4]], // Nb
+  42: [['1s',2],['2s',2],['2p',6],['3s',2],['3p',6],['4s',2],['3d',10],['4p',6],['5s',1],['4d',5]], // Mo
+  44: [['1s',2],['2s',2],['2p',6],['3s',2],['3p',6],['4s',2],['3d',10],['4p',6],['5s',1],['4d',7]], // Ru
+  45: [['1s',2],['2s',2],['2p',6],['3s',2],['3p',6],['4s',2],['3d',10],['4p',6],['5s',1],['4d',8]], // Rh
+  46: [['1s',2],['2s',2],['2p',6],['3s',2],['3p',6],['4s',2],['3d',10],['4p',6],['4d',10]], // Pd
+  47: [['1s',2],['2s',2],['2p',6],['3s',2],['3p',6],['4s',2],['3d',10],['4p',6],['5s',1],['4d',10]], // Ag
+  78: [['1s',2],['2s',2],['2p',6],['3s',2],['3p',6],['4s',2],['3d',10],['4p',6],['5s',2],['4d',10],['5p',6],['6s',1],['4f',14],['5d',9]], // Pt
+  79: [['1s',2],['2s',2],['2p',6],['3s',2],['3p',6],['4s',2],['3d',10],['4p',6],['5s',2],['4d',10],['5p',6],['6s',1],['4f',14],['5d',10]], // Au
+};
+
+function findElement(input) {
+  var s = input.trim();
+  if (!s) return null;
+  var num = parseInt(s);
+  if (!isNaN(num) && num >= 1 && num <= 118) return {z:num, sym:elements[num-1][0], name:elements[num-1][1]};
+  var lower = s.toLowerCase();
+  for (var i=0;i<elements.length;i++) {
+    if (elements[i][0].toLowerCase()===lower || elements[i][1].toLowerCase()===lower) return {z:i+1, sym:elements[i][0], name:elements[i][1]};
+  }
+  return null;
+}
+
+function getConfig(z) {
+  if (exceptions[z]) return exceptions[z].slice();
+  var config = [];
+  var remaining = z;
+  for (var i=0; i<fillingOrder.length && remaining>0; i++) {
+    var orb = fillingOrder[i];
+    var type = orb[orb.length-1];
+    var max = maxElectrons[type];
+    var fill = Math.min(remaining, max);
+    config.push([orb, fill]);
+    remaining -= fill;
+  }
+  return config;
+}
+
+function removeElectrons(config, count) {
+  // Remove from highest n first, then highest l within that n
+  var c = config.map(function(x){return [x[0],x[1]];});
+  var nOrder = {s:0,p:1,d:2,f:3};
+  // Sort by principal quantum number (desc), then by l (desc) for removal
+  var sorted = c.map(function(x,i){
+    var n = parseInt(x[0][0]);
+    var l = nOrder[x[0][x[0].length-1]];
+    return {idx:i, n:n, l:l};
+  }).sort(function(a,b){ return b.n-a.n || b.l-a.l; });
+
+  var rem = count;
+  for (var i=0; i<sorted.length && rem>0; i++) {
+    var idx = sorted[i].idx;
+    var take = Math.min(rem, c[idx][1]);
+    c[idx][1] -= take;
+    rem -= take;
+  }
+  return c.filter(function(x){return x[1]>0;});
+}
+
+function configToString(config) {
+  return config.map(function(c){
+    var sup = c[1].toString().split('').map(function(d){return '⁰¹²³⁴⁵⁶⁷⁸⁹'[parseInt(d)];}).join('');
+    return c[0]+sup;
+  }).join(' ');
+}
+
+function getShorthand(config, z) {
+  var best = null;
+  var ngKeys = Object.keys(nobleGases).map(Number).sort(function(a,b){return a-b;});
+  for (var i=ngKeys.length-1;i>=0;i--) {
+    var ngZ = ngKeys[i];
+    if (ngZ >= z) continue;
+    var ngConfig = getConfig(ngZ);
+    // Check if config starts with ngConfig
+    var match = true;
+    for (var j=0;j<ngConfig.length;j++) {
+      if (j>=config.length || config[j][0]!==ngConfig[j][0] || config[j][1]!==ngConfig[j][1]) {match=false;break;}
+    }
+    if (match) { best = {z:ngZ, sym:nobleGases[ngZ], skip:ngConfig.length}; break; }
+  }
+  if (!best) return configToString(config);
+  var remaining = config.slice(best.skip);
+  return '['+best.sym+'] '+configToString(remaining);
+}
+
+function generate() {
+  var el = findElement(document.getElementById('elemInput').value);
+  var charge = parseInt(document.getElementById('charge').value) || 0;
+  var area = document.getElementById('resultArea');
+  var note = document.getElementById('noteBox'); note.classList.remove('visible');
+
+  if (!el) { area.style.display='none'; return; }
+
+  var electrons = el.z - charge;
+  if (electrons < 0 || electrons > 118) {
+    note.textContent = '⚠ Invalid charge — would result in '+electrons+' electrons.';
+    note.classList.add('visible');
+    area.style.display='none';
+    return;
+  }
+
+  var config = (electrons === el.z && exceptions[el.z]) ? exceptions[el.z].slice() : getConfig(electrons);
+
+  // For cations of transition metals, remove from s before d
+  if (charge > 0 && el.z !== electrons) {
+    var neutralConfig = getConfig(el.z);
+    if (exceptions[el.z]) neutralConfig = exceptions[el.z].slice();
+    config = removeElectrons(neutralConfig, charge);
+  }
+
+  var chargeStr = charge === 0 ? '' : (charge > 0 ? charge+'+' : Math.abs(charge)+'-');
+  var ionStr = charge === 0 ? '' : ' (' + el.sym + (charge>0?'⁺'.repeat(Math.min(charge,3)):('⁻'.repeat(Math.min(Math.abs(charge),3)))) + ')';
+
+  document.getElementById('elemName').textContent = el.name + ionStr;
+  document.getElementById('elemMeta').textContent = 'Z = '+el.z + ' · '+electrons+' electrons' + (charge!==0?' · charge: '+(charge>0?'+':'')+charge:'');
+  document.getElementById('fullConfig').textContent = configToString(config);
+  document.getElementById('shortConfig').textContent = getShorthand(config, electrons);
+
+  // Valence electrons (outermost shell)
+  var maxN = 0;
+  config.forEach(function(c){var n=parseInt(c[0][0]);if(n>maxN)maxN=n;});
+  var valCount = 0;
+  config.forEach(function(c){if(parseInt(c[0][0])===maxN)valCount+=c[1];});
+  document.getElementById('valence').textContent = valCount + ' valence electron' + (valCount!==1?'s':'');
+
+  area.style.display='block';
+}
+</script>
+</body>
+</html>

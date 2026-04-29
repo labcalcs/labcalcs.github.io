@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dilution Calculator (C1V1=C2V2) — LabCalc</title>
+<title>Dilution Calculator (C1V1=C2V2) — LabCalcs</title>
 <meta name="description" content="Free C1V1=C2V2 dilution calculator with unit conversion. Supports M, mM, µM, mg/mL, µg/mL, µL, mL, L and more. Serial dilution calculator included.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -406,7 +406,7 @@
     <h2>How dilution calculations work</h2>
     <p>The equation C₁V₁ = C₂V₂ is based on conservation of solute — the total amount of substance remains constant before and after dilution. This calculator handles unit conversion automatically: you can enter C₁ in mM and C₂ in µM, or V₁ in µL and V₂ in mL, and it will convert internally before solving.</p>
     <p><strong>Important:</strong> C₁ and C₂ must be in compatible concentration families. You can mix molar units (M, mM, µM, nM, pM) with each other, or mass/volume units (mg/mL, µg/mL, g/L) with each other, but you cannot mix across families (e.g., mM and mg/mL) without knowing the molecular weight — the calculator will warn you if this happens.</p>
-    <p>For serial dilutions, each tube is diluted by the same factor. The transfer volume equals the final volume divided by (dilution factor − 1), and the diluent volume is the remainder.</p>
+    <p>For serial dilutions, each tube is diluted by the same factor. The transfer volume equals the final volume divided by the dilution factor, and the diluent volume is the remainder.</p>
 
     <h2 style="margin-top:24px;">Supported units</h2>
     <p><strong>Concentration:</strong> M, mM, µM, nM, pM, mg/mL, µg/mL, ng/mL, g/L, mg/L, %(w/v), %(v/v), and fold (x).</p>
@@ -585,7 +585,7 @@ function calcSerial() {
     return;
   }
 
-  const transferVol = vol / (df - 1);
+  const transferVol = vol / df;
   const diluentVol = vol - transferVol;
 
   body.innerHTML = '';

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DNA/RNA Concentration Calculator (A260) — LabCalcs</title>
+<meta name="description" content="Free DNA and RNA concentration calculator from A260 absorbance. Calculate concentration, total yield, and assess purity from A260/A280 and A260/A230 ratios.">
+<link rel="canonical" href="https://labcalcs.github.io/biology-biochemistry/dna-rna-concentration.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="cat-biology">
+<div class="grain"></div>
+<nav class="site-nav" id="site-nav"></nav>
+<div class="breadcrumb" id="breadcrumb"></div>
+<div class="ad-slot" id="ad-top"></div>
+
+<div class="container">
+  <h1 class="page-title">DNA/RNA Concentration Calculator</h1>
+  <p class="page-subtitle">Calculate nucleic acid concentration from A260, with purity assessment from A260/A280 and A260/A230 ratios.</p>
+
+  <div class="calc-card">
+    <div class="formula-bar"><em>Concentration</em> = <em>A₂₆₀</em> × <em>factor</em> × <em>dilution</em></div>
+
+    <div class="fields">
+      <div class="field">
+        <label>Nucleic Acid Type</label>
+        <select id="naType" style="width:100%;font-family:var(--font-mono);font-size:15px;padding:12px 14px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);outline:none;cursor:pointer;" onchange="calc()">
+          <option value="dsDNA" selected>dsDNA (50 µg/mL per A260)</option>
+          <option value="ssDNA">ssDNA (33 µg/mL per A260)</option>
+          <option value="RNA">RNA (40 µg/mL per A260)</option>
+          <option value="oligo">Oligonucleotide (20-30 nt, ~33 µg/mL)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>A₂₆₀ <span class="unit">absorbance at 260 nm</span></label>
+        <input type="number" id="a260" step="any" placeholder="e.g. 0.25" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Path Length <span class="unit">cm (1 cm standard, 0.1 cm NanoDrop)</span></label>
+        <input type="number" id="pathLen" step="any" value="1" placeholder="1" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Dilution Factor <span class="unit">(1 if undiluted)</span></label>
+        <input type="number" id="dilution" step="any" value="1" placeholder="1" oninput="calc()">
+      </div>
+    </div>
+
+    <div class="result-box" id="resultBox">
+      <div class="result-label">Concentration</div>
+      <div class="result-value" id="resultValue">—</div>
+    </div>
+
+    <div class="divider-row"><span class="line"></span><span class="label">Purity Assessment (optional)</span><span class="line"></span></div>
+
+    <div class="fields">
+      <div class="field">
+        <label>A₂₈₀ <span class="unit">(for A260/A280 ratio)</span></label>
+        <input type="number" id="a280" step="any" placeholder="optional" oninput="calcPurity()">
+      </div>
+      <div class="field">
+        <label>A₂₃₀ <span class="unit">(for A260/A230 ratio)</span></label>
+        <input type="number" id="a230" step="any" placeholder="optional" oninput="calcPurity()">
+      </div>
+    </div>
+
+    <div id="purityResult" style="display:none;margin-top:16px;padding:16px;border-radius:10px;background:var(--accent-glow);border:1px solid var(--accent-border);font-size:14px;line-height:1.8;"></div>
+
+    <div class="divider-row"><span class="line"></span><span class="label">Total Yield (optional)</span><span class="line"></span></div>
+
+    <div class="fields">
+      <div class="field">
+        <label>Total Sample Volume <span class="unit">µL</span></label>
+        <input type="number" id="totalVol" step="any" placeholder="e.g. 50" oninput="calcYield()">
+      </div>
+      <div class="field">
+        <label>Total Yield</label>
+        <div id="yieldResult" style="font-family:var(--font-mono);font-size:16px;padding:12px;background:var(--input-bg);border:1px solid var(--border);border-radius:8px;color:var(--text-dim);min-height:44px;display:flex;align-items:center;">Enter volume above</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ad-slot" id="ad-mid"></div>
+
+  <div class="info-section">
+    <h2>How to Use This Calculator</h2>
+    <p>Select your nucleic acid type (this sets the extinction coefficient), enter the A260 reading, path length, and dilution factor. The concentration is calculated instantly. Optionally enter A280 and A230 readings to assess sample purity, and total volume to calculate yield.</p>
+
+    <h2>The Math Behind It</h2>
+    <p>Nucleic acid concentration from UV absorbance uses the relationship: <strong>Concentration = A260 × conversion factor × dilution factor / path length</strong>. The conversion factors are empirically determined: 50 µg/mL for dsDNA, 33 µg/mL for ssDNA, and 40 µg/mL for RNA per 1.0 absorbance unit in a 1 cm path length cuvette.</p>
+    <p><strong>A260/A280 ratio:</strong> Pure DNA gives ~1.8, pure RNA gives ~2.0. Ratios significantly below these values indicate protein contamination. Note that pH affects this ratio — measure in slightly basic buffer (TE, pH 8.0) for most consistent results.</p>
+    <p><strong>A260/A230 ratio:</strong> Should be 2.0–2.2 for pure nucleic acids. Low values indicate contamination with organic compounds like phenol, TRIzol, guanidinium salts, or carbohydrates — common carryover from extraction protocols.</p>
+    <p><strong>NanoDrop note:</strong> NanoDrop and similar microvolume spectrophotometers use a 0.1 cm path length (1 mm). Set the path length to 0.1 if entering raw absorbance from a NanoDrop, though most NanoDrop software already reports the normalized concentration.</p>
+  </div>
+
+  <div class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a class="related-card" href="pcr-master-mix-calculator.html"><h3>PCR Master Mix</h3><p>Scale PCR reactions with overage.</p></a>
+      <a class="related-card" href="../spectroscopy/beer-lambert-calculator.html"><h3>Beer-Lambert Calculator</h3><p>General A = εlc solver.</p></a>
+      <a class="related-card" href="../general-lab/dilution-calculator.html"><h3>Dilution Calculator</h3><p>C₁V₁ = C₂V₂ with flexible units.</p></a>
+    </div>
+  </div>
+</div>
+
+<div class="ad-slot" id="ad-bot"></div>
+<footer class="site-footer"><a href="../">← Back to all categories</a> · © 2026 LabCalcs</footer>
+
+<script>LC = window.LC || {}; LC.basePath = '..';</script>
+<script src="../js/analytics.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() { buildBreadcrumb('biology', 'DNA/RNA Concentration'); });
+
+var factors = { dsDNA:50, ssDNA:33, RNA:40, oligo:33 };
+var concResult = 0;
+
+function fmt(v){if(v==null||isNaN(v)||!isFinite(v))return null;if(v===0)return'0';if(Math.abs(v)>=0.01&&Math.abs(v)<1e6)return parseFloat(v.toPrecision(5)).toString();return v.toExponential(3);}
+
+function calc() {
+  var type = document.getElementById('naType').value;
+  var a260 = parseFloat(document.getElementById('a260').value);
+  var path = parseFloat(document.getElementById('pathLen').value);
+  var dil = parseFloat(document.getElementById('dilution').value);
+  var box = document.getElementById('resultBox');
+
+  if (isNaN(a260)||isNaN(path)||path<=0) { box.classList.remove('visible'); concResult=0; return; }
+  if (isNaN(dil)) dil = 1;
+
+  var factor = factors[type];
+  concResult = a260 * factor * dil / path;
+  var ngul = concResult / 1000;
+
+  var html = fmt(concResult) + '<span class="result-unit">µg/mL</span>';
+  if (concResult >= 1) html += '&nbsp;&nbsp;=&nbsp;&nbsp;' + fmt(concResult/1000) + '<span class="result-unit">ng/µL</span>';
+
+  document.getElementById('resultValue').innerHTML = html;
+  box.classList.add('visible');
+  calcPurity();
+  calcYield();
+}
+
+function calcPurity() {
+  var a260 = parseFloat(document.getElementById('a260').value);
+  var a280 = parseFloat(document.getElementById('a280').value);
+  var a230 = parseFloat(document.getElementById('a230').value);
+  var type = document.getElementById('naType').value;
+  var el = document.getElementById('purityResult');
+  var lines = [];
+
+  if (!isNaN(a260) && !isNaN(a280) && a280 > 0) {
+    var r1 = a260/a280;
+    var ideal = (type==='RNA') ? 2.0 : 1.8;
+    var status = Math.abs(r1 - ideal) <= 0.2 ? '✓ Good' : (r1 < ideal-0.2 ? '⚠ Low (possible protein contamination)' : '⚠ High');
+    lines.push('<strong>A260/A280 = ' + fmt(r1) + '</strong> — ' + status + ' (ideal: ~' + ideal + ')');
+  }
+
+  if (!isNaN(a260) && !isNaN(a230) && a230 > 0) {
+    var r2 = a260/a230;
+    var status2 = r2 >= 1.8 ? '✓ Good' : '⚠ Low (possible organic solvent/salt contamination)';
+    lines.push('<strong>A260/A230 = ' + fmt(r2) + '</strong> — ' + status2 + ' (ideal: 2.0–2.2)');
+  }
+
+  if (lines.length > 0) {
+    el.innerHTML = lines.join('<br>');
+    el.style.display = 'block';
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+function calcYield() {
+  var totalVol = parseFloat(document.getElementById('totalVol').value);
+  var el = document.getElementById('yieldResult');
+  if (isNaN(totalVol) || concResult <= 0) { el.textContent = 'Enter volume above'; el.style.color='var(--text-dim)'; return; }
+
+  var yieldUg = concResult * totalVol / 1000;
+  if (yieldUg >= 1) {
+    el.innerHTML = '<span style="color:var(--accent);font-weight:600;">' + fmt(yieldUg) + ' µg</span>';
+  } else {
+    el.innerHTML = '<span style="color:var(--accent);font-weight:600;">' + fmt(yieldUg*1000) + ' ng</span>';
+  }
+}
+
+calc();
+</script>
+</body>
+</html>

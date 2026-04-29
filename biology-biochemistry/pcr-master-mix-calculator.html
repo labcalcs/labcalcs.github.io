@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PCR Master Mix Calculator — LabCalcs</title>
+<meta name="description" content="Free PCR master mix calculator. Scale reactions from 1 to 96+ tubes with customizable components, overage, and final volume. Supports Taq, Phusion, Q5 and custom polymerases.">
+<link rel="canonical" href="https://labcalcs.github.io/biology-biochemistry/pcr-master-mix-calculator.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="cat-biology">
+<div class="grain"></div>
+<nav class="site-nav" id="site-nav"></nav>
+<div class="breadcrumb" id="breadcrumb"></div>
+<div class="ad-slot" id="ad-top"></div>
+
+<div class="container">
+  <h1 class="page-title">PCR Master Mix Calculator</h1>
+  <p class="page-subtitle">Scale your PCR reactions with automatic overage. Customize components for any polymerase system.</p>
+
+  <div class="calc-card">
+    <div class="fields" style="margin-bottom:20px;">
+      <div class="field">
+        <label>Number of Reactions</label>
+        <input type="number" id="numRxns" step="1" min="1" value="8" placeholder="e.g. 8" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Final Volume per Reaction <span class="unit">µL</span></label>
+        <input type="number" id="rxnVol" step="any" value="25" placeholder="e.g. 25" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Overage <span class="unit">%</span></label>
+        <input type="number" id="overage" step="any" value="10" placeholder="10" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Template Volume per Reaction <span class="unit">µL (added separately)</span></label>
+        <input type="number" id="templateVol" step="any" value="1" placeholder="1" oninput="calc()">
+      </div>
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <label style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);display:block;margin-bottom:10px;">Polymerase Preset</label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;" id="presets"></div>
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table id="mixTable" style="width:100%;border-collapse:collapse;font-size:13px;">
+        <thead>
+          <tr>
+            <th style="text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text-dim);font-size:11px;text-transform:uppercase;letter-spacing:1px;">Component</th>
+            <th style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text-dim);font-size:11px;text-transform:uppercase;letter-spacing:1px;">Stock</th>
+            <th style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text-dim);font-size:11px;text-transform:uppercase;letter-spacing:1px;">Final</th>
+            <th style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text-dim);font-size:11px;text-transform:uppercase;letter-spacing:1px;">Per Rxn (µL)</th>
+            <th style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--accent);font-size:11px;text-transform:uppercase;letter-spacing:1px;font-weight:700;">Master Mix (µL)</th>
+          </tr>
+        </thead>
+        <tbody id="mixBody"></tbody>
+        <tfoot>
+          <tr id="totalRow" style="border-top:2px solid var(--border);">
+            <td colspan="3" style="padding:10px;font-weight:600;color:var(--text);">Total Master Mix Volume</td>
+            <td id="totalPer" style="text-align:center;padding:10px;font-family:var(--font-mono);color:var(--text);"></td>
+            <td id="totalMM" style="text-align:center;padding:10px;font-family:var(--font-mono);font-weight:600;color:var(--accent);"></td>
+          </tr>
+          <tr>
+            <td colspan="3" style="padding:6px 10px;color:var(--text-dim);font-size:12px;">+ Template (added per tube)</td>
+            <td id="templatePer" style="text-align:center;padding:6px 10px;font-family:var(--font-mono);color:var(--text-dim);font-size:12px;"></td>
+            <td style="text-align:center;padding:6px 10px;color:var(--text-dim);font-size:12px;">—</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot" id="ad-mid"></div>
+
+  <div class="info-section">
+    <h2>How to Use This Calculator</h2>
+    <p>Set the number of reactions, volume per reaction, and overage percentage (10% is standard to account for pipetting losses). Click a polymerase preset to auto-fill typical component concentrations, or customize each row in the table. Template DNA is listed separately since it varies per tube and isn't part of the master mix.</p>
+    <p>The "Master Mix" column shows total volumes including overage — this is what you actually pipette when preparing the mix.</p>
+
+    <h2>Tips for PCR Setup</h2>
+    <p><strong>Always make a master mix</strong> when running multiple reactions. It reduces pipetting errors and ensures consistency across samples. Add the template last, after aliquoting master mix into individual tubes.</p>
+    <p><strong>Overage:</strong> 10% extra is standard for up to ~20 reactions. For larger numbers of reactions (50+), you can reduce to 5% since pipetting errors average out.</p>
+    <p><strong>Common issues:</strong> If your PCR fails, check MgCl₂ concentration first (too much causes nonspecific amplification, too little reduces yield). DMSO or betaine (3–5% final) can help with GC-rich templates. For colony PCR, reduce template volume and increase initial denaturation time to 10 minutes.</p>
+  </div>
+
+  <div class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a class="related-card" href="henderson-hasselbalch-calculator.html"><h3>Henderson-Hasselbalch</h3><p>Buffer pH from pKa and ratio.</p></a>
+      <a class="related-card" href="../general-lab/dilution-calculator.html"><h3>Dilution Calculator</h3><p>C₁V₁ = C₂V₂ with flexible units.</p></a>
+      <a class="related-card" href="../general-lab/molarity-calculator.html"><h3>Molarity Calculator</h3><p>Moles, concentration, volume, mass.</p></a>
+    </div>
+  </div>
+</div>
+
+<div class="ad-slot" id="ad-bot"></div>
+<footer class="site-footer"><a href="../">← Back to all categories</a> · © 2026 LabCalcs</footer>
+
+<script>LC = window.LC || {}; LC.basePath = '..';</script>
+<script src="../js/analytics.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() { buildBreadcrumb('biology', 'PCR Master Mix Calculator'); });
+
+var components = [
+  {name:'Buffer', stock:'10×', finalX:1, stockNum:10, finalNum:1, unit:'×'},
+  {name:'dNTPs', stock:'10 mM each', finalX:'200 µM', stockNum:10, finalNum:0.2, unit:'mM'},
+  {name:'Forward Primer', stock:'10 µM', finalX:'0.5 µM', stockNum:10, finalNum:0.5, unit:'µM'},
+  {name:'Reverse Primer', stock:'10 µM', finalX:'0.5 µM', stockNum:10, finalNum:0.5, unit:'µM'},
+  {name:'MgCl₂', stock:'25 mM', finalX:'1.5 mM', stockNum:25, finalNum:1.5, unit:'mM'},
+  {name:'Polymerase', stock:'5 U/µL', finalX:'1.25 U', stockNum:5, finalNum:0.05, unit:'U/µL', isFixed:true, fixedVol:0.25},
+  {name:'Water', stock:'—', finalX:'—', isWater:true},
+];
+
+var presets = [
+  {name:'Taq (standard)', comps:[
+    {name:'Taq Buffer',stock:'10×',stockNum:10,finalNum:1,unit:'×'},
+    {name:'dNTPs',stock:'10 mM',stockNum:10,finalNum:0.2,unit:'mM'},
+    {name:'Fwd Primer',stock:'10 µM',stockNum:10,finalNum:0.5,unit:'µM'},
+    {name:'Rev Primer',stock:'10 µM',stockNum:10,finalNum:0.5,unit:'µM'},
+    {name:'MgCl₂',stock:'25 mM',stockNum:25,finalNum:1.5,unit:'mM'},
+    {name:'Taq Polymerase',stock:'5 U/µL',isFixed:true,fixedVol:0.25},
+    {name:'Water',isWater:true},
+  ]},
+  {name:'Phusion / Q5 (HF)', comps:[
+    {name:'HF Buffer',stock:'5×',stockNum:5,finalNum:1,unit:'×'},
+    {name:'dNTPs',stock:'10 mM',stockNum:10,finalNum:0.2,unit:'mM'},
+    {name:'Fwd Primer',stock:'10 µM',stockNum:10,finalNum:0.5,unit:'µM'},
+    {name:'Rev Primer',stock:'10 µM',stockNum:10,finalNum:0.5,unit:'µM'},
+    {name:'Polymerase',stock:'2 U/µL',isFixed:true,fixedVol:0.25},
+    {name:'Water',isWater:true},
+  ]},
+  {name:'GoTaq Green (2×)', comps:[
+    {name:'GoTaq Green 2× Mix',stock:'2×',stockNum:2,finalNum:1,unit:'×'},
+    {name:'Fwd Primer',stock:'10 µM',stockNum:10,finalNum:0.5,unit:'µM'},
+    {name:'Rev Primer',stock:'10 µM',stockNum:10,finalNum:0.5,unit:'µM'},
+    {name:'Water',isWater:true},
+  ]},
+];
+
+var activeComps = presets[0].comps;
+
+var presetDiv = document.getElementById('presets');
+presets.forEach(function(p,i) {
+  var btn = document.createElement('button');
+  btn.style.cssText = 'font-family:var(--font-mono);font-size:11px;padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:var(--input-bg);color:var(--text-dim);cursor:pointer;transition:all 0.15s;';
+  if(i===0) { btn.style.borderColor='var(--accent)'; btn.style.color='var(--accent)'; btn.style.background='var(--accent-glow)'; }
+  btn.textContent = p.name;
+  btn.addEventListener('click', function() {
+    activeComps = p.comps;
+    presetDiv.querySelectorAll('button').forEach(function(b){b.style.borderColor='var(--border)';b.style.color='var(--text-dim)';b.style.background='var(--input-bg)';});
+    btn.style.borderColor='var(--accent)';btn.style.color='var(--accent)';btn.style.background='var(--accent-glow)';
+    calc();
+  });
+  presetDiv.appendChild(btn);
+});
+
+function fmt(v){if(v==null||isNaN(v)||!isFinite(v))return'—';if(v===0)return'0';return parseFloat(v.toPrecision(4)).toString();}
+
+function calc() {
+  var numRxns = parseFloat(document.getElementById('numRxns').value)||0;
+  var rxnVol = parseFloat(document.getElementById('rxnVol').value)||0;
+  var overage = parseFloat(document.getElementById('overage').value)||0;
+  var templateVol = parseFloat(document.getElementById('templateVol').value)||0;
+
+  var multiplier = numRxns * (1 + overage/100);
+  var mmVol = rxnVol - templateVol;
+
+  var body = document.getElementById('mixBody');
+  body.innerHTML = '';
+  var totalPer = 0;
+
+  activeComps.forEach(function(c) {
+    var tr = document.createElement('tr');
+    var perRxn;
+    if (c.isWater) {
+      // Water fills remainder — calculated after everything else
+      perRxn = null;
+      tr.innerHTML = '<td style="padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text);">Nuclease-Free Water</td>'
+        + '<td style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text-dim);">—</td>'
+        + '<td style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text-dim);">to volume</td>'
+        + '<td id="waterPer" style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border);font-family:var(--font-mono);color:var(--text);">—</td>'
+        + '<td id="waterMM" style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-weight:600;color:var(--accent);">—</td>';
+    } else if (c.isFixed) {
+      perRxn = c.fixedVol;
+      totalPer += perRxn;
+      tr.innerHTML = '<td style="padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text);">'+c.name+'</td>'
+        + '<td style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border);font-family:var(--font-mono);color:var(--text-dim);">'+c.stock+'</td>'
+        + '<td style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border);font-family:var(--font-mono);color:var(--text-dim);">'+fmt(perRxn)+' µL</td>'
+        + '<td style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border);font-family:var(--font-mono);color:var(--text);">'+fmt(perRxn)+'</td>'
+        + '<td style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-weight:600;color:var(--accent);">'+fmt(perRxn*multiplier)+'</td>';
+    } else {
+      perRxn = (c.finalNum / c.stockNum) * rxnVol;
+      totalPer += perRxn;
+      tr.innerHTML = '<td style="padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text);">'+c.name+'</td>'
+        + '<td style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border);font-family:var(--font-mono);color:var(--text-dim);">'+c.stock+'</td>'
+        + '<td style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border);font-family:var(--font-mono);color:var(--text-dim);">'+c.finalNum+' '+c.unit+'</td>'
+        + '<td style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border);font-family:var(--font-mono);color:var(--text);">'+fmt(perRxn)+'</td>'
+        + '<td style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-weight:600;color:var(--accent);">'+fmt(perRxn*multiplier)+'</td>';
+    }
+    body.appendChild(tr);
+  });
+
+  // Fill water
+  var waterPer = mmVol - totalPer;
+  if (waterPer < 0) waterPer = 0;
+  var wp = document.getElementById('waterPer');
+  var wm = document.getElementById('waterMM');
+  if(wp){wp.textContent=fmt(waterPer);}
+  if(wm){wm.textContent=fmt(waterPer*multiplier);}
+
+  document.getElementById('totalPer').textContent = fmt(mmVol);
+  document.getElementById('totalMM').textContent = fmt(mmVol*multiplier) + ' µL';
+  document.getElementById('templatePer').textContent = fmt(templateVol);
+}
+
+calc();
+</script>
+</body>
+</html>

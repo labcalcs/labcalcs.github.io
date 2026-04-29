@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A280 Protein Concentration Calculator — LabCalcs</title>
+<meta name="description" content="Free A280 protein concentration calculator. Calculate protein concentration from UV absorbance at 280 nm using extinction coefficient or mass extinction coefficient.">
+<link rel="canonical" href="https://labcalcs.github.io/spectroscopy/a280-protein-concentration.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="cat-spectroscopy">
+<div class="grain"></div>
+<nav class="site-nav" id="site-nav"></nav>
+<div class="breadcrumb" id="breadcrumb"></div>
+<div class="ad-slot" id="ad-top"></div>
+
+<div class="container">
+  <h1 class="page-title">A280 Protein Concentration Calculator</h1>
+  <p class="page-subtitle">Calculate protein concentration from UV absorbance at 280 nm.</p>
+
+  <div class="calc-card">
+    <div class="formula-bar"><em>c</em> = <em>A₂₈₀</em> / ( <em>ε</em> × <em>l</em> ) &nbsp;&nbsp;or&nbsp;&nbsp; <em>c</em> = <em>A₂₈₀</em> / <em>ε</em><sub>0.1%</sub></div>
+
+    <div class="tabs" id="modeTabs">
+      <button class="active" onclick="setMode('molar')">Molar ε (M⁻¹cm⁻¹)</button>
+      <button onclick="setMode('mass')">Mass ε (ε₀.₁% or A₀.₁%)</button>
+    </div>
+
+    <div id="molarMode">
+      <div class="fields">
+        <div class="field">
+          <label>A₂₈₀ <span class="unit">absorbance</span></label>
+          <input type="number" id="abs280m" step="any" placeholder="e.g. 0.52" oninput="calcMolar()">
+        </div>
+        <div class="field">
+          <label>Molar Extinction Coeff. <span class="unit">M⁻¹ cm⁻¹</span></label>
+          <input type="number" id="epsilonM" step="any" placeholder="e.g. 43824" oninput="calcMolar()">
+        </div>
+        <div class="field">
+          <label>Path Length <span class="unit">cm</span></label>
+          <input type="number" id="pathM" step="any" value="1" placeholder="1" oninput="calcMolar()">
+        </div>
+        <div class="field">
+          <label>Molecular Weight <span class="unit">Da (optional, for mg/mL)</span></label>
+          <input type="number" id="mwM" step="any" placeholder="e.g. 66430" oninput="calcMolar()">
+        </div>
+      </div>
+      <div class="result-box" id="resultMolar">
+        <div class="result-label">Protein Concentration</div>
+        <div class="result-value" id="resultMolarVal">—</div>
+      </div>
+    </div>
+
+    <div id="massMode" style="display:none;">
+      <div class="fields">
+        <div class="field">
+          <label>A₂₈₀ <span class="unit">absorbance</span></label>
+          <input type="number" id="abs280x" step="any" placeholder="e.g. 0.52" oninput="calcMass()">
+        </div>
+        <div class="field">
+          <label>ε₀.₁% (A₀.₁%) <span class="unit">= A of 1 mg/mL at 1 cm</span></label>
+          <input type="number" id="epsilonX" step="any" placeholder="e.g. 0.667" oninput="calcMass()">
+        </div>
+        <div class="field">
+          <label>Path Length <span class="unit">cm</span></label>
+          <input type="number" id="pathX" step="any" value="1" placeholder="1" oninput="calcMass()">
+        </div>
+        <div class="field">
+          <label>Dilution Factor <span class="unit">(optional)</span></label>
+          <input type="number" id="dilFactor" step="any" value="1" placeholder="1" oninput="calcMass()">
+        </div>
+      </div>
+      <div class="result-box" id="resultMass">
+        <div class="result-label">Protein Concentration</div>
+        <div class="result-value" id="resultMassVal">—</div>
+      </div>
+    </div>
+
+    <div class="note-box" id="noteBox"></div>
+
+    <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);">
+      <label style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);display:block;margin-bottom:10px;">Common Proteins (click to autofill)</label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;" id="proteinPresets"></div>
+    </div>
+  </div>
+
+  <div class="ad-slot" id="ad-mid"></div>
+
+  <div class="info-section">
+    <h2>How to Use This Calculator</h2>
+    <p>Choose your mode depending on what extinction coefficient you have. "Molar ε" uses the standard Beer-Lambert approach (units of M⁻¹ cm⁻¹). "Mass ε" uses the ε₀.₁% convention (also called A₀.₁% or the absorbance of a 1 mg/mL solution), which gives concentration directly in mg/mL without needing the molecular weight.</p>
+    <p>If you measured on a NanoDrop or similar microvolume spectrophotometer, the path length is typically 1 mm (0.1 cm) — make sure to adjust accordingly.</p>
+
+    <h2>The Math Behind It</h2>
+    <p>UV absorbance at 280 nm measures the aromatic amino acids tryptophan (Trp, ε₂₈₀ ≈ 5,500 M⁻¹cm⁻¹), tyrosine (Tyr, ε₂₈₀ ≈ 1,490 M⁻¹cm⁻¹), and to a lesser extent cystine (disulfide bonds, ε₂₈₀ ≈ 125 M⁻¹cm⁻¹). The molar extinction coefficient of a protein can be estimated from its amino acid composition using the Pace equation: <strong>ε₂₈₀ = (nTrp × 5500) + (nTyr × 1490) + (nCys-Cys × 125)</strong>.</p>
+    <p>Using molar ε: <strong>c (M) = A₂₈₀ / (ε × l)</strong>, then convert to mg/mL by multiplying by MW/1000.</p>
+    <p>Using mass ε₀.₁%: <strong>c (mg/mL) = A₂₈₀ / (ε₀.₁% × l)</strong>. This is convenient because you get mg/mL directly.</p>
+    <p>Check the A₂₈₀/A₂₆₀ ratio to assess nucleic acid contamination. Pure protein typically gives a ratio of ~1.8. Ratios below 0.6 suggest significant nucleic acid contamination, which will inflate your protein concentration estimate.</p>
+  </div>
+
+  <div class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a class="related-card" href="beer-lambert-calculator.html"><h3>Beer-Lambert Calculator</h3><p>General A = εlc solver.</p></a>
+      <a class="related-card" href="../general-lab/molarity-calculator.html"><h3>Molarity Calculator</h3><p>Moles, concentration, volume, mass.</p></a>
+      <a class="related-card" href="../general-lab/dilution-calculator.html"><h3>Dilution Calculator</h3><p>C₁V₁ = C₂V₂ with flexible units.</p></a>
+    </div>
+  </div>
+</div>
+
+<div class="ad-slot" id="ad-bot"></div>
+<footer class="site-footer"><a href="../">← Back to all categories</a> · © 2026 LabCalcs</footer>
+
+<script>LC = window.LC || {}; LC.basePath = '..';</script>
+<script src="../js/analytics.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() { buildBreadcrumb('spectroscopy', 'A280 Protein Concentration'); });
+
+const proteins = [
+  ["BSA", 43824, 66430, 0.667],
+  ["IgG (human)", 210000, 150000, 1.4],
+  ["Lysozyme", 37970, 14313, 2.653],
+  ["GFP", 21890, 26870, 0.814],
+  ["Streptavidin", 41326, 52800, 0.783],
+  ["Trypsin", 37020, 23300, 1.589],
+  ["Insulin", 6335, 5808, 1.091],
+  ["Hemoglobin", 13500, 64500, 0.209],
+  ["Protein A", 5580, 44600, 0.125],
+  ["β-Galactosidase", 83030, 116400, 0.713],
+];
+
+const presetDiv = document.getElementById('proteinPresets');
+proteins.forEach(function(p) {
+  const btn = document.createElement('button');
+  btn.style.cssText = 'font-family:var(--font-mono);font-size:11px;padding:6px 10px;border-radius:6px;border:1px solid var(--border);background:var(--input-bg);color:var(--text-dim);cursor:pointer;transition:all 0.15s;';
+  btn.textContent = p[0];
+  btn.addEventListener('click', function() {
+    document.getElementById('epsilonM').value = p[1];
+    document.getElementById('mwM').value = p[2];
+    document.getElementById('epsilonX').value = p[3];
+    calcMolar(); calcMass();
+  });
+  btn.addEventListener('mouseenter', function() { this.style.borderColor = 'var(--accent)'; this.style.color = 'var(--text)'; });
+  btn.addEventListener('mouseleave', function() { this.style.borderColor = 'var(--border)'; this.style.color = 'var(--text-dim)'; });
+  presetDiv.appendChild(btn);
+});
+
+function setMode(m) {
+  document.getElementById('molarMode').style.display = m === 'molar' ? '' : 'none';
+  document.getElementById('massMode').style.display = m === 'mass' ? '' : 'none';
+  document.querySelectorAll('#modeTabs button').forEach(function(b, i) {
+    b.classList.toggle('active', (i === 0 && m === 'molar') || (i === 1 && m === 'mass'));
+  });
+}
+
+function fmt(v) {
+  if (v == null || isNaN(v) || !isFinite(v)) return null;
+  if (v === 0) return '0';
+  if (Math.abs(v) >= 0.001 && Math.abs(v) < 1e6) return parseFloat(v.toPrecision(5)).toString();
+  return v.toExponential(4);
+}
+
+function calcMolar() {
+  var A = parseFloat(document.getElementById('abs280m').value);
+  var e = parseFloat(document.getElementById('epsilonM').value);
+  var l = parseFloat(document.getElementById('pathM').value);
+  var mw = parseFloat(document.getElementById('mwM').value);
+  var box = document.getElementById('resultMolar');
+  var note = document.getElementById('noteBox');
+  note.classList.remove('visible');
+
+  if (isNaN(A) || isNaN(e) || isNaN(l) || e <= 0 || l <= 0) { box.classList.remove('visible'); return; }
+
+  var cM = A / (e * l);
+  var result = fmt(cM) + '<span class="result-unit">M</span>';
+
+  if (!isNaN(mw) && mw > 0) {
+    var mgml = cM * mw / 1000;
+    result += '&nbsp;&nbsp;=&nbsp;&nbsp;' + fmt(mgml) + '<span class="result-unit">mg/mL</span>';
+  }
+
+  if (A > 1.5) { note.textContent = '⚠ A₂₈₀ > 1.5 — consider diluting your sample for more accurate results.'; note.classList.add('visible'); }
+
+  document.getElementById('resultMolarVal').innerHTML = result;
+  box.classList.add('visible');
+}
+
+function calcMass() {
+  var A = parseFloat(document.getElementById('abs280x').value);
+  var e = parseFloat(document.getElementById('epsilonX').value);
+  var l = parseFloat(document.getElementById('pathX').value);
+  var df = parseFloat(document.getElementById('dilFactor').value) || 1;
+  var box = document.getElementById('resultMass');
+  var note = document.getElementById('noteBox');
+  note.classList.remove('visible');
+
+  if (isNaN(A) || isNaN(e) || isNaN(l) || e <= 0 || l <= 0) { box.classList.remove('visible'); return; }
+
+  var mgml = (A * df) / (e * l);
+  var ugml = mgml * 1000;
+
+  var result = fmt(mgml) + '<span class="result-unit">mg/mL</span>';
+  if (mgml < 0.1) result += '&nbsp;&nbsp;=&nbsp;&nbsp;' + fmt(ugml) + '<span class="result-unit">µg/mL</span>';
+
+  if (A > 1.5) { note.textContent = '⚠ A₂₈₀ > 1.5 — consider diluting your sample for more accurate results.'; note.classList.add('visible'); }
+
+  document.getElementById('resultMassVal').innerHTML = result;
+  box.classList.add('visible');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Percent Yield Calculator — LabCalcs</title>
+<meta name="description" content="Free percent yield calculator. Calculate reaction efficiency from actual and theoretical yields. Instantly determine how well your reaction performed.">
+<link rel="canonical" href="https://labcalcs.github.io/organic-chemistry/percent-yield-calculator.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="cat-organic">
+<div class="grain"></div>
+<nav class="site-nav" id="site-nav"></nav>
+<div class="breadcrumb" id="breadcrumb"></div>
+<div class="ad-slot" id="ad-top"></div>
+
+<div class="container">
+  <h1 class="page-title">Percent Yield Calculator</h1>
+  <p class="page-subtitle">Calculate reaction efficiency from actual and theoretical yields — or solve for any variable.</p>
+
+  <div class="calc-card">
+    <div class="formula-bar"><em>% Yield</em> = ( <em>Actual Yield</em> / <em>Theoretical Yield</em> ) × 100</div>
+
+    <div class="solve-for">
+      <label>Solve for</label>
+      <div class="solve-btns" id="solveBtns">
+        <button class="active" data-target="pct" onclick="setSolve('pct')">% Yield</button>
+        <button data-target="actual" onclick="setSolve('actual')">Actual Yield</button>
+        <button data-target="theoretical" onclick="setSolve('theoretical')">Theoretical Yield</button>
+      </div>
+    </div>
+
+    <div class="fields">
+      <div class="field">
+        <label>Actual Yield <span class="unit">g</span></label>
+        <input type="number" id="actual" step="any" placeholder="e.g. 3.2" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Theoretical Yield <span class="unit">g</span></label>
+        <input type="number" id="theoretical" step="any" placeholder="e.g. 5.0" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Percent Yield <span class="unit">%</span></label>
+        <input type="number" id="pct" step="any" placeholder="—" oninput="calc()">
+      </div>
+    </div>
+
+    <div class="result-box" id="resultBox">
+      <div class="result-label" id="resultLabel">Result</div>
+      <div class="result-value" id="resultValue">—</div>
+    </div>
+
+    <div class="note-box" id="noteBox"></div>
+  </div>
+
+  <div class="ad-slot" id="ad-mid"></div>
+
+  <div class="info-section">
+    <h2>How to Use This Calculator</h2>
+    <p>Enter any two values and the third is calculated instantly. "Actual yield" is the mass of product you actually isolated. "Theoretical yield" is the maximum possible product calculated from stoichiometry (use our Theoretical Yield Calculator to find this). Percent yield tells you how efficient your reaction was.</p>
+
+    <h2>The Math Behind It</h2>
+    <p><strong>% Yield = (Actual Yield / Theoretical Yield) × 100</strong></p>
+    <p><strong>Worked example:</strong> You calculated a theoretical yield of 5.0 g for an ester synthesis. After running the reaction, workup, and purification, you isolated 3.2 g of product. % Yield = (3.2 / 5.0) × 100 = 64%.</p>
+    <p>A yield above 100% usually indicates impurities (residual solvent, unreacted starting material, or byproducts co-purifying with your product), not a miraculous reaction. Typical yields vary widely by reaction type: simple precipitations and crystallizations often achieve 80–95%, while multi-step organic syntheses might give 30–70% per step. Total synthesis yields compound multiplicatively — five steps at 80% each gives only 33% overall.</p>
+  </div>
+
+  <div class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a class="related-card" href="theoretical-yield-calculator.html"><h3>Theoretical Yield</h3><p>Calculate max product from reactants.</p></a>
+      <a class="related-card" href="../general-lab/molarity-calculator.html"><h3>Molarity Calculator</h3><p>Moles, concentration, volume, mass.</p></a>
+    </div>
+  </div>
+</div>
+
+<div class="ad-slot" id="ad-bot"></div>
+<footer class="site-footer"><a href="../">← Back to all categories</a> · © 2026 LabCalcs</footer>
+
+<script>LC = window.LC || {}; LC.basePath = '..';</script>
+<script src="../js/analytics.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() { buildBreadcrumb('organic', 'Percent Yield Calculator'); });
+
+let solveFor = 'pct';
+function setSolve(t) {
+  solveFor = t;
+  document.querySelectorAll('#solveBtns button').forEach(b => b.classList.toggle('active', b.dataset.target === t));
+  ['actual','theoretical','pct'].forEach(id => { document.getElementById(id).disabled = (id === t); });
+  document.getElementById(t).value = '';
+  calc();
+}
+function fmt(v) { if(v==null||isNaN(v)||!isFinite(v))return null; if(v===0)return'0'; if(Math.abs(v)>=0.001&&Math.abs(v)<1e7)return parseFloat(v.toPrecision(5)).toString(); return v.toExponential(4); }
+
+function calc() {
+  var a = parseFloat(document.getElementById('actual').value);
+  var th = parseFloat(document.getElementById('theoretical').value);
+  var p = parseFloat(document.getElementById('pct').value);
+  var result = null, label = '', unit = '';
+  var note = document.getElementById('noteBox'); note.classList.remove('visible');
+
+  switch(solveFor) {
+    case 'pct': if(!isNaN(a)&&!isNaN(th)&&th>0){result=(a/th)*100;label='Percent Yield';unit='%';} break;
+    case 'actual': if(!isNaN(th)&&!isNaN(p)){result=th*p/100;label='Actual Yield';unit='g';} break;
+    case 'theoretical': if(!isNaN(a)&&!isNaN(p)&&p>0){result=a/(p/100);label='Theoretical Yield';unit='g';} break;
+  }
+
+  var box = document.getElementById('resultBox');
+  var f = fmt(result);
+  if(f!==null) {
+    document.getElementById('resultLabel').textContent = label;
+    document.getElementById('resultValue').innerHTML = f+'<span class="result-unit">'+unit+'</span>';
+    box.classList.add('visible');
+    document.getElementById(solveFor).value = f;
+    if(solveFor==='pct'&&result>100){note.textContent='⚠ Yield exceeds 100% — product likely contains impurities (residual solvent, salts, or byproducts).';note.classList.add('visible');}
+  } else { box.classList.remove('visible'); }
+}
+setSolve('pct');
+</script>
+</body>
+</html>

@@ -22,32 +22,34 @@ LC.tools = [
   { name: 'Stock Solution Calculator', cat: 'general-lab', path: '/general-lab/stock-solution-calculator.html', aka: ['buffer','reagent','recipe','weigh','prep','tris','HEPES','NaCl'], desc: 'How much to weigh for 60+ reagents.' },
 
   // Analytical Chemistry
-  { name: 'Mass Accuracy Calculator', cat: 'analytical', path: '/analytical-chemistry/mass-accuracy-calculator.html', aka: ['ppm','Da','mass error','mass spec'], desc: 'Convert between ppm and Da mass error.', soon: true },
+  { name: 'Mass Accuracy Calculator', cat: 'analytical', path: '/analytical-chemistry/mass-accuracy-calculator.html', aka: ['ppm','Da','mass error','mass spec'], desc: 'Convert between ppm and Da mass error.' },
   { name: 'Theoretical Plates Calculator', cat: 'analytical', path: '/analytical-chemistry/theoretical-plates-calculator.html', aka: ['column efficiency','N','HETP','plate count'], desc: 'Calculate column efficiency.', soon: true },
   { name: 'Resolution Calculator', cat: 'analytical', path: '/analytical-chemistry/resolution-calculator.html', aka: ['Rs','peak resolution','separation'], desc: 'Determine chromatographic resolution.', soon: true },
   { name: 'LOD/LOQ Calculator', cat: 'analytical', path: '/analytical-chemistry/lod-loq-calculator.html', aka: ['limit of detection','limit of quantitation','sensitivity','calibration'], desc: 'Estimate detection and quantitation limits.', soon: true },
 
   // Biology & Biochemistry
   { name: 'Henderson-Hasselbalch Calculator', cat: 'biology', path: '/biology-biochemistry/henderson-hasselbalch-calculator.html', aka: ['buffer pH','pKa','acid base'], desc: 'Calculate buffer pH from component ratios.' },
-  { name: 'PCR Master Mix Calculator', cat: 'biology', path: '/biology-biochemistry/pcr-master-mix-calculator.html', aka: ['polymerase','reaction','Taq','primer'], desc: 'Scale PCR reactions with overage.', soon: true },
+  { name: 'DNA/RNA Concentration', cat: 'biology', path: '/biology-biochemistry/dna-rna-concentration.html', aka: ['A260','nanodrop','nucleic acid','absorbance','260nm','purity'], desc: 'Concentration and purity from A260 absorbance.' },
+  { name: 'PCR Master Mix Calculator', cat: 'biology', path: '/biology-biochemistry/pcr-master-mix-calculator.html', aka: ['polymerase','reaction','Taq','primer'], desc: 'Scale PCR reactions with overage.' },
   { name: 'SDS-PAGE Gel Recipe', cat: 'biology', path: '/biology-biochemistry/sds-page-gel-recipe.html', aka: ['acrylamide','gel percentage','stacking','separating'], desc: 'Get exact volumes for pouring gels.', soon: true },
 
   // Spectroscopy
   { name: 'Beer-Lambert Calculator', cat: 'spectroscopy', path: '/spectroscopy/beer-lambert-calculator.html', aka: ['absorbance','extinction coefficient','path length','A=elc'], desc: 'Solve A = εlc for any variable.', soon: true },
-  { name: 'A280 Protein Concentration', cat: 'spectroscopy', path: '/spectroscopy/a280-protein-concentration.html', aka: ['UV absorbance','nanodrop','protein quantitation','280nm'], desc: 'Protein concentration from UV absorbance.', soon: true },
+  { name: 'A280 Protein Concentration', cat: 'spectroscopy', path: '/spectroscopy/a280-protein-concentration.html', aka: ['UV absorbance','nanodrop','protein quantitation','280nm'], desc: 'Protein concentration from UV absorbance.' },
 
   // Organic Chemistry
   { name: 'Theoretical Yield Calculator', cat: 'organic', path: '/organic-chemistry/theoretical-yield-calculator.html', aka: ['product','stoichiometry','reaction yield'], desc: 'Calculate maximum product from reactants.' },
-  { name: 'Percent Yield Calculator', cat: 'organic', path: '/organic-chemistry/percent-yield-calculator.html', aka: ['actual yield','efficiency'], desc: 'Determine reaction efficiency.', soon: true },
-  { name: 'Degree of Unsaturation', cat: 'organic', path: '/organic-chemistry/degree-of-unsaturation-calculator.html', aka: ['DoU','IHD','index of hydrogen deficiency','double bond equivalents'], desc: 'Calculate degrees of unsaturation from formula.', soon: true },
+  { name: 'Percent Yield Calculator', cat: 'organic', path: '/organic-chemistry/percent-yield-calculator.html', aka: ['actual yield','efficiency'], desc: 'Determine reaction efficiency.' },
+  { name: 'Degree of Unsaturation', cat: 'organic', path: '/organic-chemistry/degree-of-unsaturation-calculator.html', aka: ['DoU','IHD','index of hydrogen deficiency','double bond equivalents'], desc: 'Calculate degrees of unsaturation from formula.' },
 
   // Inorganic Chemistry
   { name: 'Oxidation State Calculator', cat: 'inorganic', path: '/inorganic-chemistry/oxidation-state-calculator.html', aka: ['oxidation number','redox'], desc: 'Determine oxidation states in compounds.', soon: true },
-  { name: 'Electron Configuration', cat: 'inorganic', path: '/inorganic-chemistry/electron-configuration.html', aka: ['orbital','aufbau','periodic table'], desc: 'Generate electron configurations.', soon: true },
+  { name: 'Electron Configuration', cat: 'inorganic', path: '/inorganic-chemistry/electron-configuration.html', aka: ['orbital','aufbau','periodic table'], desc: 'Generate electron configurations.' },
 
   // Physical Chemistry
   { name: 'Ideal Gas Law Calculator', cat: 'physical', path: '/physical-chemistry/ideal-gas-law-calculator.html', aka: ['PV=nRT','pressure','volume','temperature','gas'], desc: 'Solve PV=nRT for any variable.' },
-  { name: 'Nernst Equation Calculator', cat: 'physical', path: '/physical-chemistry/nernst-equation-calculator.html', aka: ['cell potential','electrochemistry','EMF'], desc: 'Calculate cell potential at non-standard conditions.', soon: true },
+  { name: 'Boiling/Freezing Point Calculator', cat: 'physical', path: '/physical-chemistry/boiling-freezing-point-calculator.html', aka: ['colligative','ebullioscopic','cryoscopic','molality','van\'t Hoff'], desc: 'Boiling point elevation and freezing point depression.' },
+  { name: 'Nernst Equation Calculator', cat: 'physical', path: '/physical-chemistry/nernst-equation-calculator.html', aka: ['cell potential','electrochemistry','EMF'], desc: 'Calculate cell potential at non-standard conditions.' },
   { name: 'Gibbs Free Energy Calculator', cat: 'physical', path: '/physical-chemistry/gibbs-free-energy-calculator.html', aka: ['delta G','enthalpy','entropy','spontaneous'], desc: 'Calculate ΔG from ΔH and ΔS.', soon: true },
 ];
 

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boiling Point Elevation & Freezing Point Depression Calculator — LabCalcs</title>
+<meta name="description" content="Free colligative properties calculator. Calculate boiling point elevation and freezing point depression from molality and van't Hoff factor. Includes common solvent constants.">
+<link rel="canonical" href="https://labcalcs.github.io/physical-chemistry/boiling-freezing-point-calculator.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="cat-physical">
+<div class="grain"></div>
+<nav class="site-nav" id="site-nav"></nav>
+<div class="breadcrumb" id="breadcrumb"></div>
+<div class="ad-slot" id="ad-top"></div>
+
+<div class="container">
+  <h1 class="page-title">Boiling Point Elevation & Freezing Point Depression</h1>
+  <p class="page-subtitle">Calculate how solutes change the boiling and freezing points of a solution.</p>
+
+  <div class="calc-card">
+    <div class="formula-bar"><em>ΔT</em> = <em>i</em> × <em>K</em> × <em>m</em></div>
+
+    <div class="fields">
+      <div class="field">
+        <label>Solvent</label>
+        <select id="solvent" style="width:100%;font-family:var(--font-mono);font-size:15px;padding:12px 14px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);outline:none;cursor:pointer;" onchange="calc()">
+          <option value="water" selected>Water (Kb=0.512, Kf=1.86)</option>
+          <option value="benzene">Benzene (Kb=2.53, Kf=5.12)</option>
+          <option value="ethanol">Ethanol (Kb=1.22, Kf=1.99)</option>
+          <option value="acetic">Acetic Acid (Kb=3.07, Kf=3.90)</option>
+          <option value="chloroform">Chloroform (Kb=3.63, Kf=4.68)</option>
+          <option value="camphor">Camphor (Kb=5.95, Kf=40.0)</option>
+          <option value="custom">Custom (enter Kb/Kf manually)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Molality <span class="unit">mol solute / kg solvent</span></label>
+        <input type="number" id="molality" step="any" placeholder="e.g. 0.5" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>van't Hoff Factor (i) <span class="unit">1 for non-electrolytes</span></label>
+        <input type="number" id="iF" step="any" value="1" placeholder="1" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Kb <span class="unit">°C/m (ebullioscopic)</span></label>
+        <input type="number" id="Kb" step="any" placeholder="auto" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Kf <span class="unit">°C/m (cryoscopic)</span></label>
+        <input type="number" id="Kf" step="any" placeholder="auto" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Normal BP of Solvent <span class="unit">°C</span></label>
+        <input type="number" id="normBP" step="any" placeholder="auto" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Normal FP of Solvent <span class="unit">°C</span></label>
+        <input type="number" id="normFP" step="any" placeholder="auto" oninput="calc()">
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px;">
+      <div style="padding:20px;border-radius:10px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);text-align:center;">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:#ef4444;margin-bottom:6px;font-weight:600;">Boiling Point Elevation</div>
+        <div id="bpResult" style="font-family:var(--font-mono);font-size:22px;font-weight:600;color:#ef4444;">—</div>
+        <div id="bpNew" style="font-family:var(--font-mono);font-size:13px;color:var(--text-dim);margin-top:4px;"></div>
+      </div>
+      <div style="padding:20px;border-radius:10px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);text-align:center;">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:#3b82f6;margin-bottom:6px;font-weight:600;">Freezing Point Depression</div>
+        <div id="fpResult" style="font-family:var(--font-mono);font-size:22px;font-weight:600;color:#3b82f6;">—</div>
+        <div id="fpNew" style="font-family:var(--font-mono);font-size:13px;color:var(--text-dim);margin-top:4px;"></div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+      <label style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);display:block;margin-bottom:10px;">Common van't Hoff Factors (click to use)</label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;" id="iPresets"></div>
+    </div>
+  </div>
+
+  <div class="ad-slot" id="ad-mid"></div>
+
+  <div class="info-section">
+    <h2>How to Use This Calculator</h2>
+    <p>Select your solvent (or choose "Custom" to enter your own Kb/Kf values), enter the molality of the solution and the van't Hoff factor. The van't Hoff factor (i) accounts for dissociation of electrolytes: i = 1 for non-electrolytes (sugar, glucose), i = 2 for NaCl (Na⁺ + Cl⁻), i = 3 for CaCl₂ (Ca²⁺ + 2Cl⁻), etc.</p>
+
+    <h2>The Math Behind It</h2>
+    <p>Colligative properties depend on the number of solute particles, not their identity. Boiling point elevation: <strong>ΔTb = i × Kb × m</strong>. Freezing point depression: <strong>ΔTf = i × Kf × m</strong>. The new boiling point = normal BP + ΔTb, and new freezing point = normal FP − ΔTf.</p>
+    <p><strong>Worked example:</strong> Dissolve 29.2 g of NaCl (MW = 58.44, i = 2) in 500 g of water. Molality = (29.2/58.44)/0.5 = 1.0 m. ΔTb = 2 × 0.512 × 1.0 = 1.024°C. New BP = 101.024°C. ΔTf = 2 × 1.86 × 1.0 = 3.72°C. New FP = −3.72°C.</p>
+    <p><strong>Limitations:</strong> These equations are most accurate for dilute solutions. At high concentrations, ion pairing reduces the effective van't Hoff factor, and activity coefficients deviate from unity.</p>
+  </div>
+
+  <div class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a class="related-card" href="ideal-gas-law-calculator.html"><h3>Ideal Gas Law</h3><p>PV = nRT with flexible units.</p></a>
+      <a class="related-card" href="gibbs-free-energy-calculator.html"><h3>Gibbs Free Energy</h3><p>ΔG = ΔH − TΔS.</p></a>
+      <a class="related-card" href="../general-lab/molarity-calculator.html"><h3>Molarity Calculator</h3><p>Moles, concentration, volume, mass.</p></a>
+    </div>
+  </div>
+</div>
+
+<div class="ad-slot" id="ad-bot"></div>
+<footer class="site-footer"><a href="../">← Back to all categories</a> · © 2026 LabCalcs</footer>
+
+<script>LC = window.LC || {}; LC.basePath = '..';</script>
+<script src="../js/analytics.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() { buildBreadcrumb('physical', 'Boiling/Freezing Point Calculator'); });
+
+var solvents = {
+  water: {Kb:0.512, Kf:1.86, bp:100, fp:0},
+  benzene: {Kb:2.53, Kf:5.12, bp:80.1, fp:5.5},
+  ethanol: {Kb:1.22, Kf:1.99, bp:78.4, fp:-114.1},
+  acetic: {Kb:3.07, Kf:3.90, bp:118.1, fp:16.6},
+  chloroform: {Kb:3.63, Kf:4.68, bp:61.2, fp:-63.5},
+  camphor: {Kb:5.95, Kf:40.0, bp:204, fp:179},
+};
+
+var iFactors = [
+  ["Non-electrolyte (glucose, sucrose)", 1],
+  ["NaCl, KCl, NaOH, HCl", 2],
+  ["CaCl₂, Na₂SO₄, MgCl₂", 3],
+  ["AlCl₃, FeCl₃, K₃PO₄", 4],
+];
+
+var ipDiv = document.getElementById('iPresets');
+iFactors.forEach(function(f){
+  var btn = document.createElement('button');
+  btn.style.cssText = 'font-family:var(--font-mono);font-size:11px;padding:6px 10px;border-radius:6px;border:1px solid var(--border);background:var(--input-bg);color:var(--text-dim);cursor:pointer;transition:all 0.15s;';
+  btn.textContent = f[0] + ' (i='+f[1]+')';
+  btn.addEventListener('click', function(){document.getElementById('iF').value=f[1];calc();});
+  btn.addEventListener('mouseenter',function(){this.style.borderColor='var(--accent)';this.style.color='var(--text)';});
+  btn.addEventListener('mouseleave',function(){this.style.borderColor='var(--border)';this.style.color='var(--text-dim)';});
+  ipDiv.appendChild(btn);
+});
+
+function fmt(v){if(v==null||isNaN(v)||!isFinite(v))return'—';if(v===0)return'0';return parseFloat(v.toPrecision(5)).toString();}
+
+function calc() {
+  var sel = document.getElementById('solvent').value;
+  var m = parseFloat(document.getElementById('molality').value);
+  var i = parseFloat(document.getElementById('iF').value);
+
+  // Auto-fill Kb, Kf, BP, FP from solvent selection
+  if (sel !== 'custom' && solvents[sel]) {
+    document.getElementById('Kb').value = solvents[sel].Kb;
+    document.getElementById('Kf').value = solvents[sel].Kf;
+    document.getElementById('normBP').value = solvents[sel].bp;
+    document.getElementById('normFP').value = solvents[sel].fp;
+  }
+
+  var Kb = parseFloat(document.getElementById('Kb').value);
+  var Kf = parseFloat(document.getElementById('Kf').value);
+  var bp = parseFloat(document.getElementById('normBP').value);
+  var fp = parseFloat(document.getElementById('normFP').value);
+
+  if (isNaN(m) || isNaN(i)) {
+    document.getElementById('bpResult').textContent = '—';
+    document.getElementById('fpResult').textContent = '—';
+    document.getElementById('bpNew').textContent = '';
+    document.getElementById('fpNew').textContent = '';
+    return;
+  }
+
+  if (!isNaN(Kb)) {
+    var dtb = i * Kb * m;
+    document.getElementById('bpResult').textContent = 'ΔTb = +' + fmt(dtb) + '°C';
+    document.getElementById('bpNew').textContent = !isNaN(bp) ? 'New BP: ' + fmt(bp + dtb) + '°C' : '';
+  }
+
+  if (!isNaN(Kf)) {
+    var dtf = i * Kf * m;
+    document.getElementById('fpResult').textContent = 'ΔTf = −' + fmt(dtf) + '°C';
+    document.getElementById('fpNew').textContent = !isNaN(fp) ? 'New FP: ' + fmt(fp - dtf) + '°C' : '';
+  }
+}
+</script>
+</body>
+</html>

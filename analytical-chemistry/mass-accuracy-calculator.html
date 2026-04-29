@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mass Accuracy Calculator (ppm ↔ Da) — LabCalcs</title>
+<meta name="description" content="Free mass accuracy calculator for mass spectrometry. Convert between ppm and Da mass error. Calculate observed or theoretical m/z from mass error.">
+<link rel="canonical" href="https://labcalcs.github.io/analytical-chemistry/mass-accuracy-calculator.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="cat-analytical">
+<div class="grain"></div>
+<nav class="site-nav" id="site-nav"></nav>
+<div class="breadcrumb" id="breadcrumb"></div>
+<div class="ad-slot" id="ad-top"></div>
+
+<div class="container">
+  <h1 class="page-title">Mass Accuracy Calculator</h1>
+  <p class="page-subtitle">Convert between ppm and Da mass error for mass spectrometry. Calculate observed or theoretical m/z.</p>
+
+  <div class="calc-card">
+    <div class="formula-bar"><em>ppm</em> = ( ( <em>m/z</em><sub>obs</sub> − <em>m/z</em><sub>theo</sub> ) / <em>m/z</em><sub>theo</sub> ) × 10⁶</div>
+
+    <div class="solve-for">
+      <label>Solve for</label>
+      <div class="solve-btns" id="solveBtns">
+        <button class="active" data-target="ppm" onclick="setSolve('ppm')">Mass Error (ppm)</button>
+        <button data-target="da" onclick="setSolve('da')">Mass Error (Da)</button>
+        <button data-target="obs" onclick="setSolve('obs')">Observed m/z</button>
+        <button data-target="theo" onclick="setSolve('theo')">Theoretical m/z</button>
+      </div>
+    </div>
+
+    <div class="fields">
+      <div class="field">
+        <label>Theoretical m/z <span class="unit">Da</span></label>
+        <input type="number" id="theo" step="any" placeholder="e.g. 1045.5344" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Observed m/z <span class="unit">Da</span></label>
+        <input type="number" id="obs" step="any" placeholder="e.g. 1045.5392" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Mass Error <span class="unit">ppm</span></label>
+        <input type="number" id="ppm" step="any" placeholder="—" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Mass Error <span class="unit">Da (absolute)</span></label>
+        <input type="number" id="da" step="any" placeholder="—" oninput="calc()">
+      </div>
+    </div>
+
+    <div class="result-box" id="resultBox">
+      <div class="result-label" id="resultLabel">Result</div>
+      <div class="result-value" id="resultValue">—</div>
+    </div>
+
+    <div class="note-box" id="noteBox"></div>
+
+    <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);">
+      <label style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);display:block;margin-bottom:10px;">ppm ↔ Da Quick Converter</label>
+      <div class="fields">
+        <div class="field">
+          <label>m/z <span class="unit">Da</span></label>
+          <input type="number" id="qmz" step="any" placeholder="e.g. 500" oninput="quickConv()">
+        </div>
+        <div class="field">
+          <label>Tolerance <span class="unit">ppm</span></label>
+          <input type="number" id="qppm" step="any" placeholder="e.g. 10" oninput="quickConv()">
+        </div>
+        <div class="field full">
+          <label>Window</label>
+          <div id="qresult" style="font-family:var(--font-mono);font-size:14px;padding:12px;background:var(--input-bg);border:1px solid var(--border);border-radius:8px;color:var(--text-dim);">Enter m/z and ppm to see the Da window</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ad-slot" id="ad-mid"></div>
+
+  <div class="info-section">
+    <h2>How to Use This Calculator</h2>
+    <p>Enter any two of the four values (theoretical m/z, observed m/z, ppm error, Da error) and the calculator solves for the other two. The "Quick Converter" at the bottom lets you see what a ppm tolerance window looks like in Da at a given m/z — useful for setting database search tolerances.</p>
+
+    <h2>The Math Behind It</h2>
+    <p>Mass accuracy in mass spectrometry is the difference between the measured (observed) mass and the true (theoretical) mass. It's expressed either in absolute terms (Da or mDa) or relative terms (ppm).</p>
+    <p><strong>ppm = ((m/z_obs − m/z_theo) / m/z_theo) × 10⁶</strong></p>
+    <p><strong>Da = m/z_obs − m/z_theo</strong></p>
+    <p><strong>Worked example:</strong> You observe a peptide at m/z 1045.5392, and the theoretical monoisotopic mass is 1045.5344. Error = (1045.5392 − 1045.5344) / 1045.5344 × 10⁶ = 4.59 ppm, or 0.0048 Da (4.8 mDa).</p>
+    <p><strong>Typical instrument accuracies:</strong> Orbitrap instruments achieve &lt;3 ppm (often &lt;1 ppm with internal calibration). Q-TOF instruments typically achieve 2–5 ppm. Triple quadrupoles give 0.1–0.5 Da accuracy (not useful for ppm calculations). Tighter mass accuracy reduces false positive identifications in proteomics and metabolomics database searches.</p>
+    <p><strong>Important:</strong> ppm error is mass-dependent — 10 ppm at m/z 500 is 0.005 Da, but 10 ppm at m/z 2000 is 0.02 Da. This is why ppm is preferred over Da for reporting mass accuracy across a range of masses.</p>
+  </div>
+
+  <div class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a class="related-card" href="../spectroscopy/beer-lambert-calculator.html"><h3>Beer-Lambert Calculator</h3><p>Absorbance, concentration, path length.</p></a>
+      <a class="related-card" href="../general-lab/molarity-calculator.html"><h3>Molarity Calculator</h3><p>Moles, concentration, volume, mass.</p></a>
+    </div>
+  </div>
+</div>
+
+<div class="ad-slot" id="ad-bot"></div>
+<footer class="site-footer"><a href="../">← Back to all categories</a> · © 2026 LabCalcs</footer>
+
+<script>LC = window.LC || {}; LC.basePath = '..';</script>
+<script src="../js/analytics.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() { buildBreadcrumb('analytical', 'Mass Accuracy Calculator'); });
+
+let solveFor = 'ppm';
+function setSolve(t) {
+  solveFor = t;
+  document.querySelectorAll('#solveBtns button').forEach(b => b.classList.toggle('active', b.dataset.target === t));
+  ['theo','obs','ppm','da'].forEach(id => { document.getElementById(id).disabled = (id === t || (t==='ppm'&&id==='da') || (t==='da'&&id==='ppm')); });
+  if(t==='ppm'||t==='da'){document.getElementById('ppm').value='';document.getElementById('da').value='';}
+  else{document.getElementById(t).value='';}
+  calc();
+}
+
+function fmt(v,p) { if(v==null||isNaN(v)||!isFinite(v))return null; p=p||6; if(v===0)return'0'; if(Math.abs(v)>=0.0001&&Math.abs(v)<1e8)return parseFloat(v.toPrecision(p)).toString(); return v.toExponential(4); }
+
+function calc() {
+  var theo = parseFloat(document.getElementById('theo').value);
+  var obs = parseFloat(document.getElementById('obs').value);
+  var ppm = parseFloat(document.getElementById('ppm').value);
+  var da = parseFloat(document.getElementById('da').value);
+  var box = document.getElementById('resultBox');
+  var note = document.getElementById('noteBox'); note.classList.remove('visible');
+  var result, label, unit;
+
+  if (solveFor==='ppm'||solveFor==='da') {
+    if(!isNaN(theo)&&!isNaN(obs)&&theo>0) {
+      var errDa = obs - theo;
+      var errPpm = (errDa / theo) * 1e6;
+      document.getElementById('ppm').value = fmt(errPpm,4);
+      document.getElementById('da').value = fmt(errDa,6);
+      document.getElementById('resultLabel').textContent = 'Mass Error';
+      document.getElementById('resultValue').innerHTML = fmt(errPpm,4)+'<span class="result-unit">ppm</span>&nbsp;&nbsp;=&nbsp;&nbsp;'+fmt(errDa*1000,4)+'<span class="result-unit">mDa</span>';
+      box.classList.add('visible');
+      if(Math.abs(errPpm)>10){note.textContent='⚠ Error exceeds 10 ppm — verify your calibration or theoretical mass.';note.classList.add('visible');}
+    } else { box.classList.remove('visible'); }
+  }
+  else if (solveFor==='obs') {
+    if(!isNaN(theo)&&theo>0) {
+      if(!isNaN(ppm)) { result = theo * (1 + ppm/1e6); }
+      else if(!isNaN(da)) { result = theo + da; }
+      if(result!=null) {
+        document.getElementById('obs').value = fmt(result,8);
+        document.getElementById('resultLabel').textContent = 'Observed m/z';
+        document.getElementById('resultValue').innerHTML = fmt(result,8)+'<span class="result-unit">Da</span>';
+        box.classList.add('visible');
+      } else { box.classList.remove('visible'); }
+    }
+  }
+  else if (solveFor==='theo') {
+    if(!isNaN(obs)&&obs>0) {
+      if(!isNaN(ppm)) { result = obs / (1 + ppm/1e6); }
+      else if(!isNaN(da)) { result = obs - da; }
+      if(result!=null) {
+        document.getElementById('theo').value = fmt(result,8);
+        document.getElementById('resultLabel').textContent = 'Theoretical m/z';
+        document.getElementById('resultValue').innerHTML = fmt(result,8)+'<span class="result-unit">Da</span>';
+        box.classList.add('visible');
+      } else { box.classList.remove('visible'); }
+    }
+  }
+}
+
+function quickConv() {
+  var mz = parseFloat(document.getElementById('qmz').value);
+  var ppm = parseFloat(document.getElementById('qppm').value);
+  var el = document.getElementById('qresult');
+  if(isNaN(mz)||isNaN(ppm)||mz<=0){el.textContent='Enter m/z and ppm to see the Da window';return;}
+  var da = mz * ppm / 1e6;
+  el.innerHTML = '± '+fmt(ppm,4)+' ppm at m/z '+fmt(mz,6)+' = <strong>± '+fmt(da,4)+' Da</strong> ('+fmt(da*1000,4)+' mDa)<br>Window: '+fmt(mz-da,6)+' — '+fmt(mz+da,6)+' Da';
+}
+
+setSolve('ppm');
+</script>
+</body>
+</html>
