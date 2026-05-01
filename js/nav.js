@@ -19,16 +19,19 @@ LC.tools = [
   { name: 'Molarity Calculator', cat: 'general-lab', path: '/general-lab/molarity-calculator.html', aka: ['moles','molar','concentration','molecular weight'], desc: 'Calculate molarity, mass, volume, or moles.' },
   { name: 'Dilution Calculator', cat: 'general-lab', path: '/general-lab/dilution-calculator.html', aka: ['C1V1','C2V2','dilute','serial dilution'], desc: 'C₁V₁ = C₂V₂ with flexible units.' },
   { name: 'RCF ↔ RPM Converter', cat: 'general-lab', path: '/general-lab/rcf-rpm-converter.html', aka: ['centrifuge','g-force','rotor','spin'], desc: 'Convert between RCF and RPM.' },
+  { name: 'Unit Converter', cat: 'general-lab', path: '/general-lab/unit-converter.html', aka: ['convert','mass','volume','temperature','pressure','length','Da','kDa','ppm'], desc: 'Convert between scientific units.' },
+  { name: 'Percent Solutions Calculator', cat: 'general-lab', path: '/general-lab/percent-solutions-calculator.html', aka: ['w/v','v/v','w/w','percent','weight volume'], desc: 'Calculate w/v, v/v, and w/w percent solutions.' },
   { name: 'Stock Solution Calculator', cat: 'general-lab', path: '/general-lab/stock-solution-calculator.html', aka: ['buffer','reagent','recipe','weigh','prep','tris','HEPES','NaCl'], desc: 'How much to weigh for 60+ reagents.' },
 
   // Analytical Chemistry
   { name: 'Mass Accuracy Calculator', cat: 'analytical', path: '/analytical-chemistry/mass-accuracy-calculator.html', aka: ['ppm','Da','mass error','mass spec'], desc: 'Convert between ppm and Da mass error.' },
-  { name: 'Theoretical Plates Calculator', cat: 'analytical', path: '/analytical-chemistry/theoretical-plates-calculator.html', aka: ['column efficiency','N','HETP','plate count'], desc: 'Calculate column efficiency.', soon: true },
-  { name: 'Resolution Calculator', cat: 'analytical', path: '/analytical-chemistry/resolution-calculator.html', aka: ['Rs','peak resolution','separation'], desc: 'Determine chromatographic resolution.', soon: true },
-  { name: 'LOD/LOQ Calculator', cat: 'analytical', path: '/analytical-chemistry/lod-loq-calculator.html', aka: ['limit of detection','limit of quantitation','sensitivity','calibration'], desc: 'Estimate detection and quantitation limits.', soon: true },
+  { name: 'Theoretical Plates Calculator', cat: 'analytical', path: '/analytical-chemistry/theoretical-plates-calculator.html', aka: ['column efficiency','N','HETP','plate count'], desc: 'Calculate column efficiency.' },
+  { name: 'Resolution Calculator', cat: 'analytical', path: '/analytical-chemistry/resolution-calculator.html', aka: ['Rs','peak resolution','separation'], desc: 'Determine chromatographic resolution.' },
+  { name: 'LOD/LOQ Calculator', cat: 'analytical', path: '/analytical-chemistry/lod-loq-calculator.html', aka: ['limit of detection','limit of quantitation','sensitivity','calibration'], desc: 'Estimate detection and quantitation limits.' },
 
   // Biology & Biochemistry
   { name: 'Henderson-Hasselbalch Calculator', cat: 'biology', path: '/biology-biochemistry/henderson-hasselbalch-calculator.html', aka: ['buffer pH','pKa','acid base'], desc: 'Calculate buffer pH from component ratios.' },
+  { name: 'Primer Tm Calculator', cat: 'biology', path: '/biology-biochemistry/primer-tm-calculator.html', aka: ['melting temperature','primer design','GC content','annealing','oligonucleotide'], desc: 'Tm by Wallace, salt-adjusted, and nearest-neighbor methods.' },
   { name: 'Cell Counting Calculator', cat: 'biology', path: '/biology-biochemistry/cell-counting-calculator.html', aka: ['hemocytometer','trypan blue','viability','seeding','cell culture'], desc: 'Concentration, viability, and seeding from hemocytometer counts.' },
   { name: 'DNA/RNA Concentration', cat: 'biology', path: '/biology-biochemistry/dna-rna-concentration.html', aka: ['A260','nanodrop','nucleic acid','absorbance','260nm','purity'], desc: 'Concentration and purity from A260 absorbance.' },
   { name: 'PCR Master Mix Calculator', cat: 'biology', path: '/biology-biochemistry/pcr-master-mix-calculator.html', aka: ['polymerase','reaction','Taq','primer'], desc: 'Scale PCR reactions with overage.' },
@@ -39,6 +42,7 @@ LC.tools = [
   { name: 'A280 Protein Concentration', cat: 'spectroscopy', path: '/spectroscopy/a280-protein-concentration.html', aka: ['UV absorbance','nanodrop','protein quantitation','280nm'], desc: 'Protein concentration from UV absorbance.' },
 
   // Organic Chemistry
+  { name: 'Atom Economy Calculator', cat: 'organic', path: '/organic-chemistry/atom-economy-calculator.html', aka: ['green chemistry','waste','efficiency','Trost'], desc: 'Measure how efficiently atoms end up in desired product.' },
   { name: 'Theoretical Yield Calculator', cat: 'organic', path: '/organic-chemistry/theoretical-yield-calculator.html', aka: ['product','stoichiometry','reaction yield'], desc: 'Calculate maximum product from reactants.' },
   { name: 'Percent Yield Calculator', cat: 'organic', path: '/organic-chemistry/percent-yield-calculator.html', aka: ['actual yield','efficiency'], desc: 'Determine reaction efficiency.' },
   { name: 'Degree of Unsaturation', cat: 'organic', path: '/organic-chemistry/degree-of-unsaturation-calculator.html', aka: ['DoU','IHD','index of hydrogen deficiency','double bond equivalents'], desc: 'Calculate degrees of unsaturation from formula.' },
@@ -49,6 +53,7 @@ LC.tools = [
 
   // Physical Chemistry
   { name: 'Ideal Gas Law Calculator', cat: 'physical', path: '/physical-chemistry/ideal-gas-law-calculator.html', aka: ['PV=nRT','pressure','volume','temperature','gas'], desc: 'Solve PV=nRT for any variable.' },
+  { name: 'Rate Law Calculator', cat: 'physical', path: '/physical-chemistry/rate-law-calculator.html', aka: ['integrated rate law','zero order','first order','second order','half-life','kinetics'], desc: 'Concentration vs time for 0th, 1st, 2nd order reactions.' },
   { name: 'Arrhenius Equation Calculator', cat: 'physical', path: '/physical-chemistry/arrhenius-equation-calculator.html', aka: ['activation energy','rate constant','pre-exponential','kinetics','temperature dependence'], desc: 'Rate constants and activation energy from temperature data.' },
   { name: 'Boiling/Freezing Point Calculator', cat: 'physical', path: '/physical-chemistry/boiling-freezing-point-calculator.html', aka: ['colligative','ebullioscopic','cryoscopic','molality','van\'t Hoff'], desc: 'Boiling point elevation and freezing point depression.' },
   { name: 'Nernst Equation Calculator', cat: 'physical', path: '/physical-chemistry/nernst-equation-calculator.html', aka: ['cell potential','electrochemistry','EMF'], desc: 'Calculate cell potential at non-standard conditions.' },

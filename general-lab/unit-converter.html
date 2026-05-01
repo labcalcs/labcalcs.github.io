@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scientific Unit Converter — LabCalcs</title>
+<meta name="description" content="Free scientific unit converter. Convert between mass, volume, concentration, temperature, pressure, length, and molecular weight units. Covers ng to kg, nM to M, psi to atm, and more.">
+<link rel="canonical" href="https://labcalcs.github.io/general-lab/unit-converter.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="cat-general-lab">
+<div class="grain"></div>
+<nav class="site-nav" id="site-nav"></nav>
+<div class="breadcrumb" id="breadcrumb"></div>
+<div class="ad-slot" id="ad-top"></div>
+
+<div class="container">
+  <h1 class="page-title">Scientific Unit Converter</h1>
+  <p class="page-subtitle">Convert between common lab and science units — mass, volume, concentration, temperature, pressure, and length.</p>
+
+  <div class="calc-card">
+    <div class="fields" style="margin-bottom:16px;">
+      <div class="field full">
+        <label>Category</label>
+        <select id="category" style="width:100%;font-family:var(--font-mono);font-size:15px;padding:12px 14px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);outline:none;cursor:pointer;" onchange="loadCategory()"></select>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <div class="field" style="flex:1;min-width:140px;">
+        <label>Value</label>
+        <input type="number" id="inputVal" step="any" placeholder="Enter value" oninput="convert()" style="font-size:18px;">
+      </div>
+      <div class="field" style="flex:1;min-width:120px;">
+        <label>From</label>
+        <select id="fromUnit" style="width:100%;font-family:var(--font-mono);font-size:14px;padding:12px 10px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);outline:none;cursor:pointer;" onchange="convert()"></select>
+      </div>
+      <div style="padding-top:20px;color:var(--text-dim);font-size:18px;flex-shrink:0;">→</div>
+      <div class="field" style="flex:1;min-width:120px;">
+        <label>To</label>
+        <select id="toUnit" style="width:100%;font-family:var(--font-mono);font-size:14px;padding:12px 10px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);outline:none;cursor:pointer;" onchange="convert()"></select>
+      </div>
+    </div>
+
+    <div class="result-box" id="resultBox" style="margin-top:20px;">
+      <div class="result-label" id="resultLabel">Result</div>
+      <div class="result-value" id="resultValue">—</div>
+    </div>
+
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+      <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:12px;">All Conversions</div>
+      <div id="allConversions" style="font-family:var(--font-mono);font-size:13px;color:var(--text-dim);line-height:2;"></div>
+    </div>
+  </div>
+
+  <div class="ad-slot" id="ad-mid"></div>
+
+  <div class="info-section">
+    <h2>How to Use This Converter</h2>
+    <p>Select a category (mass, volume, concentration, etc.), enter a value, and choose your source and target units. All conversions in the selected category are shown below the result for quick reference. Temperature conversions use the correct formulas (not simple multiplication).</p>
+
+    <h2>Common Lab Conversions</h2>
+    <p>Some conversions that trip people up: 1 mg/mL = 1 g/L = 1000 µg/mL = 1000 ppm (in dilute aqueous solutions). 1 M = 1000 mM = 1,000,000 µM. 1 L = 1000 mL = 1,000,000 µL. 1 atm = 101.325 kPa = 760 mmHg = 14.696 psi. 1 nm = 10 Å. 1 Da = 1 g/mol.</p>
+  </div>
+
+  <div class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a class="related-card" href="molarity-calculator.html"><h3>Molarity Calculator</h3><p>Moles, concentration, volume, mass.</p></a>
+      <a class="related-card" href="dilution-calculator.html"><h3>Dilution Calculator</h3><p>C₁V₁ = C₂V₂ with flexible units.</p></a>
+      <a class="related-card" href="stock-solution-calculator.html"><h3>Stock Solution Calculator</h3><p>Weigh reagents for 60+ compounds.</p></a>
+    </div>
+  </div>
+</div>
+
+<div class="ad-slot" id="ad-bot"></div>
+<footer class="site-footer"><a href="../">← Back to all categories</a> · © 2026 LabCalcs</footer>
+
+<script>LC = window.LC || {}; LC.basePath = '..';</script>
+<script src="../js/analytics.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() { buildBreadcrumb('general-lab', 'Unit Converter'); });
+
+var categories = {
+  'Mass': {
+    units: ['kg','g','mg','µg','ng','pg','lb','oz'],
+    toBase: {kg:1000,g:1,mg:1e-3,'µg':1e-6,ng:1e-9,pg:1e-12,lb:453.592,oz:28.3495},
+    base: 'g'
+  },
+  'Volume': {
+    units: ['L','mL','µL','nL','pL','gal','fl oz'],
+    toBase: {L:1,mL:1e-3,'µL':1e-6,nL:1e-9,pL:1e-12,gal:3.78541,'fl oz':0.0295735},
+    base: 'L'
+  },
+  'Concentration (Molar)': {
+    units: ['M','mM','µM','nM','pM','fM'],
+    toBase: {M:1,mM:1e-3,'µM':1e-6,nM:1e-9,pM:1e-12,fM:1e-15},
+    base: 'M'
+  },
+  'Concentration (Mass/Vol)': {
+    units: ['g/L','mg/mL','mg/L','µg/mL','µg/L','ng/mL','ng/µL','ppm','ppb'],
+    toBase: {'g/L':1,'mg/mL':1,'mg/L':1e-3,'µg/mL':1e-3,'µg/L':1e-6,'ng/mL':1e-6,'ng/µL':1e-3,ppm:1e-3,ppb:1e-6},
+    base: 'g/L'
+  },
+  'Temperature': {
+    units: ['°C','°F','K'],
+    special: true
+  },
+  'Pressure': {
+    units: ['atm','Pa','kPa','bar','mbar','mmHg','torr','psi'],
+    toBase: {atm:101325,Pa:1,kPa:1000,bar:100000,mbar:100,mmHg:133.322,torr:133.322,psi:6894.76},
+    base: 'Pa'
+  },
+  'Length': {
+    units: ['m','cm','mm','µm','nm','Å','pm','in','ft'],
+    toBase: {m:1,cm:0.01,mm:0.001,'µm':1e-6,nm:1e-9,'Å':1e-10,pm:1e-12,'in':0.0254,ft:0.3048},
+    base: 'm'
+  },
+  'Molecular Weight': {
+    units: ['Da','kDa','g/mol','kg/mol'],
+    toBase: {Da:1,kDa:1000,'g/mol':1,'kg/mol':1000},
+    base: 'Da'
+  },
+  'Amount': {
+    units: ['mol','mmol','µmol','nmol','pmol','fmol'],
+    toBase: {mol:1,mmol:1e-3,'µmol':1e-6,nmol:1e-9,pmol:1e-12,fmol:1e-15},
+    base: 'mol'
+  },
+  'Time': {
+    units: ['s','ms','µs','ns','min','hr','day'],
+    toBase: {s:1,ms:1e-3,'µs':1e-6,ns:1e-9,min:60,hr:3600,day:86400},
+    base: 's'
+  },
+};
+
+var catSel = document.getElementById('category');
+Object.keys(categories).forEach(function(name) {
+  var opt = document.createElement('option');
+  opt.value = name; opt.textContent = name;
+  catSel.appendChild(opt);
+});
+
+function loadCategory() {
+  var cat = categories[catSel.value];
+  var from = document.getElementById('fromUnit');
+  var to = document.getElementById('toUnit');
+  from.innerHTML = ''; to.innerHTML = '';
+  cat.units.forEach(function(u,i) {
+    var o1 = document.createElement('option'); o1.value = u; o1.textContent = u; from.appendChild(o1);
+    var o2 = document.createElement('option'); o2.value = u; o2.textContent = u; to.appendChild(o2);
+  });
+  if (cat.units.length > 1) to.selectedIndex = 1;
+  convert();
+}
+
+function fmt(v) {
+  if (v==null||isNaN(v)||!isFinite(v)) return '—';
+  if (v===0) return '0';
+  if (Math.abs(v)>=0.001&&Math.abs(v)<1e8) return parseFloat(v.toPrecision(8)).toString();
+  return v.toExponential(5);
+}
+
+function convertTemp(val, from, to) {
+  var c;
+  if (from==='°C') c = val;
+  else if (from==='°F') c = (val-32)*5/9;
+  else c = val - 273.15;
+  if (to==='°C') return c;
+  if (to==='°F') return c*9/5+32;
+  return c + 273.15;
+}
+
+function convert() {
+  var val = parseFloat(document.getElementById('inputVal').value);
+  var fromU = document.getElementById('fromUnit').value;
+  var toU = document.getElementById('toUnit').value;
+  var catName = catSel.value;
+  var cat = categories[catName];
+  var box = document.getElementById('resultBox');
+
+  if (isNaN(val)) { box.classList.remove('visible'); document.getElementById('allConversions').innerHTML=''; return; }
+
+  var result;
+  if (cat.special) {
+    result = convertTemp(val, fromU, toU);
+  } else {
+    var base = val * cat.toBase[fromU];
+    result = base / cat.toBase[toU];
+  }
+
+  document.getElementById('resultLabel').textContent = fmt(val) + ' ' + fromU + ' =';
+  document.getElementById('resultValue').innerHTML = fmt(result) + '<span class="result-unit">' + toU + '</span>';
+  box.classList.add('visible');
+
+  // Show all conversions
+  var allDiv = document.getElementById('allConversions');
+  var html = '';
+  cat.units.forEach(function(u) {
+    if (u === fromU) return;
+    var r;
+    if (cat.special) { r = convertTemp(val, fromU, u); }
+    else { r = (val * cat.toBase[fromU]) / cat.toBase[u]; }
+    html += '<div>' + fmt(val) + ' ' + fromU + ' = <strong style="color:var(--text);">' + fmt(r) + '</strong> ' + u + '</div>';
+  });
+  allDiv.innerHTML = html;
+}
+
+loadCategory();
+</script>
+</body>
+</html>

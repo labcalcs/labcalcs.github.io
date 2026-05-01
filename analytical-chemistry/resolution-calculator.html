@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chromatographic Resolution Calculator — LabCalcs</title>
+<meta name="description" content="Free chromatographic resolution calculator. Calculate Rs from retention times and peak widths. Includes resolution from plate count, selectivity, and retention factor.">
+<link rel="canonical" href="https://labcalcs.github.io/analytical-chemistry/resolution-calculator.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="cat-analytical">
+<div class="grain"></div>
+<nav class="site-nav" id="site-nav"></nav>
+<div class="breadcrumb" id="breadcrumb"></div>
+<div class="ad-slot" id="ad-top"></div>
+
+<div class="container">
+  <h1 class="page-title">Chromatographic Resolution Calculator</h1>
+  <p class="page-subtitle">Calculate resolution between two peaks, or predict the plate count needed for a target resolution.</p>
+
+  <div class="calc-card">
+    <div class="tabs" id="modeTabs">
+      <button class="active" onclick="setMode('direct')">From Peak Data</button>
+      <button onclick="setMode('fundamental')">From N, α, k</button>
+    </div>
+
+    <div id="directMode">
+      <div class="formula-bar"><em>Rs</em> = 2 × ( <em>t</em><sub>R2</sub> − <em>t</em><sub>R1</sub> ) / ( <em>W</em><sub>b1</sub> + <em>W</em><sub>b2</sub> )</div>
+      <div class="divider-row"><span class="line"></span><span class="label">Peak 1 (earlier)</span><span class="line"></span></div>
+      <div class="fields">
+        <div class="field">
+          <label>t<sub>R1</sub> — Retention Time <span class="unit">min</span></label>
+          <input type="number" id="tR1" step="any" placeholder="e.g. 5.2" oninput="calcDirect()">
+        </div>
+        <div class="field">
+          <label>W<sub>b1</sub> — Base Width <span class="unit">min</span></label>
+          <input type="number" id="wb1" step="any" placeholder="e.g. 0.25" oninput="calcDirect()">
+        </div>
+      </div>
+      <div class="divider-row"><span class="line"></span><span class="label">Peak 2 (later)</span><span class="line"></span></div>
+      <div class="fields">
+        <div class="field">
+          <label>t<sub>R2</sub> — Retention Time <span class="unit">min</span></label>
+          <input type="number" id="tR2" step="any" placeholder="e.g. 5.8" oninput="calcDirect()">
+        </div>
+        <div class="field">
+          <label>W<sub>b2</sub> — Base Width <span class="unit">min</span></label>
+          <input type="number" id="wb2" step="any" placeholder="e.g. 0.28" oninput="calcDirect()">
+        </div>
+      </div>
+    </div>
+
+    <div id="fundamentalMode" style="display:none;">
+      <div class="formula-bar"><em>Rs</em> = ( √<em>N</em> / 4 ) × ( (<em>α</em>−1) / <em>α</em> ) × ( <em>k</em> / (1+<em>k</em>) )</div>
+      <div class="fields">
+        <div class="field">
+          <label>N — Plate Count</label>
+          <input type="number" id="Nf" step="any" placeholder="e.g. 15000" oninput="calcFund()">
+        </div>
+        <div class="field">
+          <label>α — Selectivity Factor</label>
+          <input type="number" id="alpha" step="any" placeholder="e.g. 1.05" oninput="calcFund()">
+        </div>
+        <div class="field">
+          <label>k — Retention Factor (average)</label>
+          <input type="number" id="kf" step="any" placeholder="e.g. 5" oninput="calcFund()">
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:24px;border-radius:10px;background:var(--accent-glow);border:1px solid var(--accent-border);text-align:center;margin-top:20px;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:6px;font-weight:600;">Resolution (Rs)</div>
+      <div id="rsResult" style="font-family:var(--font-mono);font-size:36px;font-weight:600;color:var(--accent);">—</div>
+      <div id="rsInterpret" style="font-size:13px;color:var(--text-dim);margin-top:8px;"></div>
+    </div>
+
+    <div class="note-box" id="noteBox"></div>
+
+    <div style="margin-top:20px;padding:14px 16px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid var(--border);font-size:13px;color:var(--text-dim);line-height:1.7;">
+      <span style="font-family:var(--font-mono);font-size:11px;color:var(--accent);margin-right:6px;">GUIDE</span>
+      <strong style="color:var(--text);">Rs &lt; 0.8:</strong> Poorly resolved (significant overlap) &nbsp;|&nbsp;
+      <strong style="color:var(--text);">Rs = 1.0:</strong> ~98% resolved (some overlap at base) &nbsp;|&nbsp;
+      <strong style="color:var(--text);">Rs ≥ 1.5:</strong> Baseline resolved (sufficient for quantitation)
+    </div>
+  </div>
+
+  <div class="ad-slot" id="ad-mid"></div>
+
+  <div class="info-section">
+    <h2>How to Use This Calculator</h2>
+    <p><strong>From Peak Data:</strong> Enter the retention times and base widths of two adjacent peaks. The calculator computes resolution directly. Use the same time units for all values.</p>
+    <p><strong>From N, α, k:</strong> Use this when you want to predict resolution from column parameters — useful for method development. Enter plate count (N), selectivity factor (α = k₂/k₁), and average retention factor (k).</p>
+
+    <h2>The Math Behind It</h2>
+    <p><strong>Direct calculation:</strong> Rs = 2(tR2 − tR1) / (Wb1 + Wb2). This is the standard USP definition of resolution.</p>
+    <p><strong>Fundamental equation:</strong> Rs = (√N/4) × ((α−1)/α) × (k/(1+k)). This separates resolution into three independent contributions: efficiency (N), selectivity (α), and retention (k). It shows that the most efficient way to improve resolution is usually to increase α (change stationary phase, mobile phase composition, or pH), rather than increasing N (longer column, slower flow).</p>
+    <p><strong>Worked example:</strong> Peak 1 elutes at 5.2 min (Wb = 0.25 min), Peak 2 at 5.8 min (Wb = 0.28 min). Rs = 2(5.8−5.2)/(0.25+0.28) = 1.2/0.53 = 2.26. Baseline resolved.</p>
+    <p><strong>Scaling rule:</strong> Resolution scales with √N. To double the resolution, you need 4× the plate count (4× column length at constant HETP). This is why improving selectivity is almost always preferred over brute-force efficiency increases.</p>
+  </div>
+
+  <div class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a class="related-card" href="theoretical-plates-calculator.html"><h3>Theoretical Plates</h3><p>Column efficiency from peak data.</p></a>
+      <a class="related-card" href="mass-accuracy-calculator.html"><h3>Mass Accuracy (ppm)</h3><p>Convert between ppm and Da error.</p></a>
+      <a class="related-card" href="../general-lab/unit-converter.html"><h3>Unit Converter</h3><p>Convert between scientific units.</p></a>
+    </div>
+  </div>
+</div>
+
+<div class="ad-slot" id="ad-bot"></div>
+<footer class="site-footer"><a href="../">← Back to all categories</a> · © 2026 LabCalcs</footer>
+
+<script>LC = window.LC || {}; LC.basePath = '..';</script>
+<script src="../js/analytics.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() { buildBreadcrumb('analytical', 'Resolution Calculator'); });
+
+function setMode(m) {
+  document.getElementById('directMode').style.display = m==='direct'?'':'none';
+  document.getElementById('fundamentalMode').style.display = m==='fundamental'?'':'none';
+  document.querySelectorAll('#modeTabs button').forEach(function(b,i){b.classList.toggle('active',(i===0&&m==='direct')||(i===1&&m==='fundamental'));});
+  document.getElementById('rsResult').textContent = '—';
+  document.getElementById('rsInterpret').textContent = '';
+}
+
+function fmt(v){if(v==null||isNaN(v)||!isFinite(v))return'—';return parseFloat(v.toPrecision(4)).toString();}
+
+function interpret(rs) {
+  if (rs < 0.5) return 'Coeluting — peaks heavily overlapped.';
+  if (rs < 0.8) return 'Poor resolution — significant overlap.';
+  if (rs < 1.0) return 'Partial resolution — peaks distinguishable but overlap at base.';
+  if (rs < 1.5) return 'Good resolution — ~98% separated. Adequate for identification.';
+  if (rs < 2.0) return 'Baseline resolved — suitable for quantitation.';
+  return 'Fully baseline resolved — excellent separation.';
+}
+
+function calcDirect() {
+  var tR1 = parseFloat(document.getElementById('tR1').value);
+  var tR2 = parseFloat(document.getElementById('tR2').value);
+  var wb1 = parseFloat(document.getElementById('wb1').value);
+  var wb2 = parseFloat(document.getElementById('wb2').value);
+  var note = document.getElementById('noteBox'); note.classList.remove('visible');
+
+  if (isNaN(tR1)||isNaN(tR2)||isNaN(wb1)||isNaN(wb2)||wb1<=0||wb2<=0) {
+    document.getElementById('rsResult').textContent = '—';
+    document.getElementById('rsInterpret').textContent = '';
+    return;
+  }
+
+  if (tR2 < tR1) { note.textContent = '⚠ t_R2 should be greater than t_R1 (Peak 2 elutes later). Values have been swapped.'; note.classList.add('visible'); var tmp=tR1;tR1=tR2;tR2=tmp; }
+
+  var rs = 2*(tR2 - tR1) / (wb1 + wb2);
+  document.getElementById('rsResult').textContent = fmt(rs);
+  document.getElementById('rsInterpret').textContent = interpret(rs);
+}
+
+function calcFund() {
+  var N = parseFloat(document.getElementById('Nf').value);
+  var alpha = parseFloat(document.getElementById('alpha').value);
+  var k = parseFloat(document.getElementById('kf').value);
+
+  if (isNaN(N)||isNaN(alpha)||isNaN(k)||N<=0||alpha<=0||k<=0) {
+    document.getElementById('rsResult').textContent = '—';
+    document.getElementById('rsInterpret').textContent = '';
+    return;
+  }
+
+  var rs = (Math.sqrt(N)/4) * ((alpha-1)/alpha) * (k/(1+k));
+  document.getElementById('rsResult').textContent = fmt(rs);
+  document.getElementById('rsInterpret').textContent = interpret(rs);
+
+  // Also show required N for Rs=1.5 if current Rs < 1.5
+  var note = document.getElementById('noteBox'); note.classList.remove('visible');
+  if (rs < 1.5) {
+    var nRequired = Math.pow(1.5 * 4 / (((alpha-1)/alpha) * (k/(1+k))), 2);
+    note.innerHTML = 'To achieve Rs = 1.5 with the same α and k, you would need <strong>N = ' + Math.round(nRequired).toLocaleString() + '</strong> plates.';
+    note.style.color='var(--accent)';note.style.background='var(--accent-glow)';note.style.borderColor='var(--accent-border)';
+    note.classList.add('visible');
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Percent Solutions Calculator (w/v, v/v, w/w) — LabCalcs</title>
+<meta name="description" content="Free percent solutions calculator. Calculate weight/volume (w/v), volume/volume (v/v), and weight/weight (w/w) percentages. Convert between percent and other concentration units.">
+<link rel="canonical" href="https://labcalcs.github.io/general-lab/percent-solutions-calculator.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="cat-general-lab">
+<div class="grain"></div>
+<nav class="site-nav" id="site-nav"></nav>
+<div class="breadcrumb" id="breadcrumb"></div>
+<div class="ad-slot" id="ad-top"></div>
+
+<div class="container">
+  <h1 class="page-title">Percent Solutions Calculator</h1>
+  <p class="page-subtitle">Calculate how much solute to add for any percent solution — weight/volume, volume/volume, or weight/weight.</p>
+
+  <div class="calc-card">
+    <div class="tabs" id="modeTabs">
+      <button class="active" onclick="setMode('wv')">% (w/v)</button>
+      <button onclick="setMode('vv')">% (v/v)</button>
+      <button onclick="setMode('ww')">% (w/w)</button>
+    </div>
+
+    <div id="wvMode">
+      <div class="formula-bar">% (w/v) = ( <em>mass solute (g)</em> / <em>volume solution (mL)</em> ) × 100</div>
+      <div class="fields">
+        <div class="field">
+          <label>Desired Percentage <span class="unit">% (w/v)</span></label>
+          <input type="number" id="wv_pct" step="any" placeholder="e.g. 10" oninput="calcWV()">
+        </div>
+        <div class="field">
+          <label>Final Volume <span class="unit">mL</span></label>
+          <input type="number" id="wv_vol" step="any" placeholder="e.g. 500" oninput="calcWV()">
+        </div>
+      </div>
+      <div class="result-box" id="wvResult">
+        <div class="result-label">Mass of Solute Needed</div>
+        <div class="result-value" id="wvValue">—</div>
+      </div>
+      <div id="wvSteps" style="margin-top:16px;font-size:13px;color:var(--text-dim);line-height:1.8;display:none;"></div>
+    </div>
+
+    <div id="vvMode" style="display:none;">
+      <div class="formula-bar">% (v/v) = ( <em>volume solute (mL)</em> / <em>volume solution (mL)</em> ) × 100</div>
+      <div class="fields">
+        <div class="field">
+          <label>Desired Percentage <span class="unit">% (v/v)</span></label>
+          <input type="number" id="vv_pct" step="any" placeholder="e.g. 70" oninput="calcVV()">
+        </div>
+        <div class="field">
+          <label>Final Volume <span class="unit">mL</span></label>
+          <input type="number" id="vv_vol" step="any" placeholder="e.g. 1000" oninput="calcVV()">
+        </div>
+      </div>
+      <div class="result-box" id="vvResult">
+        <div class="result-label">Volume of Solute Needed</div>
+        <div class="result-value" id="vvValue">—</div>
+      </div>
+      <div id="vvSteps" style="margin-top:16px;font-size:13px;color:var(--text-dim);line-height:1.8;display:none;"></div>
+    </div>
+
+    <div id="wwMode" style="display:none;">
+      <div class="formula-bar">% (w/w) = ( <em>mass solute (g)</em> / <em>mass solution (g)</em> ) × 100</div>
+      <div class="fields">
+        <div class="field">
+          <label>Desired Percentage <span class="unit">% (w/w)</span></label>
+          <input type="number" id="ww_pct" step="any" placeholder="e.g. 5" oninput="calcWW()">
+        </div>
+        <div class="field">
+          <label>Total Mass of Solution <span class="unit">g</span></label>
+          <input type="number" id="ww_mass" step="any" placeholder="e.g. 200" oninput="calcWW()">
+        </div>
+      </div>
+      <div class="result-box" id="wwResult">
+        <div class="result-label">Mass of Solute Needed</div>
+        <div class="result-value" id="wwValue">—</div>
+      </div>
+      <div id="wwSteps" style="margin-top:16px;font-size:13px;color:var(--text-dim);line-height:1.8;display:none;"></div>
+    </div>
+  </div>
+
+  <div class="ad-slot" id="ad-mid"></div>
+
+  <div class="info-section">
+    <h2>How to Use This Calculator</h2>
+    <p>Select the type of percent solution you need: <strong>%(w/v)</strong> for dissolving a solid in a liquid (most common in biology/chemistry labs), <strong>%(v/v)</strong> for mixing two liquids (e.g., ethanol in water), or <strong>%(w/w)</strong> for mass-based mixtures. Enter the desired percentage and final volume or mass, and the calculator tells you exactly what to measure.</p>
+
+    <h2>The Math Behind It</h2>
+    <p><strong>% (w/v)</strong> = grams of solute per 100 mL of solution. A 10% (w/v) NaCl solution contains 10 g NaCl per 100 mL. To make 500 mL: 10/100 × 500 = 50 g NaCl, dissolved and brought to 500 mL with water.</p>
+    <p><strong>% (v/v)</strong> = mL of solute per 100 mL of solution. A 70% (v/v) ethanol solution contains 70 mL ethanol per 100 mL. To make 1 L: 70/100 × 1000 = 700 mL ethanol + 300 mL water.</p>
+    <p><strong>% (w/w)</strong> = grams of solute per 100 g of total solution. A 5% (w/w) sugar solution: 5 g sugar + 95 g water = 100 g solution.</p>
+    <p><strong>Common lab solutions:</strong> 10% SDS (w/v), 70% ethanol (v/v), 10% APS (w/v, make fresh), 0.1% Tween-20 (v/v), 10% glycerol (v/v), 1% agarose (w/v).</p>
+  </div>
+
+  <div class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a class="related-card" href="stock-solution-calculator.html"><h3>Stock Solution Calculator</h3><p>Weigh reagents for 60+ compounds.</p></a>
+      <a class="related-card" href="dilution-calculator.html"><h3>Dilution Calculator</h3><p>C₁V₁ = C₂V₂ with flexible units.</p></a>
+      <a class="related-card" href="molarity-calculator.html"><h3>Molarity Calculator</h3><p>Moles, concentration, volume, mass.</p></a>
+    </div>
+  </div>
+</div>
+
+<div class="ad-slot" id="ad-bot"></div>
+<footer class="site-footer"><a href="../">← Back to all categories</a> · © 2026 LabCalcs</footer>
+
+<script>LC = window.LC || {}; LC.basePath = '..';</script>
+<script src="../js/analytics.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() { buildBreadcrumb('general-lab', 'Percent Solutions Calculator'); });
+
+function setMode(m) {
+  document.getElementById('wvMode').style.display = m==='wv'?'':'none';
+  document.getElementById('vvMode').style.display = m==='vv'?'':'none';
+  document.getElementById('wwMode').style.display = m==='ww'?'':'none';
+  document.querySelectorAll('#modeTabs button').forEach(function(b,i){
+    b.classList.toggle('active',(i===0&&m==='wv')||(i===1&&m==='vv')||(i===2&&m==='ww'));
+  });
+}
+
+function fmt(v){if(v==null||isNaN(v)||!isFinite(v))return'—';if(v===0)return'0';if(v>=0.01&&v<1e6)return parseFloat(v.toPrecision(5)).toString();return v.toExponential(4);}
+
+function calcWV() {
+  var pct = parseFloat(document.getElementById('wv_pct').value);
+  var vol = parseFloat(document.getElementById('wv_vol').value);
+  var box = document.getElementById('wvResult');
+  var steps = document.getElementById('wvSteps');
+  if (isNaN(pct)||isNaN(vol)||pct<=0||vol<=0){box.classList.remove('visible');steps.style.display='none';return;}
+
+  var mass = (pct / 100) * vol;
+  var massG = mass;
+  var unit = 'g';
+  if (mass < 1) { massG = mass*1000; unit = 'mg'; }
+
+  document.getElementById('wvValue').innerHTML = fmt(massG) + '<span class="result-unit">' + unit + '</span>';
+  box.classList.add('visible');
+
+  steps.innerHTML = '<strong>Steps:</strong> Weigh ' + fmt(massG) + ' ' + unit + ' of solute. Dissolve in ~' + fmt(vol*0.8) + ' mL water. Bring to final volume of ' + fmt(vol) + ' mL.';
+  steps.style.display = 'block';
+}
+
+function calcVV() {
+  var pct = parseFloat(document.getElementById('vv_pct').value);
+  var vol = parseFloat(document.getElementById('vv_vol').value);
+  var box = document.getElementById('vvResult');
+  var steps = document.getElementById('vvSteps');
+  if (isNaN(pct)||isNaN(vol)||pct<=0||vol<=0){box.classList.remove('visible');steps.style.display='none';return;}
+
+  var soluteVol = (pct / 100) * vol;
+  var solventVol = vol - soluteVol;
+  var unit = 'mL';
+  if (soluteVol < 1) { soluteVol *= 1000; unit = 'µL'; }
+
+  document.getElementById('vvValue').innerHTML = fmt(soluteVol) + '<span class="result-unit">' + unit + '</span>';
+  box.classList.add('visible');
+
+  steps.innerHTML = '<strong>Steps:</strong> Measure ' + fmt(soluteVol) + ' ' + unit + ' of solute liquid. Add ' + fmt(solventVol) + ' mL of solvent to reach ' + fmt(vol) + ' mL total.';
+  steps.style.display = 'block';
+}
+
+function calcWW() {
+  var pct = parseFloat(document.getElementById('ww_pct').value);
+  var totalMass = parseFloat(document.getElementById('ww_mass').value);
+  var box = document.getElementById('wwResult');
+  var steps = document.getElementById('wwSteps');
+  if (isNaN(pct)||isNaN(totalMass)||pct<=0||totalMass<=0){box.classList.remove('visible');steps.style.display='none';return;}
+
+  var soluteMass = (pct / 100) * totalMass;
+  var solventMass = totalMass - soluteMass;
+
+  document.getElementById('wwValue').innerHTML = fmt(soluteMass) + '<span class="result-unit">g</span>';
+  box.classList.add('visible');
+
+  steps.innerHTML = '<strong>Steps:</strong> Weigh ' + fmt(soluteMass) + ' g of solute. Add ' + fmt(solventMass) + ' g of solvent. Total mass = ' + fmt(totalMass) + ' g.';
+  steps.style.display = 'block';
+}
+</script>
+</body>
+</html>

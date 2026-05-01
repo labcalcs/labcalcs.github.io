@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atom Economy Calculator — LabCalcs</title>
+<meta name="description" content="Free atom economy calculator. Calculate the atom economy of a reaction from molecular weights of products and reactants. A key green chemistry metric.">
+<link rel="canonical" href="https://labcalcs.github.io/organic-chemistry/atom-economy-calculator.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="cat-organic">
+<div class="grain"></div>
+<nav class="site-nav" id="site-nav"></nav>
+<div class="breadcrumb" id="breadcrumb"></div>
+<div class="ad-slot" id="ad-top"></div>
+
+<div class="container">
+  <h1 class="page-title">Atom Economy Calculator</h1>
+  <p class="page-subtitle">Calculate the atom economy of a reaction — a measure of how efficiently reactant atoms end up in the desired product.</p>
+
+  <div class="calc-card">
+    <div class="formula-bar"><em>Atom Economy</em> = ( <em>MW desired products</em> / <em>MW all reactants</em> ) × 100%</div>
+
+    <div style="margin-bottom:20px;">
+      <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:10px;">Reactants</div>
+      <div id="reactantRows"></div>
+      <button id="addReactant" style="font-family:var(--font-mono);font-size:12px;padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--input-bg);color:var(--text-dim);cursor:pointer;margin-top:8px;">+ Add Reactant</button>
+    </div>
+
+    <div class="divider-row"><span class="line"></span><span class="label">→</span><span class="line"></span></div>
+
+    <div style="margin-bottom:20px;">
+      <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent);margin-bottom:10px;">Desired Product(s)</div>
+      <div id="productRows"></div>
+      <button id="addProduct" style="font-family:var(--font-mono);font-size:12px;padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--input-bg);color:var(--text-dim);cursor:pointer;margin-top:8px;">+ Add Product</button>
+    </div>
+
+    <div style="padding:24px;border-radius:10px;background:var(--accent-glow);border:1px solid var(--accent-border);text-align:center;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:6px;font-weight:600;">Atom Economy</div>
+      <div id="aeResult" style="font-family:var(--font-mono);font-size:36px;font-weight:600;color:var(--accent);">—</div>
+      <div id="aeInterpret" style="font-size:13px;color:var(--text-dim);margin-top:6px;"></div>
+    </div>
+
+    <div class="note-box" id="noteBox"></div>
+  </div>
+
+  <div class="ad-slot" id="ad-mid"></div>
+
+  <div class="info-section">
+    <h2>How to Use This Calculator</h2>
+    <p>Enter the molecular weight and stoichiometric coefficient of each reactant and desired product. The calculator determines what fraction of reactant mass ends up in your desired product. Byproducts and waste are not included in the numerator — only the product(s) you actually want.</p>
+
+    <h2>The Math Behind It</h2>
+    <p><strong>Atom Economy = (Σ MW of desired products × their coefficients) / (Σ MW of all reactants × their coefficients) × 100%</strong></p>
+    <p>This metric was introduced by Barry Trost in 1991 as a measure of reaction efficiency from a green chemistry perspective. Unlike percent yield (which measures how much product you actually isolate), atom economy measures how much of the reactant atoms could theoretically end up in the desired product — it's an intrinsic property of the reaction itself.</p>
+    <p><strong>Worked example:</strong> The Diels-Alder reaction of butadiene (MW 54.09) + ethylene (MW 28.05) → cyclohexene (MW 82.14) has atom economy = 82.14 / (54.09 + 28.05) × 100 = 100%. It's an addition reaction — every atom ends up in the product.</p>
+    <p><strong>Contrast:</strong> A Grignard reaction or Wittig reaction often has atom economy below 50% because large leaving groups become waste. Rearrangement and addition reactions have the best atom economy; elimination and substitution reactions are typically worse.</p>
+  </div>
+
+  <div class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a class="related-card" href="theoretical-yield-calculator.html"><h3>Theoretical Yield</h3><p>Calculate max product from reactants.</p></a>
+      <a class="related-card" href="percent-yield-calculator.html"><h3>Percent Yield</h3><p>Calculate reaction efficiency.</p></a>
+      <a class="related-card" href="../general-lab/molarity-calculator.html"><h3>Molarity Calculator</h3><p>Moles, concentration, volume, mass.</p></a>
+    </div>
+  </div>
+</div>
+
+<div class="ad-slot" id="ad-bot"></div>
+<footer class="site-footer"><a href="../">← Back to all categories</a> · © 2026 LabCalcs</footer>
+
+<script>LC = window.LC || {}; LC.basePath = '..';</script>
+<script src="../js/analytics.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() { buildBreadcrumb('organic', 'Atom Economy Calculator'); });
+
+var reactants = [{mw:'',coeff:1}];
+var products = [{mw:'',coeff:1}];
+
+function renderRows() {
+  var rDiv = document.getElementById('reactantRows');
+  rDiv.innerHTML = '';
+  reactants.forEach(function(r, i) {
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:8px;';
+    row.innerHTML = '<input type="number" step="any" placeholder="MW (g/mol)" value="'+(r.mw||'')+'" oninput="reactants['+i+'].mw=this.value;calc();" style="flex:2;font-family:var(--font-mono);font-size:15px;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);outline:none;">'
+      + '<input type="number" step="1" min="1" placeholder="coeff" value="'+r.coeff+'" oninput="reactants['+i+'].coeff=parseInt(this.value)||1;calc();" style="flex:1;max-width:80px;font-family:var(--font-mono);font-size:15px;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);outline:none;">'
+      + (reactants.length > 1 ? '<button onclick="reactants.splice('+i+',1);renderRows();calc();" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:18px;padding:4px 8px;">×</button>' : '<div style="width:30px;"></div>');
+    rDiv.appendChild(row);
+  });
+
+  var pDiv = document.getElementById('productRows');
+  pDiv.innerHTML = '';
+  products.forEach(function(p, i) {
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:8px;';
+    row.innerHTML = '<input type="number" step="any" placeholder="MW (g/mol)" value="'+(p.mw||'')+'" oninput="products['+i+'].mw=this.value;calc();" style="flex:2;font-family:var(--font-mono);font-size:15px;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);outline:none;">'
+      + '<input type="number" step="1" min="1" placeholder="coeff" value="'+p.coeff+'" oninput="products['+i+'].coeff=parseInt(this.value)||1;calc();" style="flex:1;max-width:80px;font-family:var(--font-mono);font-size:15px;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);outline:none;">'
+      + (products.length > 1 ? '<button onclick="products.splice('+i+',1);renderRows();calc();" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:18px;padding:4px 8px;">×</button>' : '<div style="width:30px;"></div>');
+    pDiv.appendChild(row);
+  });
+}
+
+document.getElementById('addReactant').addEventListener('click', function() { reactants.push({mw:'',coeff:1}); renderRows(); });
+document.getElementById('addProduct').addEventListener('click', function() { products.push({mw:'',coeff:1}); renderRows(); });
+
+function calc() {
+  var rSum = 0, pSum = 0, valid = true;
+  reactants.forEach(function(r) { var mw = parseFloat(r.mw); if(isNaN(mw)){valid=false;}else{rSum += mw * (r.coeff||1);} });
+  products.forEach(function(p) { var mw = parseFloat(p.mw); if(isNaN(mw)){valid=false;}else{pSum += mw * (p.coeff||1);} });
+
+  if (!valid || rSum === 0) {
+    document.getElementById('aeResult').textContent = '—';
+    document.getElementById('aeInterpret').textContent = '';
+    return;
+  }
+
+  var ae = (pSum / rSum) * 100;
+  document.getElementById('aeResult').textContent = ae.toFixed(1) + '%';
+
+  var interp = '';
+  if (ae >= 90) interp = 'Excellent atom economy — very little waste generated.';
+  else if (ae >= 70) interp = 'Good atom economy.';
+  else if (ae >= 50) interp = 'Moderate atom economy — consider alternative routes.';
+  else interp = 'Poor atom economy — significant waste. Look for addition or rearrangement alternatives.';
+  document.getElementById('aeInterpret').textContent = interp;
+
+  var note = document.getElementById('noteBox'); note.classList.remove('visible');
+  if (ae > 100.5) {
+    note.textContent = '⚠ Atom economy exceeds 100% — check that all reactant MWs and coefficients are correct. The sum of product masses cannot exceed reactant masses.';
+    note.classList.add('visible');
+  }
+}
+
+renderRows();
+</script>
+</body>
+</html>

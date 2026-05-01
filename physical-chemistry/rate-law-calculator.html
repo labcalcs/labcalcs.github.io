@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rate Law Calculator — LabCalcs</title>
+<meta name="description" content="Free rate law and integrated rate law calculator. Solve for rate, rate constant, concentration, or time for zero, first, and second order reactions. Includes half-life.">
+<link rel="canonical" href="https://labcalcs.github.io/physical-chemistry/rate-law-calculator.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="cat-physical">
+<div class="grain"></div>
+<nav class="site-nav" id="site-nav"></nav>
+<div class="breadcrumb" id="breadcrumb"></div>
+<div class="ad-slot" id="ad-top"></div>
+
+<div class="container">
+  <h1 class="page-title">Rate Law & Integrated Rate Law Calculator</h1>
+  <p class="page-subtitle">Calculate rate, concentration at time t, or half-life for zero, first, and second order reactions.</p>
+
+  <div class="calc-card">
+    <div style="margin-bottom:16px;">
+      <label style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);display:block;margin-bottom:10px;">Reaction Order</label>
+      <div class="solve-btns" id="orderBtns">
+        <button class="active" data-order="0" onclick="setOrder(0)">Zero Order</button>
+        <button data-order="1" onclick="setOrder(1)">First Order</button>
+        <button data-order="2" onclick="setOrder(2)">Second Order</button>
+      </div>
+    </div>
+
+    <div class="formula-bar" id="formulaDisplay"></div>
+
+    <div class="fields">
+      <div class="field">
+        <label>[A]₀ — Initial Concentration <span class="unit">M</span></label>
+        <input type="number" id="A0" step="any" placeholder="e.g. 0.50" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>[A]ₜ — Concentration at Time t <span class="unit">M</span></label>
+        <input type="number" id="At" step="any" placeholder="e.g. 0.25" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>k — Rate Constant</label>
+        <input type="number" id="k" step="any" placeholder="e.g. 0.015" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>t — Time</label>
+        <input type="number" id="t" step="any" placeholder="e.g. 100" oninput="calc()">
+      </div>
+    </div>
+
+    <div class="solve-for" style="margin-top:16px;">
+      <label>Solve for</label>
+      <div class="solve-btns" id="solveBtns">
+        <button class="active" data-target="At" onclick="setSolve('At')">[ A ]ₜ</button>
+        <button data-target="t" onclick="setSolve('t')">Time (t)</button>
+        <button data-target="k" onclick="setSolve('k')">k</button>
+        <button data-target="A0" onclick="setSolve('A0')">[ A ]₀</button>
+      </div>
+    </div>
+
+    <div class="result-box" id="resultBox" style="margin-top:20px;">
+      <div class="result-label" id="resultLabel">Result</div>
+      <div class="result-value" id="resultValue">—</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;">
+      <div style="padding:16px;border-radius:10px;background:var(--accent-glow);border:1px solid var(--accent-border);text-align:center;">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:4px;font-weight:600;">Half-Life (t½)</div>
+        <div id="halfLife" style="font-family:var(--font-mono);font-size:18px;font-weight:600;color:var(--accent);">—</div>
+      </div>
+      <div style="padding:16px;border-radius:10px;background:var(--accent-glow);border:1px solid var(--accent-border);text-align:center;">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:4px;font-weight:600;">k Units</div>
+        <div id="kUnits" style="font-family:var(--font-mono);font-size:18px;font-weight:600;color:var(--accent);">—</div>
+      </div>
+    </div>
+
+    <div class="note-box" id="noteBox"></div>
+  </div>
+
+  <div class="ad-slot" id="ad-mid"></div>
+
+  <div class="info-section">
+    <h2>How to Use This Calculator</h2>
+    <p>Select the reaction order, enter three of the four variables ([A]₀, [A]ₜ, k, t), and choose which to solve for. The calculator also shows the half-life and appropriate units for k.</p>
+
+    <h2>The Math Behind It</h2>
+    <p><strong>Zero order:</strong> [A]ₜ = [A]₀ − kt. Rate is constant and independent of concentration. Half-life: t½ = [A]₀/(2k). k units: M/time.</p>
+    <p><strong>First order:</strong> ln([A]ₜ) = ln([A]₀) − kt, or equivalently [A]ₜ = [A]₀ × e⁻ᵏᵗ. Rate depends linearly on concentration. Half-life: t½ = ln(2)/k = 0.693/k (independent of concentration). k units: 1/time.</p>
+    <p><strong>Second order:</strong> 1/[A]ₜ = 1/[A]₀ + kt. Rate depends on concentration squared. Half-life: t½ = 1/(k[A]₀). k units: 1/(M·time).</p>
+    <p><strong>How to determine order experimentally:</strong> Plot [A] vs t (linear = zero order), ln[A] vs t (linear = first order), or 1/[A] vs t (linear = second order). The plot that gives a straight line reveals the order, and the slope gives k.</p>
+  </div>
+
+  <div class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a class="related-card" href="arrhenius-equation-calculator.html"><h3>Arrhenius Equation</h3><p>k vs temperature and activation energy.</p></a>
+      <a class="related-card" href="gibbs-free-energy-calculator.html"><h3>Gibbs Free Energy</h3><p>ΔG = ΔH − TΔS thermodynamics.</p></a>
+      <a class="related-card" href="ideal-gas-law-calculator.html"><h3>Ideal Gas Law</h3><p>PV = nRT with flexible units.</p></a>
+    </div>
+  </div>
+</div>
+
+<div class="ad-slot" id="ad-bot"></div>
+<footer class="site-footer"><a href="../">← Back to all categories</a> · © 2026 LabCalcs</footer>
+
+<script>LC = window.LC || {}; LC.basePath = '..';</script>
+<script src="../js/analytics.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() { buildBreadcrumb('physical', 'Rate Law Calculator'); });
+
+var order = 1;
+var solveFor = 'At';
+var formulas = {
+  0: '[A]ₜ = [A]₀ − kt',
+  1: 'ln([A]ₜ) = ln([A]₀) − kt &nbsp;→&nbsp; [A]ₜ = [A]₀ × e⁻ᵏᵗ',
+  2: '1/[A]ₜ = 1/[A]₀ + kt'
+};
+var kUnitLabels = {0:'M/time', 1:'1/time (s⁻¹)', 2:'1/(M·time)'};
+
+function setOrder(o) {
+  order = o;
+  document.querySelectorAll('#orderBtns button').forEach(function(b){b.classList.toggle('active',parseInt(b.dataset.order)===o);});
+  document.getElementById('formulaDisplay').innerHTML = '<em>'+formulas[o]+'</em>';
+  document.getElementById('kUnits').textContent = kUnitLabels[o];
+  calc();
+}
+
+function setSolve(t) {
+  solveFor = t;
+  document.querySelectorAll('#solveBtns button').forEach(function(b){b.classList.toggle('active',b.dataset.target===t);});
+  ['A0','At','k','t'].forEach(function(id){document.getElementById(id).disabled=(id===t);});
+  document.getElementById(t).value='';
+  calc();
+}
+
+function fmt(v){if(v==null||isNaN(v)||!isFinite(v))return null;if(v===0)return'0';if(Math.abs(v)>=0.0001&&Math.abs(v)<1e7)return parseFloat(v.toPrecision(5)).toString();return v.toExponential(4);}
+
+function calc() {
+  var A0=parseFloat(document.getElementById('A0').value);
+  var At=parseFloat(document.getElementById('At').value);
+  var k=parseFloat(document.getElementById('k').value);
+  var t=parseFloat(document.getElementById('t').value);
+  var box=document.getElementById('resultBox');
+  var note=document.getElementById('noteBox');note.classList.remove('visible');
+  var result=null,label='',unit='';
+
+  if(order===0){
+    switch(solveFor){
+      case'At':if(!isNaN(A0)&&!isNaN(k)&&!isNaN(t)){result=A0-k*t;label='[A]ₜ';unit='M';}break;
+      case't':if(!isNaN(A0)&&!isNaN(At)&&!isNaN(k)&&k!==0){result=(A0-At)/k;label='Time';unit='';}break;
+      case'k':if(!isNaN(A0)&&!isNaN(At)&&!isNaN(t)&&t!==0){result=(A0-At)/t;label='k';unit='M/time';}break;
+      case'A0':if(!isNaN(At)&&!isNaN(k)&&!isNaN(t)){result=At+k*t;label='[A]₀';unit='M';}break;
+    }
+    if(!isNaN(A0)&&!isNaN(k)&&k>0){document.getElementById('halfLife').textContent=fmt(A0/(2*k));}else{document.getElementById('halfLife').textContent='—';}
+  } else if(order===1){
+    switch(solveFor){
+      case'At':if(!isNaN(A0)&&!isNaN(k)&&!isNaN(t)){result=A0*Math.exp(-k*t);label='[A]ₜ';unit='M';}break;
+      case't':if(!isNaN(A0)&&!isNaN(At)&&!isNaN(k)&&k!==0&&A0>0&&At>0){result=Math.log(A0/At)/k;label='Time';unit='';}break;
+      case'k':if(!isNaN(A0)&&!isNaN(At)&&!isNaN(t)&&t!==0&&A0>0&&At>0){result=Math.log(A0/At)/t;label='k';unit='s⁻¹';}break;
+      case'A0':if(!isNaN(At)&&!isNaN(k)&&!isNaN(t)){result=At*Math.exp(k*t);label='[A]₀';unit='M';}break;
+    }
+    if(!isNaN(k)&&k>0){document.getElementById('halfLife').textContent=fmt(0.693/k);}else{document.getElementById('halfLife').textContent='—';}
+  } else {
+    switch(solveFor){
+      case'At':if(!isNaN(A0)&&!isNaN(k)&&!isNaN(t)&&A0!==0){var inv=1/A0+k*t;result=inv>0?1/inv:null;label='[A]ₜ';unit='M';}break;
+      case't':if(!isNaN(A0)&&!isNaN(At)&&!isNaN(k)&&k!==0&&A0!==0&&At!==0){result=(1/At-1/A0)/k;label='Time';unit='';}break;
+      case'k':if(!isNaN(A0)&&!isNaN(At)&&!isNaN(t)&&t!==0&&A0!==0&&At!==0){result=(1/At-1/A0)/t;label='k';unit='M⁻¹time⁻¹';}break;
+      case'A0':if(!isNaN(At)&&!isNaN(k)&&!isNaN(t)&&At!==0){var inv=1/At-k*t;result=inv>0?1/inv:null;label='[A]₀';unit='M';}break;
+    }
+    if(!isNaN(A0)&&!isNaN(k)&&k>0&&A0>0){document.getElementById('halfLife').textContent=fmt(1/(k*A0));}else{document.getElementById('halfLife').textContent='—';}
+  }
+
+  var f=fmt(result);
+  if(f!==null){
+    document.getElementById('resultLabel').textContent=label;
+    document.getElementById('resultValue').innerHTML=f+'<span class="result-unit">'+unit+'</span>';
+    box.classList.add('visible');
+    document.getElementById(solveFor).value=f;
+    if(solveFor==='At'&&result<0){note.textContent='⚠ Negative concentration — the reaction would have completed before time t. Check your inputs.';note.classList.add('visible');}
+  }else{box.classList.remove('visible');}
+}
+
+setOrder(1);
+setSolve('At');
+</script>
+</body>
+</html>

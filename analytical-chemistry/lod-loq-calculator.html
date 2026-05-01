@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LOD/LOQ Calculator — LabCalcs</title>
+<meta name="description" content="Free LOD and LOQ calculator. Estimate limits of detection and quantitation from calibration curve data using standard deviation of response and slope methods (ICH guidelines).">
+<link rel="canonical" href="https://labcalcs.github.io/analytical-chemistry/lod-loq-calculator.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="cat-analytical">
+<div class="grain"></div>
+<nav class="site-nav" id="site-nav"></nav>
+<div class="breadcrumb" id="breadcrumb"></div>
+<div class="ad-slot" id="ad-top"></div>
+
+<div class="container">
+  <h1 class="page-title">LOD / LOQ Calculator</h1>
+  <p class="page-subtitle">Estimate limits of detection and quantitation using ICH-recommended methods.</p>
+
+  <div class="calc-card">
+    <div class="tabs" id="modeTabs">
+      <button class="active" onclick="setMode('sd')">From σ and Slope</button>
+      <button onclick="setMode('sn')">From Signal-to-Noise</button>
+    </div>
+
+    <div id="sdMode">
+      <div class="formula-bar"><em>LOD</em> = 3.3 × <em>σ</em> / <em>S</em> &nbsp;&nbsp;|&nbsp;&nbsp; <em>LOQ</em> = 10 × <em>σ</em> / <em>S</em></div>
+      <div class="fields">
+        <div class="field">
+          <label>σ — Standard Deviation of Response</label>
+          <input type="number" id="sigma" step="any" placeholder="e.g. 0.0025" oninput="calcSD()">
+        </div>
+        <div class="field">
+          <label>S — Slope of Calibration Curve</label>
+          <input type="number" id="slope" step="any" placeholder="e.g. 1250" oninput="calcSD()">
+        </div>
+      </div>
+      <div style="margin-top:12px;padding:12px 16px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid var(--border);font-size:12px;color:var(--text-dim);line-height:1.7;">
+        <strong style="color:var(--text);">How to get σ:</strong> Use the standard deviation of the y-intercepts from multiple calibration curves, the standard deviation of residuals from a single regression, or the standard deviation of blank responses (n ≥ 7).
+      </div>
+    </div>
+
+    <div id="snMode" style="display:none;">
+      <div class="formula-bar"><em>LOD</em>: S/N = 3 &nbsp;&nbsp;|&nbsp;&nbsp; <em>LOQ</em>: S/N = 10</div>
+      <div class="fields">
+        <div class="field">
+          <label>Known Concentration <span class="unit">(same units as LOD/LOQ)</span></label>
+          <input type="number" id="knownConc" step="any" placeholder="e.g. 50" oninput="calcSN()">
+        </div>
+        <div class="field">
+          <label>Measured S/N at that Concentration</label>
+          <input type="number" id="measuredSN" step="any" placeholder="e.g. 45" oninput="calcSN()">
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px;">
+      <div style="padding:20px;border-radius:10px;background:var(--accent-glow);border:1px solid var(--accent-border);text-align:center;">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:6px;font-weight:600;">LOD (3.3σ/S or S/N=3)</div>
+        <div id="lodResult" style="font-family:var(--font-mono);font-size:24px;font-weight:600;color:var(--accent);">—</div>
+      </div>
+      <div style="padding:20px;border-radius:10px;background:var(--accent-glow);border:1px solid var(--accent-border);text-align:center;">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:6px;font-weight:600;">LOQ (10σ/S or S/N=10)</div>
+        <div id="loqResult" style="font-family:var(--font-mono);font-size:24px;font-weight:600;color:var(--accent);">—</div>
+      </div>
+    </div>
+
+    <div class="note-box" id="noteBox"></div>
+  </div>
+
+  <div class="ad-slot" id="ad-mid"></div>
+
+  <div class="info-section">
+    <h2>How to Use This Calculator</h2>
+    <p><strong>σ and Slope method (ICH Q2):</strong> Enter the standard deviation of the response (σ) and the slope (S) of your calibration curve. σ can come from the standard deviation of y-intercepts of multiple calibrations, residual standard deviation of the regression, or replicate blank measurements.</p>
+    <p><strong>Signal-to-Noise method:</strong> Measure the S/N ratio at a known low concentration. The calculator extrapolates to find the concentration that would give S/N = 3 (LOD) and S/N = 10 (LOQ), assuming linear response.</p>
+
+    <h2>The Math Behind It</h2>
+    <p><strong>ICH method:</strong> LOD = 3.3σ/S and LOQ = 10σ/S, where σ is the standard deviation of the response and S is the slope of the calibration curve in the region near the detection limit.</p>
+    <p><strong>S/N method:</strong> LOD corresponds to S/N = 3:1 and LOQ to S/N = 10:1. If a standard at concentration C gives S/N = x, then LOD = C × 3/x and LOQ = C × 10/x (assuming linearity).</p>
+    <p><strong>Worked example:</strong> A calibration curve has slope = 1250 AU/(µg/mL) and residual standard deviation = 0.0025 AU. LOD = 3.3 × 0.0025/1250 = 6.6 × 10⁻⁶ µg/mL = 6.6 pg/mL. LOQ = 10 × 0.0025/1250 = 2.0 × 10⁻⁵ µg/mL = 20 pg/mL.</p>
+    <p><strong>Important:</strong> These are statistical estimates. Always verify experimentally by analyzing standards at the calculated LOD/LOQ concentrations and confirming acceptable precision (%RSD &lt; 20% for LOQ) and accuracy.</p>
+  </div>
+
+  <div class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a class="related-card" href="theoretical-plates-calculator.html"><h3>Theoretical Plates</h3><p>Column efficiency from peak data.</p></a>
+      <a class="related-card" href="resolution-calculator.html"><h3>Resolution Calculator</h3><p>Chromatographic resolution Rs.</p></a>
+      <a class="related-card" href="mass-accuracy-calculator.html"><h3>Mass Accuracy (ppm)</h3><p>ppm and Da error conversion.</p></a>
+    </div>
+  </div>
+</div>
+
+<div class="ad-slot" id="ad-bot"></div>
+<footer class="site-footer"><a href="../">← Back to all categories</a> · © 2026 LabCalcs</footer>
+
+<script>LC = window.LC || {}; LC.basePath = '..';</script>
+<script src="../js/analytics.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() { buildBreadcrumb('analytical', 'LOD/LOQ Calculator'); });
+
+function setMode(m) {
+  document.getElementById('sdMode').style.display = m==='sd'?'':'none';
+  document.getElementById('snMode').style.display = m==='sn'?'':'none';
+  document.querySelectorAll('#modeTabs button').forEach(function(b,i){b.classList.toggle('active',(i===0&&m==='sd')||(i===1&&m==='sn'));});
+  document.getElementById('lodResult').textContent='—';
+  document.getElementById('loqResult').textContent='—';
+}
+
+function fmt(v){if(v==null||isNaN(v)||!isFinite(v))return'—';if(v===0)return'0';if(Math.abs(v)>=0.001&&Math.abs(v)<1e6)return parseFloat(v.toPrecision(4)).toString();return v.toExponential(3);}
+
+function calcSD() {
+  var sigma=parseFloat(document.getElementById('sigma').value);
+  var slope=parseFloat(document.getElementById('slope').value);
+  if(isNaN(sigma)||isNaN(slope)||slope===0){document.getElementById('lodResult').textContent='—';document.getElementById('loqResult').textContent='—';return;}
+  document.getElementById('lodResult').textContent=fmt(3.3*sigma/slope);
+  document.getElementById('loqResult').textContent=fmt(10*sigma/slope);
+}
+
+function calcSN() {
+  var conc=parseFloat(document.getElementById('knownConc').value);
+  var sn=parseFloat(document.getElementById('measuredSN').value);
+  if(isNaN(conc)||isNaN(sn)||sn===0){document.getElementById('lodResult').textContent='—';document.getElementById('loqResult').textContent='—';return;}
+  document.getElementById('lodResult').textContent=fmt(conc*3/sn);
+  document.getElementById('loqResult').textContent=fmt(conc*10/sn);
+}
+</script>
+</body>
+</html>

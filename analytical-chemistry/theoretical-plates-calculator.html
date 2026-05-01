@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Theoretical Plates Calculator (Column Efficiency) — LabCalcs</title>
+<meta name="description" content="Free theoretical plates calculator. Calculate column efficiency (N), HETP, and plate height from retention time and peak width. Supports half-height and tangent methods.">
+<link rel="canonical" href="https://labcalcs.github.io/analytical-chemistry/theoretical-plates-calculator.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="cat-analytical">
+<div class="grain"></div>
+<nav class="site-nav" id="site-nav"></nav>
+<div class="breadcrumb" id="breadcrumb"></div>
+<div class="ad-slot" id="ad-top"></div>
+
+<div class="container">
+  <h1 class="page-title">Theoretical Plates Calculator</h1>
+  <p class="page-subtitle">Calculate column efficiency (N), HETP, and reduced plate height from chromatographic peak data.</p>
+
+  <div class="calc-card">
+    <div class="tabs" id="modeTabs">
+      <button class="active" onclick="setMode('halfheight')">Half-Height Method</button>
+      <button onclick="setMode('tangent')">Tangent (Base Width) Method</button>
+    </div>
+
+    <div id="halfheightMode">
+      <div class="formula-bar"><em>N</em> = 5.545 × ( <em>t</em><sub>R</sub> / <em>W</em><sub>½</sub> )²</div>
+      <div class="fields">
+        <div class="field">
+          <label>Retention Time (t<sub>R</sub>) <span class="unit">min</span></label>
+          <input type="number" id="tR_hh" step="any" placeholder="e.g. 8.5" oninput="calcHH()">
+        </div>
+        <div class="field">
+          <label>Peak Width at Half Height (W<sub>½</sub>) <span class="unit">min</span></label>
+          <input type="number" id="whh" step="any" placeholder="e.g. 0.12" oninput="calcHH()">
+        </div>
+      </div>
+    </div>
+
+    <div id="tangentMode" style="display:none;">
+      <div class="formula-bar"><em>N</em> = 16 × ( <em>t</em><sub>R</sub> / <em>W</em><sub>b</sub> )²</div>
+      <div class="fields">
+        <div class="field">
+          <label>Retention Time (t<sub>R</sub>) <span class="unit">min</span></label>
+          <input type="number" id="tR_tan" step="any" placeholder="e.g. 8.5" oninput="calcTan()">
+        </div>
+        <div class="field">
+          <label>Peak Width at Base (W<sub>b</sub>) <span class="unit">min</span></label>
+          <input type="number" id="wb" step="any" placeholder="e.g. 0.28" oninput="calcTan()">
+        </div>
+      </div>
+    </div>
+
+    <div class="fields" style="margin-top:16px;">
+      <div class="field">
+        <label>Column Length <span class="unit">mm (optional, for HETP)</span></label>
+        <input type="number" id="colLen" step="any" placeholder="e.g. 150" oninput="calcAll()">
+      </div>
+      <div class="field">
+        <label>Particle Size <span class="unit">µm (optional, for reduced h)</span></label>
+        <input type="number" id="dp" step="any" placeholder="e.g. 3" oninput="calcAll()">
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:20px;">
+      <div style="padding:16px;border-radius:10px;background:var(--accent-glow);border:1px solid var(--accent-border);text-align:center;">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:4px;font-weight:600;">Plate Count (N)</div>
+        <div id="nResult" style="font-family:var(--font-mono);font-size:22px;font-weight:600;color:var(--accent);">—</div>
+      </div>
+      <div style="padding:16px;border-radius:10px;background:var(--accent-glow);border:1px solid var(--accent-border);text-align:center;">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:4px;font-weight:600;">HETP (H)</div>
+        <div id="hetpResult" style="font-family:var(--font-mono);font-size:22px;font-weight:600;color:var(--accent);">—</div>
+      </div>
+      <div style="padding:16px;border-radius:10px;background:var(--accent-glow);border:1px solid var(--accent-border);text-align:center;">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:4px;font-weight:600;">Reduced h (H/dp)</div>
+        <div id="reducedH" style="font-family:var(--font-mono);font-size:22px;font-weight:600;color:var(--accent);">—</div>
+      </div>
+    </div>
+
+    <div class="note-box" id="noteBox"></div>
+
+    <div style="margin-top:20px;padding:14px 16px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid var(--border);font-size:13px;color:var(--text-dim);line-height:1.7;">
+      <span style="font-family:var(--font-mono);font-size:11px;color:var(--accent);margin-right:6px;">BENCHMARKS</span>
+      <strong style="color:var(--text);">Good HPLC column:</strong> N &gt; 10,000 per 150 mm &nbsp;|&nbsp;
+      <strong style="color:var(--text);">Reduced h:</strong> 2–3 is excellent, &gt;5 suggests problems &nbsp;|&nbsp;
+      <strong style="color:var(--text);">N/m:</strong> Modern C18 columns achieve 80,000–100,000 N/m
+    </div>
+  </div>
+
+  <div class="ad-slot" id="ad-mid"></div>
+
+  <div class="info-section">
+    <h2>How to Use This Calculator</h2>
+    <p>Choose the half-height or tangent method depending on which peak width measurement you have. Half-height is more commonly used and more reliable for asymmetric peaks. Enter the retention time and peak width in the same time units (both in minutes or both in seconds). Optionally enter column length and particle size to get HETP and reduced plate height.</p>
+
+    <h2>The Math Behind It</h2>
+    <p><strong>Half-height method:</strong> N = 5.545 × (tR / W½)². This uses the peak width measured at 50% of peak height, which is easier to measure accurately than base width.</p>
+    <p><strong>Tangent method:</strong> N = 16 × (tR / Wb)². This uses the peak width at the base, determined by drawing tangent lines on the peak inflection points. Both methods give identical results for perfectly Gaussian peaks.</p>
+    <p><strong>HETP (Height Equivalent to a Theoretical Plate):</strong> H = L / N, where L is column length. Lower H means better efficiency. For a 150 mm column with 15,000 plates: H = 150/15000 = 0.010 mm = 10 µm.</p>
+    <p><strong>Reduced plate height:</strong> h = H / dp, where dp is particle diameter. This normalizes for particle size, allowing comparison across different columns. A reduced plate height of 2–3 indicates well-packed columns operating near optimum.</p>
+    <p><strong>Troubleshooting:</strong> Decreasing plate count over time suggests column degradation (voiding, contamination, or frit blockage). Sudden drops usually indicate a void forming at the column head.</p>
+  </div>
+
+  <div class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a class="related-card" href="mass-accuracy-calculator.html"><h3>Mass Accuracy (ppm)</h3><p>Convert between ppm and Da error.</p></a>
+      <a class="related-card" href="../spectroscopy/beer-lambert-calculator.html"><h3>Beer-Lambert Calculator</h3><p>A = εlc for spectroscopy.</p></a>
+      <a class="related-card" href="../general-lab/unit-converter.html"><h3>Unit Converter</h3><p>Convert between scientific units.</p></a>
+    </div>
+  </div>
+</div>
+
+<div class="ad-slot" id="ad-bot"></div>
+<footer class="site-footer"><a href="../">← Back to all categories</a> · © 2026 LabCalcs</footer>
+
+<script>LC = window.LC || {}; LC.basePath = '..';</script>
+<script src="../js/analytics.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() { buildBreadcrumb('analytical', 'Theoretical Plates Calculator'); });
+
+var currentN = null;
+
+function setMode(m) {
+  document.getElementById('halfheightMode').style.display = m==='halfheight'?'':'none';
+  document.getElementById('tangentMode').style.display = m==='tangent'?'':'none';
+  document.querySelectorAll('#modeTabs button').forEach(function(b,i){b.classList.toggle('active',(i===0&&m==='halfheight')||(i===1&&m==='tangent'));});
+}
+
+function fmt(v) { if(v==null||isNaN(v)||!isFinite(v))return'—'; if(v===0)return'0'; if(v>=1000)return Math.round(v).toLocaleString(); if(v>=0.001)return parseFloat(v.toPrecision(4)).toString(); return v.toExponential(3); }
+
+function calcHH() {
+  var tR = parseFloat(document.getElementById('tR_hh').value);
+  var w = parseFloat(document.getElementById('whh').value);
+  if(!isNaN(tR)&&!isNaN(w)&&w>0) { currentN = 5.545 * Math.pow(tR/w, 2); }
+  else { currentN = null; }
+  updateResults();
+}
+
+function calcTan() {
+  var tR = parseFloat(document.getElementById('tR_tan').value);
+  var w = parseFloat(document.getElementById('wb').value);
+  if(!isNaN(tR)&&!isNaN(w)&&w>0) { currentN = 16 * Math.pow(tR/w, 2); }
+  else { currentN = null; }
+  updateResults();
+}
+
+function calcAll() { if(document.getElementById('halfheightMode').style.display!=='none')calcHH();else calcTan(); }
+
+function updateResults() {
+  var colLen = parseFloat(document.getElementById('colLen').value);
+  var dp = parseFloat(document.getElementById('dp').value);
+  var note = document.getElementById('noteBox'); note.classList.remove('visible');
+
+  document.getElementById('nResult').textContent = fmt(currentN);
+
+  if (currentN !== null && !isNaN(colLen) && colLen > 0) {
+    var hetp = colLen / currentN; // mm
+    document.getElementById('hetpResult').textContent = fmt(hetp*1000) + ' µm';
+
+    if (!isNaN(dp) && dp > 0) {
+      var h = (hetp * 1000) / dp; // reduced (both in µm)
+      document.getElementById('reducedH').textContent = fmt(h);
+
+      if (h > 5) { note.innerHTML = '⚠ Reduced plate height > 5 — column may be poorly packed, degraded, or operating far from optimum flow rate.'; note.classList.add('visible'); }
+      else if (h <= 3) { note.innerHTML = '✓ Reduced plate height ≤ 3 — excellent column performance.'; note.style.color='var(--accent)';note.style.background='var(--accent-glow)';note.style.borderColor='var(--accent-border)'; note.classList.add('visible'); }
+    } else {
+      document.getElementById('reducedH').textContent = '—';
+    }
+
+    // Also check N/m
+    var nPerM = currentN / (colLen/1000);
+    if (nPerM < 50000 && currentN !== null) {
+      if(!note.classList.contains('visible')) {
+        note.innerHTML = 'N/m = ' + fmt(nPerM) + '. Modern HPLC columns typically achieve 60,000–100,000 N/m.';
+        note.style.color='#fbbf24';note.style.background='rgba(251,191,36,0.08)';note.style.borderColor='rgba(251,191,36,0.2)';
+        note.classList.add('visible');
+      }
+    }
+  } else {
+    document.getElementById('hetpResult').textContent = '—';
+    document.getElementById('reducedH').textContent = '—';
+  }
+}
+</script>
+</body>
+</html>

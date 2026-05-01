@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Primer Tm Calculator — LabCalcs</title>
+<meta name="description" content="Free primer melting temperature (Tm) calculator. Calculate Tm using basic, salt-adjusted, and nearest-neighbor methods. Supports GC content and primer analysis.">
+<link rel="canonical" href="https://labcalcs.github.io/biology-biochemistry/primer-tm-calculator.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="cat-biology">
+<div class="grain"></div>
+<nav class="site-nav" id="site-nav"></nav>
+<div class="breadcrumb" id="breadcrumb"></div>
+<div class="ad-slot" id="ad-top"></div>
+
+<div class="container">
+  <h1 class="page-title">Primer Tm Calculator</h1>
+  <p class="page-subtitle">Calculate melting temperature using basic, salt-adjusted, and nearest-neighbor thermodynamic methods.</p>
+
+  <div class="calc-card">
+    <div class="fields" style="margin-bottom:16px;">
+      <div class="field full">
+        <label>Primer Sequence <span class="unit">(5′ → 3′, DNA only)</span></label>
+        <input type="text" id="seq" placeholder="e.g. ATGCGATCGATCGATCG" oninput="calc()" autocomplete="off" style="font-family:var(--font-mono);font-size:18px;letter-spacing:1px;text-transform:uppercase;">
+      </div>
+    </div>
+
+    <div class="fields" style="margin-bottom:16px;">
+      <div class="field">
+        <label>Na⁺ Concentration <span class="unit">mM</span></label>
+        <input type="number" id="naConc" step="any" value="50" placeholder="50" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Primer Concentration <span class="unit">nM</span></label>
+        <input type="number" id="primerConc" step="any" value="250" placeholder="250" oninput="calc()">
+      </div>
+    </div>
+
+    <div id="resultArea" style="display:none;">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;">
+        <div style="padding:16px;border-radius:10px;background:var(--accent-glow);border:1px solid var(--accent-border);text-align:center;">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:4px;font-weight:600;">Basic (Wallace)</div>
+          <div id="tmBasic" style="font-family:var(--font-mono);font-size:22px;font-weight:600;color:var(--accent);">—</div>
+        </div>
+        <div style="padding:16px;border-radius:10px;background:var(--accent-glow);border:1px solid var(--accent-border);text-align:center;">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:4px;font-weight:600;">Salt-Adjusted</div>
+          <div id="tmSalt" style="font-family:var(--font-mono);font-size:22px;font-weight:600;color:var(--accent);">—</div>
+        </div>
+        <div style="padding:16px;border-radius:10px;background:var(--accent-glow);border:1px solid var(--accent-border);text-align:center;">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:4px;font-weight:600;">Nearest-Neighbor</div>
+          <div id="tmNN" style="font-family:var(--font-mono);font-size:22px;font-weight:600;color:var(--accent);">—</div>
+        </div>
+      </div>
+
+      <div style="padding:16px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid var(--border);font-size:13px;color:var(--text-dim);line-height:1.8;font-family:var(--font-mono);">
+        <div id="seqStats"></div>
+      </div>
+    </div>
+
+    <div class="note-box" id="noteBox"></div>
+  </div>
+
+  <div class="ad-slot" id="ad-mid"></div>
+
+  <div class="info-section">
+    <h2>How to Use This Calculator</h2>
+    <p>Paste or type your primer sequence (5′ to 3′, DNA bases A/T/G/C only). The calculator provides three Tm estimates: the basic Wallace rule (good for short primers &lt;20 nt), the salt-adjusted method (accounts for ionic strength), and the nearest-neighbor thermodynamic method (most accurate, especially for primers 15–30 nt).</p>
+    <p>For PCR, design primer pairs with Tm values within 2–3°C of each other, and set your annealing temperature 3–5°C below the lower Tm.</p>
+
+    <h2>The Math Behind It</h2>
+    <p><strong>Basic (Wallace rule):</strong> Tm = 2(A+T) + 4(G+C). Simple count-based formula, only reliable for primers 14–20 nt with ~50% GC content.</p>
+    <p><strong>Salt-adjusted:</strong> Tm = 100.5 + (41 × GC fraction) − (820/length) + 16.6 × log₁₀([Na⁺]). Accounts for primer length and salt concentration.</p>
+    <p><strong>Nearest-neighbor (SantaLucia 1998):</strong> Uses thermodynamic parameters (ΔH and ΔS) for each pair of adjacent bases. Most accurate for primers 15–30 nt. Formula: Tm = (ΔH / (ΔS + R × ln(Ct/4))) − 273.15 + 16.6 × log₁₀([Na⁺]).</p>
+    <p><strong>GC content:</strong> Ideal primer GC content is 40–60%. Primers outside this range may have poor specificity (too low) or strong secondary structures (too high). The 3′ end should ideally have 1–2 G/C bases (a "GC clamp") for efficient extension.</p>
+  </div>
+
+  <div class="related-tools">
+    <h2>Related Tools</h2>
+    <div class="related-grid">
+      <a class="related-card" href="pcr-master-mix-calculator.html"><h3>PCR Master Mix</h3><p>Scale PCR reactions with overage.</p></a>
+      <a class="related-card" href="dna-rna-concentration.html"><h3>DNA/RNA Concentration</h3><p>A260 concentration and purity.</p></a>
+      <a class="related-card" href="../general-lab/dilution-calculator.html"><h3>Dilution Calculator</h3><p>C₁V₁ = C₂V₂ with flexible units.</p></a>
+    </div>
+  </div>
+</div>
+
+<div class="ad-slot" id="ad-bot"></div>
+<footer class="site-footer"><a href="../">← Back to all categories</a> · © 2026 LabCalcs</footer>
+
+<script>LC = window.LC || {}; LC.basePath = '..';</script>
+<script src="../js/analytics.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() { buildBreadcrumb('biology', 'Primer Tm Calculator'); });
+
+// Nearest-neighbor parameters (SantaLucia 1998, unified)
+// ΔH in cal/mol, ΔS in cal/(mol·K)
+var nnH = {AA:-7900,AT:-7200,TA:-7200,CA:-8500,GT:-8400,CT:-7800,GA:-8200,CG:-10600,GC:-9800,GG:-8000,
+            TT:-7900,AC:-8400,TG:-8500,TC:-8200,AG:-7800,CC:-8000,
+            // Complements
+            };
+var nnS = {AA:-22.2,AT:-20.4,TA:-21.3,CA:-22.7,GT:-22.4,CT:-21.0,GA:-22.2,CG:-27.2,GC:-24.4,GG:-19.9,
+            TT:-22.2,AC:-22.4,TG:-22.7,TC:-22.2,AG:-21.0,CC:-19.9,
+            };
+// Initiation parameters
+var initH = {A:2300,T:2300,G:100,C:100};
+var initS = {A:4.1,T:4.1,G:-2.8,C:-2.8};
+
+var R = 1.987; // cal/(mol·K)
+
+function calc() {
+  var seq = document.getElementById('seq').value.trim().toUpperCase().replace(/[^ATGC]/g,'');
+  var naConc = parseFloat(document.getElementById('naConc').value) || 50;
+  var primerConc = parseFloat(document.getElementById('primerConc').value) || 250;
+  var area = document.getElementById('resultArea');
+  var note = document.getElementById('noteBox'); note.classList.remove('visible');
+
+  if (seq.length < 8) { area.style.display='none'; return; }
+
+  var nA=0,nT=0,nG=0,nC=0;
+  for(var i=0;i<seq.length;i++){
+    if(seq[i]==='A')nA++;else if(seq[i]==='T')nT++;else if(seq[i]==='G')nG++;else if(seq[i]==='C')nC++;
+  }
+  var len = seq.length;
+  var gc = (nG+nC)/len;
+  var naMolar = naConc / 1000;
+  var ctMolar = primerConc * 1e-9;
+
+  // Basic (Wallace)
+  var tmBasic = 2*(nA+nT) + 4*(nG+nC);
+
+  // Salt-adjusted
+  var tmSalt = 100.5 + 41*gc - 820/len + 16.6*Math.log10(naMolar);
+
+  // Nearest-neighbor
+  var dH = 0, dS = 0;
+  for(var i=0;i<len-1;i++){
+    var pair = seq[i]+seq[i+1];
+    if(nnH[pair]!==undefined){dH+=nnH[pair];dS+=nnS[pair];}
+    else{dH+=-8000;dS+=-21.5;} // fallback average
+  }
+  // Add initiation
+  dH += initH[seq[0]] + initH[seq[len-1]];
+  dS += initS[seq[0]] + initS[seq[len-1]];
+
+  var tmNN = (dH / (dS + R * Math.log(ctMolar/4))) - 273.15;
+  // Salt correction for NN
+  tmNN += 16.6 * Math.log10(naMolar);
+
+  document.getElementById('tmBasic').textContent = tmBasic.toFixed(1) + '°C';
+  document.getElementById('tmSalt').textContent = tmSalt.toFixed(1) + '°C';
+  document.getElementById('tmNN').textContent = tmNN.toFixed(1) + '°C';
+
+  // Stats
+  var gcClamp = (seq[len-1]==='G'||seq[len-1]==='C') ? 'Yes' : 'No';
+  var last3 = seq.slice(-3);
+  var gc3 = (last3.split('').filter(function(b){return b==='G'||b==='C';}).length);
+
+  document.getElementById('seqStats').innerHTML =
+    '<strong style="color:var(--text);">Length:</strong> ' + len + ' nt &nbsp;&nbsp;|&nbsp;&nbsp;' +
+    '<strong style="color:var(--text);">GC Content:</strong> ' + (gc*100).toFixed(1) + '% &nbsp;&nbsp;|&nbsp;&nbsp;' +
+    '<strong style="color:var(--text);">3\u2032 GC Clamp:</strong> ' + gcClamp + ' (' + gc3 + '/3 last bases are G/C)<br>' +
+    '<strong style="color:var(--text);">Composition:</strong> A=' + nA + ' T=' + nT + ' G=' + nG + ' C=' + nC +
+    '<br><strong style="color:var(--text);">MW (approx):</strong> ' + (len*330).toLocaleString() + ' Da' +
+    ' &nbsp;&nbsp;|&nbsp;&nbsp;<strong style="color:var(--text);">ε₂₆₀ (approx):</strong> ' + (nA*15400+nT*8700+nG*11500+nC*7400).toLocaleString() + ' M\u207B\u00B9cm\u207B\u00B9';
+
+  area.style.display = '';
+
+  // Warnings
+  var warnings = [];
+  if (gc < 0.4) warnings.push('GC content below 40% \u2014 primer may bind weakly.');
+  if (gc > 0.6) warnings.push('GC content above 60% \u2014 risk of secondary structures.');
+  if (len < 15) warnings.push('Primer shorter than 15 nt \u2014 may lack specificity.');
+  if (len > 30) warnings.push('Primer longer than 30 nt \u2014 consider shorter design.');
+  if (gc3 === 0) warnings.push('No GC clamp at 3\u2032 end \u2014 may reduce priming efficiency.');
+
+  if (warnings.length > 0) {
+    note.innerHTML = '\u26A0 ' + warnings.join('<br>\u26A0 ');
+    note.style.color='#fbbf24';note.style.background='rgba(251,191,36,0.08)';note.style.borderColor='rgba(251,191,36,0.2)';
+    note.classList.add('visible');
+  }
+}
+</script>
+</body>
+</html>
