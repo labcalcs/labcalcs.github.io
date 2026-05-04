@@ -170,7 +170,7 @@ function calc() {
       } else if (keys.length === 2 && elems['O'] === 2 && (elems['H'] === 2 || elems['Na'] === 2 || elems['K'] === 2 || elems['Ba'] === 1)) {
         // Check if it could be a peroxide
         var otherEl = keys.find(function(k){return k!=='O';});
-        var otherOx = fixedStates[otherEl];
+        var otherOx = fixedStates[otherEl] !== undefined ? fixedStates[otherEl] : states[otherEl];
         if (otherOx !== undefined) {
           var testOx = (charge - otherOx * elems[otherEl]) / elems['O'];
           if (Math.abs(testOx - (-1)) < 0.01) {
