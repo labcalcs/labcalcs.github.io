@@ -96,7 +96,7 @@ function buildNav() {
   });
 
   nav.innerHTML = `
-    <a class="nav-logo" href="${LC.basePath}/">Lab<span>Calcs</span></a>
+    <a class="nav-logo" href="${LC.basePath}/">Sharp<span>Calcs</span></a>
     <div class="nav-links">${linksHTML}</div>
     <div class="nav-search">
       <input type="text" placeholder="Search tools..." id="navSearchInput" autocomplete="off">
