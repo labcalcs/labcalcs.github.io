@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════
-   LabCalcs — Navigation & Tool Registry v1.0
+   SharpCalcs — Navigation & Tool Registry v1.0
    ═══════════════════════════════════════════════════ */
 
 const LC = window.LC || {};
